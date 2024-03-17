@@ -1,0 +1,180 @@
+*::before,*::after{
+    box-sizing: border-box;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.floating-label{
+    position: relative;
+}
+.floating-label > label {
+    position: absolute;
+    left: 20px;
+    top: -8px;
+    background-color: white;
+    padding: 0 10px;
+}
+
+/*    */
+.input__group{
+    position: relative;
+    --color-focus: #1e4bd1;
+    --color: rgba(19, 19, 21, 0.6);
+    --color-disabled: rgba(47, 60, 85, 0.18);
+}
+.input__underlined{
+    input{
+        width: 100%;
+        height: 2rem;
+        font-size: 1.0625rem;
+        padding-left: 0.875rem;
+        padding-top: 0.825rem;
+        padding-bottom: 0.5rem;
+        line-height: 147.6%;
+        border: none;
+        border-bottom: 0.125rem solid var(--color);
+    }
+    /* .select2-container--default .select2-selection--single{
+        width: 100%;
+        height: 3.5rem;
+        font-size: 1.0625rem;
+        padding-left: 0.875rem;
+        padding-top: 0.825rem;
+        padding-bottom: 0.5rem;
+        line-height: 147.6%;
+        border: none;
+        border-bottom: 0.125rem solid var(--color);
+        background-color: #fff;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 26px;
+        position: absolute;
+        top: 25%;
+        right: 1px;
+        width: 20px;
+    } */
+
+    textarea{
+        width: 100%;
+        height: 2rem;
+        font-size: 1.0625rem;
+        padding-left: 0.875rem;
+        padding-top: 0.825rem;
+        padding-bottom: 0.5rem;
+        line-height: 147.6%;
+        border: none;
+        border-bottom: 0.125rem solid var(--color);
+        resize: none;
+    }
+    input:focus, select:focus, textarea:focus{
+        outline: none;
+        border-color: var(--color-focus);
+    }
+    input:hover, select:hover, textarea:hover {
+        background: rgba(73, 133, 224, 0.12);
+        border-color: #121212;
+    }
+    input:disabled, select:disabled, textarea:disabled{
+        background: #eff1f2;
+        cursor: not-allowed;
+    }
+    .input__underlined--label{
+        position: absolute;
+        top: 0.9375rem;
+        left: 0.875rem;
+        line-height: 147.6%;
+        color: var(--color);
+        transition: top .2s;
+    }
+    .input__underlined--helper{
+        font-size: 0.9375rem;
+        color: var(--color);
+        letter-spacing: 0.0275rem;
+        margin: 0.125rem 0.875rem;
+    }
+    :where(input:focus,select:focus,input:valid,textarea:focus,textarea:valid) + .input__underlined--label{
+        top: 0;
+        font-size: 0.9375rem;
+        margin-bottom: 32px;
+    }
+    :is(input:focus,select:focus,textarea:focus) + .input__underlined--label {
+        color: var(--color-focus);
+    }
+    :is(input:disabled,select:disabled,textarea:disabled) + .input__underlined--label,
+    :is(input:disabled,select:disabled,textarea:disabled) ~ .input__underlined--helper{
+        color: var(--color-disabled);
+    }
+}
+
+.input__filled{
+    --color-focus: #1e4bd1;
+    --color: rgba(19, 19, 21, 0.6);
+    --color-disabled: rgba(47, 60, 85, 0.18);
+    
+    input{
+        width: 100%;
+        height: 2rem;
+        font-size: 1.0625rem;
+        padding-left: 0.875rem;
+        padding-top: 0.825rem;
+        padding-bottom: 0.5rem;
+        line-height: 147.6%;
+        border: none;
+        border-bottom: 0.125rem solid --color;
+        background: #eff1f2;
+    }
+    input:focus{
+        outline: none;
+        border-color: var(--color-focus);
+    }
+    input:hover {
+        background: rgba(73, 133, 224, 0.12);
+        border-color: #121212;
+    }
+    .input__filled--label{
+        position: absolute;
+        top: 0.9375rem;
+        left: 0.875rem;
+        line-height: 147.6%;
+        color: --color;
+        transition: top .2s;
+    }
+    .input__filled--helper{
+        font-size: 0.9375rem;
+        color: --color;
+        letter-spacing: 0.0275rem;
+        margin: 0.125rem 0.875rem;
+    }
+    :where(input:focus,input:valid) + .input__filled--label{
+        top: 0;
+        font-size: 0.9375rem;
+        margin-bottom: 32px;;
+    }
+    input:focus + .input__filled--label {
+        color: var(--color-focus);
+    }
+    input:disabled{
+        cursor: not-allowed;
+    }
+    input:disabled + .input__filled--label,
+    input:disabled ~ .input__filled--helper{
+        color: var(--color-disabled);
+    }
+}
