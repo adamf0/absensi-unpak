@@ -1,10 +1,11 @@
+import { MouseEventHandler } from "react";
 import { CutiModel } from "./CutiModel";
 
 interface UserProps {
     data: CutiModel,
-    toggleDialog: Function, 
-    boxRef: any, 
-    tooltipRef: any, 
+    toggleDialog: MouseEventHandler<HTMLSpanElement>,
+    boxRef: React.RefObject<HTMLSpanElement>,
+    tooltipRef: React.RefObject<HTMLDivElement>,
     styleDialog: any, 
     attributes: any
 }

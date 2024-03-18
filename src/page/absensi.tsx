@@ -3,7 +3,7 @@ import '../home.css'
 const Welcoming = lazy(() => import('../component/welcoming'));
 const Absent = lazy(() => import('../component/absent'));
 
-function Home() {
+function Absensi() {
     return (
         <Suspense fallback={<></>}>
             <div className="wrapper">
@@ -14,4 +14,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default Absensi;
