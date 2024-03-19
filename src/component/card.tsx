@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import '../home.css'
-import UserProps from './UserProps';
+import UserProps from '../model/UserProps';
 
 const Card: FC<UserProps> = ({ data, toggleDialog, boxRef, tooltipRef, styleDialog, attributes }): JSX.Element => {
     return <tr>

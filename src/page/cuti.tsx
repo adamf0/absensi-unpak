@@ -1,10 +1,10 @@
 import '../home.css'
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { usePopper } from 'react-popper';
-import { CutiModel } from '../component/CutiModel';
+import { CutiModel } from '../model/CutiModel';
 
-const Welcoming = lazy(() => import('../component/welcoming'));
-const Card = lazy(() => import('../component/card'));
+const Welcoming = lazy(() => import('../component/Welcoming'));
+const Card = lazy(() => import('../component/Card'));
 
 function Cuti() {
     const boxRef = useRef<HTMLDivElement>(null);

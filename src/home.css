@@ -236,16 +236,16 @@ body{
               box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.5);
               border-radius: 10px;
           }
-          li:is(.active):hover{
-              background-color: #002984;
-              color: white;
-          }
           li.disabled{
               opacity: .4;
           }
           li.now{
               border: 3px solid #002984;
           }
+          li:is(.active,.now):hover{
+            background-color: #002984;
+            color: white;
+        }
       }
   }
   .calendar-event{
