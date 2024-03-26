@@ -366,7 +366,9 @@ body{
               grid-template-columns: repeat(auto-fill, minmax(100%,1fr));
 
               :is(tr), :is(td) {
-                  display: block;
+                  /* display: block; */
+                  display: flex;
+                  flex-direction: column;
                   border: 0;
               }
 
@@ -451,7 +453,9 @@ body{
                   }
               }
               :is(td) .action-desktop{
-                  display: none;
+                  /* display: none; */
+                  display: flex;
+                  flex-wrap: wrap;
               }
           }
       }
@@ -466,6 +470,7 @@ body{
   font-size: 12px;
   border-radius: 3px;
   padding: 4px 8px;
+  width: fit-content;
 }
 
 .custom-badge.approved {
@@ -485,11 +490,12 @@ body{
 
 .pagination{
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 
   > * + *{
-    margin-left: 30px;
+    margin-left: 1.875rem;
   }
 
   p {

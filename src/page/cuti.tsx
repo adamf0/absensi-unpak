@@ -1,10 +1,11 @@
 import '../home.css'
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useReducer, useRef, useState } from 'react';
 import { usePopper } from 'react-popper';
 import { CutiModel } from '../model/CutiModel';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
+import { reducerCuti } from '../reducer/CutiReducer';
 
 const Welcoming = lazy(() => import('../component/Welcoming'));
 const TableComponent = lazy(() => import('../component/TableComponent'));
@@ -12,19 +13,13 @@ const ModalTambahCuti = lazy(() => import('../component/ModalTambahCuti'));
 const ModalUbahCuti = lazy(() => import('../component/ModalUbahCuti'));
 
 function Cuti() {
-    const boxRef = useRef<HTMLDivElement>(null);
-    const tooltipRef = useRef<HTMLDivElement>(null);
-    const { styles, attributes } = usePopper(boxRef.current, tooltipRef.current, {
-        modifiers: [{ name: 'offset', options: { offset: [10, 0] } }],
-    });
-
     const [totalData, setTotalData] = useState(0);
     const [totalPage, setTotalPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [start, setStart] = useState(0);
     const [end, setEnd] = useState(0);
-    const [listData, setListData] = useState<CutiModel[]>([]);
-
+    const [listData, dispatch] = useReducer(reducerCuti, []);
+    
     const loadTable = async (page=1) => {
         const requestOptions = {
             method: 'GET',
@@ -46,9 +41,10 @@ function Cuti() {
                             setTotalData(json.list.totalData) 
                             setTotalPage(json.list.totalPage)
                             setCurrentPage(json.list.currentPage)
-                            setListData(list);
+                            dispatch({ type: 'STORE_LIST', list });
                             setStart(json.list.startIndex || 1)
                             setEnd(json.list.endIndex)
+                            
                         }
                     })
                     .catch(error => {
@@ -60,41 +56,11 @@ function Cuti() {
                     })
     }
 
-    const toggleDialog = (index: number) => {
-        console.log(boxRef.current, tooltipRef.current, index)
-        setListData(prevListData => prevListData.map((data, i) => ({
-            ...data,
-            openDetail: i === index
-        })));
-    };
-
-    const handleOutsideClick = (event: any) => {
-        if (
-            boxRef.current &&
-            tooltipRef.current &&
-            !boxRef.current.contains(event.target) &&
-            !tooltipRef.current.contains(event.target)
-        ) {
-            setListData(prevListData => prevListData.map(data => ({
-                ...data,
-                openDetail: false
-            })));
-        }
-    };
-
     useEffect(() => {
         loadTable(currentPage)
 
         return () => {};
     }, [currentPage]);
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleOutsideClick);
-        return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-        };
-    }, [handleOutsideClick]);
-
     
     const handlePrevPage = () => {
         if (currentPage ?? 0 > 1) {
@@ -121,12 +87,12 @@ function Cuti() {
                     <div className="leave__content row-container spaceAroundRow">
                         <TableComponent
                             colums={["Tanggal","Lama","Jenis","Tujuan","Status","Aksi",]}
-                            listData={listData}
-                            toggleDialog={()=>toggleDialog}
-                            boxRef={boxRef}
-                            tooltipRef={tooltipRef}
-                            styles={styles}
-                            attributes={attributes}
+                            record={listData}
+                            // toggleDialog={()=>toggleDialog}
+                            // boxRef={boxRef}
+                            // tooltipRef={tooltipRef}
+                            // styles={styles}
+                            // attributes={attributes}
                         />
                         <PaginationComponent
                             currentPage={currentPage}
