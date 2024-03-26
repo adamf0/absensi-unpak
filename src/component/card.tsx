@@ -3,10 +3,15 @@ import '../home.css'
 import CardProps from '../model/CardProps';
 import { GetJenisCuti } from '../model/JenisCutiEnum';
 import moment from 'moment';
+import { edit } from '../redux/cutiSlice';
+import { useAppDispatch } from '../redux/hooks';
 // import "moment/locale/id";
 
 const Card: FC<CardProps> = ({ data, toggleDialog, boxRef, tooltipRef, styleDialog, attributes }): JSX.Element => {
-    return <tr>
+    const dispatch = useAppDispatch();
+    
+    return <>
+    <tr>
         <td data-name="Tanggal">{moment(data.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</td>
         <td data-name="Lama Cuti">{data.lama} hari</td>
         <td data-name="Jenis Cuti">
@@ -18,11 +23,13 @@ const Card: FC<CardProps> = ({ data, toggleDialog, boxRef, tooltipRef, styleDial
         </td>
         <td data-name="Aksi">
             <div className="action-desktop">
-                <button data-id={data.id} className="btn blueDark btnSmall w-full">Edit</button>
+                <button onClick={
+                    ()=>dispatch(edit(data))
+                } data-bs-toggle="modal" data-bs-target="#modalEdit" data-id={data.id} className="btn blueDark btnSmall w-full">Edit</button>
                 <button data-id={data.id} className="btn blue btnSmall w-full">Hapus</button>
             </div>
-            <div className="action-mobile">
-                <span onClick={()=>toggleDialog} ref={boxRef} className="text-decoration-none" data-id={data.id}>...</span>
+            {/*<div className="action-mobile">
+                <span onClick={()=>toggleDialog(parseInt(data.id))} ref={boxRef} className="text-decoration-none" data-id={data.id}>...</span>
                 <ul className="tooltip1" ref={tooltipRef} style={styleDialog} {...attributes}>
                     <li>
                         <a href="#" id="btnModalEdit" data-bs-toggle="modal" data-bs-target="#modalEdit">Edit</a>
@@ -31,9 +38,11 @@ const Card: FC<CardProps> = ({ data, toggleDialog, boxRef, tooltipRef, styleDial
                         <a href="#">Hapus</a>
                     </li>
                 </ul>
-            </div>
+            </div> */}
         </td>
     </tr>
+    
+    </>
     ;
 }
 

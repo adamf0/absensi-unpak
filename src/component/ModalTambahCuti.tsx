@@ -1,16 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { schema } from '@hookform/resolvers/ajv/src/__tests__/__fixtures__/data.js';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 
+const schema = z.object({
+    tanggal_pengajuan: z.coerce.date(),
+    lama_cuti: z.coerce.number().min(1),
+    tujuan: z.string().nonempty("Tujuan is required"),
+    jenis_cuti: z.string().nonempty("Jenis Cuti is required")
+})
+
 const ModalTambahCuti = () => {
-    const [errTanggalPengajuan, setErrTanggalPengajuan] = useState<string | null>(null);
-    const [errJenisCuti, setErrJenisCuti] = useState<string | null>(null);
-    const [errLamaCuti, setErrLamaCuti] = useState<string | null>(null);
-    const [errTujuan, setErrTujuan] = useState<string | null>(null);
+    const [errTanggalPengajuan, setErrTanggalPengajuan] = useState<ReactElement | null>(null);
+    const [errJenisCuti, setErrJenisCuti] = useState<ReactElement | null>(null);
+    const [errLamaCuti, setErrLamaCuti] = useState<ReactElement | null>(null);
+    const [errTujuan, setErrTujuan] = useState<ReactElement | null>(null);
 
     type ValidationSchemaType = z.infer<typeof schema>
     const buttonSubmitModalRef = useRef<HTMLButtonElement>(null);
@@ -93,28 +99,28 @@ const ModalTambahCuti = () => {
     useEffect(() => {
         if (errors.tanggal_pengajuan) {
             const message = errors.tanggal_pengajuan.message;
-            setErrTanggalPengajuan(`<div className="invalid-feedback">${message}</div>`);
+            setErrTanggalPengajuan(<div className="invalid-feedback">{message}</div>);
         } else {
             setErrTanggalPengajuan(null);
         }
 
         if (errors.jenis_cuti) {
             const message = errors.jenis_cuti.message;
-            setErrJenisCuti(`<div className="invalid-feedback">${message}</div>`);
+            setErrJenisCuti(<div className="invalid-feedback">{message}</div>);
         } else {
             setErrJenisCuti(null);
         }
 
         if (errors.lama_cuti) {
             const message = errors.lama_cuti.message;
-            setErrLamaCuti(`<div className="invalid-feedback">${message}</div>`);
+            setErrLamaCuti(<div className="invalid-feedback">{message}</div>);
         } else {
             setErrLamaCuti(null);
         }
 
         if (errors.tujuan) {
             const message = errors.tujuan.message;
-            setErrTujuan(`<div className="invalid-feedback">${message}</div>`);
+            setErrTujuan(<div className="invalid-feedback">{message}</div>);
         } else {
             setErrTujuan(null);
         }

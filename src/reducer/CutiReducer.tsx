@@ -1,8 +1,8 @@
 import { CutiModel } from "../model/CutiModel";
 
-type ActionType = { type: 'STORE_LIST'; list: CutiModel[] } | { type: 'TOGGLE_DETAIL'; id: number } | { type: 'CLOSE_DETAIL' };
+export type ActionTypeCuti = { type: 'STORE_LIST'; list: CutiModel[] } | { type: 'TOGGLE_DETAIL'; id: number } | { type: 'CLOSE_DETAIL' };
 
-export const reducerCuti = (state: CutiModel[], action: ActionType): CutiModel[] => {
+export const reducerCuti = (state: CutiModel[], action: ActionTypeCuti): CutiModel[] => {
     switch (action.type) {
         case 'STORE_LIST':
             return state = action.list;

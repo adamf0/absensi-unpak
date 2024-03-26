@@ -1,11 +1,12 @@
 import '../home.css'
-import { Suspense, lazy, useEffect, useReducer, useRef, useState } from 'react';
-import { usePopper } from 'react-popper';
+import { Suspense, lazy, useEffect, useState } from 'react';
+// import { usePopper } from 'react-popper';
 import { CutiModel } from '../model/CutiModel';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
-import { reducerCuti } from '../reducer/CutiReducer';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { cutiselector, loadList } from '../redux/cutiSlice';
 
 const Welcoming = lazy(() => import('../component/Welcoming'));
 const TableComponent = lazy(() => import('../component/TableComponent'));
@@ -18,7 +19,9 @@ function Cuti() {
     const [currentPage, setCurrentPage] = useState(1);
     const [start, setStart] = useState(0);
     const [end, setEnd] = useState(0);
-    const [listData, dispatch] = useReducer(reducerCuti, []);
+
+    const selectorCuti = useAppSelector(cutiselector);
+    const dispatch = useAppDispatch();
     
     const loadTable = async (page=1) => {
         const requestOptions = {
@@ -34,14 +37,15 @@ function Cuti() {
                         if (json.status != 200) {
                             toast.error(json.message ?? "terjadi masalah pada saat request ke server")
                         } else{
-                            const list = json.list.data.map((item:any) => 
+                            let list = json.list.data.map((item:any) => 
                                 new CutiModel(item.tanggal_pengajuan, item.lama_cuti, item.jenis_cuti, item.tujuan, "Pending", item.id, false)
                             );
 
                             setTotalData(json.list.totalData) 
                             setTotalPage(json.list.totalPage)
                             setCurrentPage(json.list.currentPage)
-                            dispatch({ type: 'STORE_LIST', list });
+
+                            dispatch(loadList(list))
                             setStart(json.list.startIndex || 1)
                             setEnd(json.list.endIndex)
                             
@@ -73,7 +77,7 @@ function Cuti() {
             setCurrentPage(prevState => prevState+1);
         }
     };
-
+    console.log(selectorCuti.edit);
     return (
         <Suspense fallback={<>Loading...</>}>
             <div className="wrapper">
@@ -87,7 +91,7 @@ function Cuti() {
                     <div className="leave__content row-container spaceAroundRow">
                         <TableComponent
                             colums={["Tanggal","Lama","Jenis","Tujuan","Status","Aksi",]}
-                            record={listData}
+                            record={selectorCuti.list}
                             // toggleDialog={()=>toggleDialog}
                             // boxRef={boxRef}
                             // tooltipRef={tooltipRef}
@@ -108,11 +112,11 @@ function Cuti() {
 
                 <ModalTambahCuti/>
                 <ModalUbahCuti 
-                    id={""}
-                    tanggal_pengajuan={""}
-                    jenis_cuti={""}
-                    lama_cuti={0}
-                    tujuan={""}
+                    id={selectorCuti.edit?.id??''}
+                    tanggal_pengajuan={selectorCuti.edit?.tanggal??''}
+                    jenis_cuti={selectorCuti.edit?.jenis??''}
+                    lama_cuti={`${selectorCuti.edit?.lama??''}`}
+                    tujuan={selectorCuti.edit?.tujuan??""}
                 />
             </div>
             <ToastContainer />
