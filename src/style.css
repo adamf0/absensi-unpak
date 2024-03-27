@@ -40,7 +40,7 @@ body{
 [hide]{
   display: none;
 }
-.btn{
+.button{
   width: fit-content;
   height: auto;
   border: none;
@@ -53,11 +53,11 @@ body{
   background-color: white;
   color: black;
 }
-.btn:hover{
+.button:hover{
   background-color: grey;
   color: white;
 }
-.btnSmall{
+.buttonSmall{
   padding: .7em 1.2em;
   font-size: .8rem;
   font-size: clamp(.8rem,.3rem + 2vmin,1rem);
@@ -184,9 +184,10 @@ body{
 
       .calendar-header{
           border: 1px solid black;
-
+          align-items: center;
+          
           a{
-              font-size: clamp(14px,.9rem + 0.06vmax,1.3rem);
+              font-size: clamp(14px,.9rem + 1vmax,1.3rem);
               text-decoration: none;
               cursor: pointer;
           }
@@ -295,7 +296,7 @@ body{
           height: -webkit-fit-content;
       }
       .calendar-event{
-          width: fit-content;
+          width: -webkit-fill-available;
           height: -webkit-max-content;
           margin-top: 20px;
       }

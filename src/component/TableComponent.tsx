@@ -3,15 +3,18 @@ import { TableProps } from '../model/TableProps';
 import Card from './Card';
 import { usePopper } from 'react-popper';
 import { reducerCuti } from '../reducer/CutiReducer';
+import { cutiselector } from '../redux/cutiSlice';
+import { useAppSelector } from '../redux/hooks';
 
-const TableComponent: React.FC<TableProps> = ({ colums, record }) => {
-    const [list, dispatch] = useReducer(reducerCuti, record);
+const TableComponent: React.FC<TableProps> = ({ colums }) => {
+    const selectorCuti = useAppSelector(cutiselector);
+    const [list, dispatch] = useReducer(reducerCuti, []);
     const boxRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
     const { styles, attributes } = usePopper(boxRef.current, tooltipRef.current, {
         modifiers: [{ name: 'offset', options: { offset: [10, 0] } }],
     });
-
+    
     const toggleDialog = (id: number) => {
         dispatch({type:'TOGGLE_DETAIL', id})
     };
@@ -33,6 +36,10 @@ const TableComponent: React.FC<TableProps> = ({ colums, record }) => {
             document.removeEventListener('mousedown', handleOutsideClick);
         };
     }, [handleOutsideClick]);
+
+    useEffect(()=>{
+        dispatch({type:'STORE_LIST', list:selectorCuti.list})
+    },[list])
 
     return (
         <table>

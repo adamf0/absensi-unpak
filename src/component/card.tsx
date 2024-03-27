@@ -1,9 +1,9 @@
 import { FC } from 'react';
-import '../home.css'
+import '../style.css'
 import CardProps from '../model/CardProps';
 import { GetJenisCuti } from '../model/JenisCutiEnum';
 import moment from 'moment';
-import { edit } from '../redux/cutiSlice';
+import { deletedCuti, editCuti } from '../redux/cutiSlice';
 import { useAppDispatch } from '../redux/hooks';
 // import "moment/locale/id";
 
@@ -23,16 +23,14 @@ const Card: FC<CardProps> = ({ data, toggleDialog, boxRef, tooltipRef, styleDial
         </td>
         <td data-name="Aksi">
             <div className="action-desktop">
-                <button onClick={
-                    ()=>dispatch(edit(data))
-                } data-bs-toggle="modal" data-bs-target="#modalEdit" data-id={data.id} className="btn blueDark btnSmall w-full">Edit</button>
-                <button data-id={data.id} className="btn blue btnSmall w-full">Hapus</button>
+                <button onClick={ ()=>dispatch(editCuti(data)) } data-bs-toggle="modal" data-bs-target="#modalEdit" data-id={data.id} className="btn button blueDark buttonSmall w-full">Edit</button>
+                <button onClick={ ()=>dispatch(deletedCuti(data)) } data-id={data.id} className="btn button blue buttonSmall w-full">Hapus</button>
             </div>
             {/*<div className="action-mobile">
                 <span onClick={()=>toggleDialog(parseInt(data.id))} ref={boxRef} className="text-decoration-none" data-id={data.id}>...</span>
                 <ul className="tooltip1" ref={tooltipRef} style={styleDialog} {...attributes}>
                     <li>
-                        <a href="#" id="btnModalEdit" data-bs-toggle="modal" data-bs-target="#modalEdit">Edit</a>
+                        <a href="#" id="buttonModalEdit" data-bs-toggle="modal" data-bs-target="#modalEdit">Edit</a>
                     </li>
                     <li>
                         <a href="#">Hapus</a>

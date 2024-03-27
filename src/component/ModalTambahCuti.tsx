@@ -1,136 +1,115 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
-import { z } from 'zod';
-
-const schema = z.object({
-    tanggal_pengajuan: z.coerce.date(),
-    lama_cuti: z.coerce.number().min(1),
-    tujuan: z.string().nonempty("Tujuan is required"),
-    jenis_cuti: z.string().nonempty("Jenis Cuti is required")
-})
+import * as Yup from "yup";
 
 const ModalTambahCuti = () => {
-    const [errTanggalPengajuan, setErrTanggalPengajuan] = useState<ReactElement | null>(null);
-    const [errJenisCuti, setErrJenisCuti] = useState<ReactElement | null>(null);
-    const [errLamaCuti, setErrLamaCuti] = useState<ReactElement | null>(null);
-    const [errTujuan, setErrTujuan] = useState<ReactElement | null>(null);
-
-    type ValidationSchemaType = z.infer<typeof schema>
     const buttonSubmitModalRef = useRef<HTMLButtonElement>(null);
     const buttonCloseModalRef = useRef<HTMLButtonElement>(null);
-    const { register, handleSubmit, formState: { errors }, trigger, setValue } = useForm<ValidationSchemaType>({
-        resolver: zodResolver(schema),
+    
+    const [errors, setErrors] = useState<Errors>({});
+    const [formData, setFormData] = useState({
+        tanggal_pengajuan: "",
+        lama_cuti: "",
+        tujuan: "",
+        jenis_cuti: "",
     });
-    const handleSelectedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setValue("jenis_cuti", e.target.value);
-        // setSelectedDay(e.target.value);
-        trigger("jenis_cuti")
-    };
-    const onSubmit: SubmitHandler<ValidationSchemaType> = async (data) => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                tanggal_pengajuan: new Date(data.tanggal_pengajuan).toISOString()?.split('T')[0] ?? "",
-                lama_cuti: data.lama_cuti,
-                tujuan: data.tujuan,
-                jenis_cuti: data.jenis_cuti,
-            })
-        };
+    const validationSchema = Yup.object({
+        tanggal_pengajuan: Yup.date().required("this is required"),
+        lama_cuti: Yup.number()
+          .typeError("must be a number")
+          .min(1, "this must be at least 1 day")
+          .required("this is required"),
+          tujuan: Yup.string().required("this is required"),
+          jenis_cuti: Yup.string().required("this is required"),
+    });
+    const handleSubmit = async (e:any) => {
+        e.preventDefault();
 
-        await toast.promise(
-            new Promise((resolve, reject) => {
-                console.log(requestOptions)
-                if (buttonCloseModalRef.current) {
-                    buttonCloseModalRef.current.disabled = true;
-                }
-                if (buttonSubmitModalRef.current) {
-                    buttonSubmitModalRef.current.disabled = true;
-                }
+        try {
+            await validationSchema.validate(formData, {abortEarly: false});
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    tanggal_pengajuan: new Date(formData.tanggal_pengajuan).toISOString()?.split('T')[0] ?? "",
+                    lama_cuti: formData.lama_cuti,
+                    tujuan: formData.tujuan,
+                    jenis_cuti: formData.jenis_cuti,
+                })
+            };
 
-                setTimeout(() => {
-                    fetch(`http://localhost:8000/cuti/create`, requestOptions)
-                        .then(async response => response.json())
-                        .then(async json => {
-                            console.log(json)
-                            if (json.status != 200) {
-                                reject(json.message ?? "terjadi masalah pada saat request ke server")
-                            } else {
-                                resolve(json.message)
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error)
-                            reject(error)
-                        })
-                        .finally(() => {
-                            if (buttonCloseModalRef.current) {
-                                buttonCloseModalRef.current.disabled = false;
-                            }
-                            if (buttonSubmitModalRef.current) {
-                                buttonSubmitModalRef.current.disabled = false;
-                            }
-                        })
-                }, 2000)
-            }),
-            {
-                pending: {
-                    render() {
-                        return "Loading"
+            await toast.promise(
+                new Promise((resolve, reject) => {
+                    console.log(requestOptions)
+                    if (buttonCloseModalRef.current) {
+                        buttonCloseModalRef.current.disabled = true;
+                    }
+                    if (buttonSubmitModalRef.current) {
+                        buttonSubmitModalRef.current.disabled = true;
+                    }
+    
+                    setTimeout(() => {
+                        fetch(`http://localhost:8000/cuti/create`, requestOptions)
+                            .then(async response => response.json())
+                            .then(async json => {
+                                console.log(json)
+                                if (json.status != 200) {
+                                    reject(json.message ?? "terjadi masalah pada saat request ke server")
+                                } else {
+                                    resolve(json.message)
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error)
+                                reject(error)
+                            })
+                            .finally(() => {
+                                if (buttonCloseModalRef.current) {
+                                    buttonCloseModalRef.current.disabled = false;
+                                }
+                                if (buttonSubmitModalRef.current) {
+                                    buttonSubmitModalRef.current.disabled = false;
+                                }
+                            })
+                    }, 2000)
+                }),
+                {
+                    pending: {
+                        render() {
+                            return "Loading"
+                        },
                     },
-                },
-                success: {
-                    render({ data }) {
-                        return `${data}`
+                    success: {
+                        render({ data }) {
+                            return `${data}`
+                        },
                     },
-                },
-                error: {
-                    render({ data }) {
-                        return `${data}`
+                    error: {
+                        render({ data }) {
+                            return `${data}`
+                        }
                     }
                 }
+            )
+          } catch (error) {
+            if (error instanceof Yup.ValidationError) {
+                const newErrors: Errors = {};
+                error.inner.forEach((err) => {
+                    if (err.path) {
+                        newErrors[err.path] = err.message;
+                    }
+                });
+                setErrors(newErrors);
             }
-        )
+        }
     }
-
-    useEffect(() => {
-        if (errors.tanggal_pengajuan) {
-            const message = errors.tanggal_pengajuan.message;
-            setErrTanggalPengajuan(<div className="invalid-feedback">{message}</div>);
-        } else {
-            setErrTanggalPengajuan(null);
-        }
-
-        if (errors.jenis_cuti) {
-            const message = errors.jenis_cuti.message;
-            setErrJenisCuti(<div className="invalid-feedback">{message}</div>);
-        } else {
-            setErrJenisCuti(null);
-        }
-
-        if (errors.lama_cuti) {
-            const message = errors.lama_cuti.message;
-            setErrLamaCuti(<div className="invalid-feedback">{message}</div>);
-        } else {
-            setErrLamaCuti(null);
-        }
-
-        if (errors.tujuan) {
-            const message = errors.tujuan.message;
-            setErrTujuan(<div className="invalid-feedback">{message}</div>);
-        } else {
-            setErrTujuan(null);
-        }
-    }, [errors]);
 
     return ReactDOM.createPortal(
         <div className="modal fades show" id="modalTambah" aria-hidden="true" style={{ display: 'none' }}>
             <div className="modal-dialog">
                 <div className="modal-content">
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <form onSubmit={handleSubmit}>
                         <div className="modal-header">
                             <h5 className="modal-title" >Tambah Cuti</h5>
                             <button type="button" ref={buttonCloseModalRef} className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -139,31 +118,44 @@ const ModalTambahCuti = () => {
                             <div className="row">
                                 <div className="col-12">
                                     <label className="form-label">Tanggal Pengajuan</label>
-                                    <input type="date" className={`form-control${errors.tanggal_pengajuan ? ' is-invalid' : ''}`} {...register('tanggal_pengajuan')} />
-                                    {errTanggalPengajuan}
+                                    <input type="date" 
+                                            className={`form-control${errors.tanggal_pengajuan ? ' is-invalid' : ''}`} 
+                                            defaultValue={formData.tanggal_pengajuan}
+                                            onChange={(e) => setFormData({ ...formData, tanggal_pengajuan: e.target.value })} />
+                                    {errors.tanggal_pengajuan && <div className="invalid-feedback">{errors.tanggal_pengajuan}</div>}
                                 </div>
+                                
                                 <div className="col-12">
                                     <label className="form-label">Jenis Cuti</label>
-                                    <select className={`form-control select${errors.jenis_cuti ? ' is-invalid' : ''}`} onChange={handleSelectedChange}>
-                                        <option>--pilih--</option>
+                                    <select className={`form-control select${errors.jenis_cuti ? ' is-invalid' : ''}`} 
+                                            defaultValue={formData.jenis_cuti} 
+                                            onChange={(e) => setFormData({ ...formData, jenis_cuti: e.target.value })}>
+                                        <option value="">--pilih--</option>
                                         <option value="1">tes</option>
                                     </select>
-                                    {errJenisCuti}
+                                    {errors.jenis_cuti && <div className="invalid-feedback">{errors.jenis_cuti}</div>}
                                 </div>
+
                                 <div className="col-12">
                                     <label className="form-label">Lama Cuti</label>
-                                    <input type="number" className={`form-control${errors.lama_cuti ? ' is-invalid' : ''}`} {...register('lama_cuti', { valueAsNumber: true })} />
-                                    {errLamaCuti}
+                                    <input type="number" 
+                                            className={`form-control${errors.lama_cuti ? ' is-invalid' : ''}`} 
+                                            defaultValue={formData.lama_cuti}
+                                            onChange={(e) => setFormData({ ...formData, lama_cuti: e.target.value })} />
+                                    {errors.lama_cuti && <div className="invalid-feedback">{errors.lama_cuti}</div>}
                                 </div>
+                                
                                 <div className="col-12">
                                     <label className="form-label">Tujuan</label>
-                                    <textarea className={`form-control${errors.tujuan ? ' is-invalid' : ''}`} {...register('tujuan')}></textarea>
-                                    {errTujuan}
+                                    <textarea defaultValue={formData.tujuan} 
+                                                className={`form-control${errors.tujuan ? ' is-invalid' : ''}`} 
+                                                onChange={(e) => setFormData({ ...formData, tujuan: e.target.value })}></textarea>
+                                    {errors.tujuan && <div className="invalid-feedback"></div>}
                                 </div>
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type='submit' ref={buttonSubmitModalRef} className="btn btnSmall blueDark">Simpan</button>
+                            <button type='submit' ref={buttonSubmitModalRef} className="button buttonSmall blueDark">Simpan</button>
                         </div>
                     </form>
                 </div>

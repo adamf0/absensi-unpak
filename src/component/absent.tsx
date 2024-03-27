@@ -1,8 +1,14 @@
 import moment from 'moment';
-import '../home.css'
+import '../style.css'
 import Calendar from './Calendar';
+import { absenselector } from '../redux/absenSlice';
+import { useAppSelector } from '../redux/hooks';
+import { authselector } from '../redux/authSlice';
 
 function Absent() {
+    const selectorAuth = useAppSelector(authselector);
+    const selectorAbsen = useAppSelector(absenselector);
+
     const data: EventData[] = [
         {
           eventName: "Skripsi",
@@ -39,7 +45,7 @@ function Absent() {
         <section className="absent card">
             <div className="absent__content row-container spaceBetweenRow">
                 <h3>Absensi</h3>
-                <button className="btn btnSmall blueDark">Absen</button>
+                {selectorAuth.nidn != null && selectorAbsen.absen == null? <button className="btn button buttonSmall blueDark">Absen</button>:<></>}
             </div>
             <div className="absent__content row-container spaceAroundRow">
                 <Calendar events={data} click={openDay} />
