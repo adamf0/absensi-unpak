@@ -8,38 +8,38 @@ import { useAppSelector } from '../redux/hooks';
 
 const TableComponent: React.FC<TableProps> = ({ colums }) => {
     const selectorCuti = useAppSelector(cutiselector);
-    const [list, dispatch] = useReducer(reducerCuti, []);
-    const boxRef = useRef<HTMLDivElement>(null);
-    const tooltipRef = useRef<HTMLDivElement>(null);
-    const { styles, attributes } = usePopper(boxRef.current, tooltipRef.current, {
-        modifiers: [{ name: 'offset', options: { offset: [10, 0] } }],
-    });
+    // const [list, dispatch] = useReducer(reducerCuti, []);
+    // const boxRef = useRef<HTMLDivElement>(null);
+    // const tooltipRef = useRef<HTMLDivElement>(null);
+    // const { styles, attributes } = usePopper(boxRef.current, tooltipRef.current, {
+    //     modifiers: [{ name: 'offset', options: { offset: [10, 0] } }],
+    // });
     
-    const toggleDialog = (id: number) => {
-        dispatch({type:'TOGGLE_DETAIL', id})
-    };
+    // const toggleDialog = (id: number) => {
+    //     dispatch({type:'TOGGLE_DETAIL', id})
+    // };
 
-    const handleOutsideClick = (event: any) => {
-        if (
-            boxRef.current &&
-            tooltipRef.current &&
-            !boxRef.current.contains(event.target) &&
-            !tooltipRef.current.contains(event.target)
-        ) {
-            dispatch({type:'CLOSE_DETAIL'})
-        }
-    };
+    // const handleOutsideClick = (event: any) => {
+    //     if (
+    //         boxRef.current &&
+    //         tooltipRef.current &&
+    //         !boxRef.current.contains(event.target) &&
+    //         !tooltipRef.current.contains(event.target)
+    //     ) {
+    //         dispatch({type:'CLOSE_DETAIL'})
+    //     }
+    // };
 
-    useEffect(() => {
-        document.addEventListener('mousedown', handleOutsideClick);
-        return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-        };
-    }, [handleOutsideClick]);
+    // useEffect(() => {
+    //     document.addEventListener('mousedown', handleOutsideClick);
+    //     return () => {
+    //         document.removeEventListener('mousedown', handleOutsideClick);
+    //     };
+    // }, [handleOutsideClick]);
 
-    useEffect(()=>{
-        dispatch({type:'STORE_LIST', list:selectorCuti.list})
-    },[list])
+    // useEffect(()=>{
+    //     dispatch({type:'STORE_LIST', list:selectorCuti.list})
+    // },[list])
 
     return (
         <table>
@@ -51,15 +51,10 @@ const TableComponent: React.FC<TableProps> = ({ colums }) => {
                 </tr>
             </thead>
             <tbody>
-                {list.map((data, index) => {
+                {selectorCuti.list.map((data, index) => {
                     return <Card
                         key={data.id}
                         data={data}
-                        toggleDialog={() => toggleDialog(index)}
-                        boxRef={boxRef}
-                        tooltipRef={tooltipRef}
-                        styleDialog={{ display: data.openDetail ? 'block' : 'none', ...styles.popper }}
-                        attributes={attributes}
                     />
                 })}
             </tbody>
