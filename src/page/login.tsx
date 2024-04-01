@@ -24,70 +24,75 @@ function Login() {
         e.preventDefault();
         try {
             await validationSchema.validate(formData, {abortEarly: false});
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    nidn: formData.nidn,
-                    password: formData.password,
-                })
-            };
+            dispatch(setAuth(formData.nidn))
+            setTimeout(()=>{
+                navigate('/')
+            },1000)
 
-            await toast.promise(
-                new Promise((resolve, reject) => {
-                    console.log(requestOptions)
-                    if (buttonmasukRef.current) {
-                        buttonmasukRef.current.disabled = true;
-                    }
-                    setTimeout(() => {
-                        fetch(`http://localhost:8000/login`, requestOptions)
-                            .then(async response => {
-                                if (response.ok) {
-                                    return response.json()
-                                } else {
-                                    throw new Error(`${response.status}`);
-                                }
-                            })
-                            .then(async json => {
-                                console.log(json)
-                                if (json.status != 200) {
-                                    reject(json.message ?? "terjadi masalah pada saat request ke server")
-                                } else {
-                                    dispatch(setAuth(formData.nidn))
-                                    resolve(json.message)
-                                }
-                            })
-                            .catch(error => {
-                                reject(error)
-                            })
-                            .finally(() => {
-                                if (buttonmasukRef.current) {
-                                    buttonmasukRef.current.disabled = false;
-                                }
-                            })
-                    }, 2000)
-                }),
-                {
-                    pending: {
-                        render() {
-                            return "Loading"
-                        },
-                    },
-                    success: {
-                        render({ data }) {
-                            setTimeout(()=>{
-                                navigate('/')
-                            },2000)
-                            return `${data}`
-                        },
-                    },
-                    error: {
-                        render({ data }) {
-                            return `${data}`
-                        }
-                    }
-                }
-            )
+            // const requestOptions = {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            //     body: JSON.stringify({
+            //         nidn: formData.nidn,
+            //         password: formData.password,
+            //     })
+            // };
+
+            // await toast.promise(
+            //     new Promise((resolve, reject) => {
+            //         console.log(requestOptions)
+            //         if (buttonmasukRef.current) {
+            //             buttonmasukRef.current.disabled = true;
+            //         }
+            //         setTimeout(() => {
+            //             fetch(`http://localhost:8000/login`, requestOptions)
+            //                 .then(async response => {
+            //                     if (response.ok) {
+            //                         return response.json()
+            //                     } else {
+            //                         throw new Error(`${response.status}`);
+            //                     }
+            //                 })
+            //                 .then(async json => {
+            //                     console.log(json)
+            //                     if (json.status != 200) {
+            //                         reject(json.message ?? "terjadi masalah pada saat request ke server")
+            //                     } else {
+            //                         dispatch(setAuth(formData.nidn))
+            //                         resolve(json.message)
+            //                     }
+            //                 })
+            //                 .catch(error => {
+            //                     reject(error)
+            //                 })
+            //                 .finally(() => {
+            //                     if (buttonmasukRef.current) {
+            //                         buttonmasukRef.current.disabled = false;
+            //                     }
+            //                 })
+            //         }, 2000)
+            //     }),
+            //     {
+            //         pending: {
+            //             render() {
+            //                 return "Loading"
+            //             },
+            //         },
+            //         success: {
+            //             render({ data }) {
+            //                 setTimeout(()=>{
+            //                     navigate('/')
+            //                 },2000)
+            //                 return `${data}`
+            //             },
+            //         },
+            //         error: {
+            //             render({ data }) {
+            //                 return `${data}`
+            //             }
+            //         }
+            //     }
+            // )
           } catch (error) {
             console.log(`error: ${error}`)
             if (error instanceof Yup.ValidationError) {

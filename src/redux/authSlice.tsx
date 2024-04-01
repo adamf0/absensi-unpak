@@ -5,7 +5,7 @@ interface auth{
   nidn: string | null,
 }
 const initialState:auth = {
-  nidn: "123",
+  nidn: null,
 }
 
 export const authlice = createSlice({
