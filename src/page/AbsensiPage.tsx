@@ -3,7 +3,7 @@ import '../style.css'
 import Welcoming from '../component/Welcoming';
 import Absent from '../component/Absent';
 
-function Home() {
+function AbsensiPage() {
     return (
         <Suspense fallback={<></>}>
             <div className="wrapper">
@@ -14,4 +14,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default AbsensiPage;

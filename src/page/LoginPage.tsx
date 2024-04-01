@@ -6,7 +6,7 @@ import { setAuth } from '../redux/authSlice';
 import { useAppDispatch } from '../redux/hooks';
 import { useNavigate } from 'react-router-dom';
 
-function Login() {
+function LoginPage() {
     const buttonmasukRef = useRef<HTMLButtonElement>(null);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -142,4 +142,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default LoginPage;

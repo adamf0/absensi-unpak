@@ -1,32 +1,32 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthenticateRoutes from './component/AuthenticateRoutes';
 import BlockAfterAuthenticateRoutes from './component/BlockAfterAuthenticateRoutes';
-import Home from './page/Home';
-import Absensi from './page/Absensi';
-import Cuti from './page/Cuti';
-import Login from './page/Login';
-import Logout from './page/Logout';
+import HomePage from './page/HomePage';
+import AbsensiPage from './page/AbsensiPage';
+import CutiPage from './page/CutiPage';
+import LoginPage from './page/LoginPage';
+import LogoutPage from './page/LogoutPage';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/absensi" element={
           <AuthenticateRoutes>
-              <Absensi />
+              <AbsensiPage />
           </AuthenticateRoutes>
         } />
         <Route path="/cuti" element={
           <AuthenticateRoutes>
-            <Cuti />
+            <CutiPage />
           </AuthenticateRoutes>
         } />
         <Route path="/login" element={
           <BlockAfterAuthenticateRoutes>
-            <Login />
+            <LoginPage />
           </BlockAfterAuthenticateRoutes>} />
-        <Route path="/logout" element={<Logout />} />
+        <Route path="/logout" element={<LogoutPage />} />
       </Routes>
     </Router>
   )

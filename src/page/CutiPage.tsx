@@ -10,7 +10,7 @@ import TableComponent from '../component/TableComponent';
 import ModalTambahCuti from '../component/ModalTambahCuti';
 import ModalUbahCuti from '../component/ModalUbahCuti';
 
-function Cuti() {
+function CutiPage() {
     const selectorCuti = useAppSelector(cutiselector);
     const dispatch = useAppDispatch();
     
@@ -105,4 +105,4 @@ function Cuti() {
     );
 }
 
-export default Cuti;
+export default CutiPage;
