@@ -1,8 +1,5 @@
-import { useEffect, useReducer, useRef } from 'react';
 import { TableProps } from '../model/TableProps';
 import Card from './Card';
-import { usePopper } from 'react-popper';
-import { reducerCuti } from '../reducer/CutiReducer';
 import { cutiselector } from '../redux/cutiSlice';
 import { useAppSelector } from '../redux/hooks';
 
@@ -51,7 +48,7 @@ const TableComponent: React.FC<TableProps> = ({ colums }) => {
                 </tr>
             </thead>
             <tbody>
-                {selectorCuti.list.map((data, index) => {
+                {selectorCuti.list.map((data, _) => {
                     return <Card
                         key={data.id}
                         data={data}

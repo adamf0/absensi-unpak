@@ -73,10 +73,10 @@ export const cutilice = createSlice({
     pagingTable: (state, action: PayloadAction<PagingTable>) => {
       state.paging = action.payload;
     },
-    prev: (state, action: PayloadAction<void>) => {
+    prev: (state) => {
       state.paging.currentPage -= 1;
     },
-    next: (state, action: PayloadAction<void>) => {
+    next: (state) => {
       state.paging.currentPage += 1;
     },
   },
