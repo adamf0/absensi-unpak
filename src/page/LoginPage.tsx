@@ -2,13 +2,10 @@ import { useRef, useState } from 'react';
 import '../style.login.css'
 import * as Yup from "yup";
 // import { toast } from 'react-toastify';
-import { setAuth } from '../redux/authSlice';
-import { useAppDispatch } from '../redux/hooks';
 import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
     const buttonmasukRef = useRef<HTMLButtonElement>(null);
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const [errors, setErrors] = useState<Errors>({});
@@ -24,7 +21,7 @@ function LoginPage() {
         e.preventDefault();
         try {
             await validationSchema.validate(formData, {abortEarly: false});
-            dispatch(setAuth(formData.nidn))
+            localStorage.setItem('authData', formData.nidn);
             setTimeout(()=>{
                 navigate('/')
             },1000)

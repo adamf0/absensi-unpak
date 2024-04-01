@@ -1,14 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearAuth } from '../redux/authSlice';
-import { useAppDispatch } from '../redux/hooks';
 
 const LogoutPage = () => {
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(clearAuth())
+        localStorage.clear();
         navigate('/login')
     }, []);
     

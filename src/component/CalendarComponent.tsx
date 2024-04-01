@@ -36,12 +36,12 @@ const CalendarComponent: React.FC<CalendarProps> = ({ events, click }) => {
         const month = Array.from({ length: daysInMonth }, (_, i) => {
             const d = i + 1;
             const dayEvents = calendarEvents.filter(
-                ev => moment(ev.startdate).date() === d && moment(ev.startdate).month() === currentMonth
+                ev => moment(ev.tanggal).date() === d && moment(ev.tanggal).month() === currentMonth
             );
 
-            let className = dayEvents.length > 0 ? `active ${dayEvents[0]['color']}` : 'active';
+            let className = dayEvents.length > 0 ? `active ${dayEvents[0]['type']}` : 'active';
             if (d === moment().date() && currentMonth === moment().month()) {
-                className = 'now';
+                className = className + ' now';
             }
 
             return (
@@ -51,12 +51,12 @@ const CalendarComponent: React.FC<CalendarProps> = ({ events, click }) => {
                     onClick={() => click(dayEvents)}
                 >
                     {d}
-                    {/* {dayEvents.map((event, index) => ( //buat bullet indicator
+                    {dayEvents.map((event, index) => ( //buat bullet indicator
                         <div
                             key={`event-${d}-${index}`}
-                            className={`event-category ${event.color}`}
+                            className={`event-category ${event.type}`}
                         ></div>
-                    ))} */}
+                    ))}
                 </li>
             );
         });
@@ -98,7 +98,9 @@ const CalendarComponent: React.FC<CalendarProps> = ({ events, click }) => {
 
     const drawLegend = () => {
         const calendars: LegendData[] = events.reduce((memo, e: EventData) => {
-            memo.push({ name: e['calendar'], color: e['color'] });
+            if (!memo.find(item => item.name === e.type)) {
+                memo.push({ name: e.type ?? "", color: e.type ?? "" });
+            }
             return memo;
         }, [] as LegendData[]);
 

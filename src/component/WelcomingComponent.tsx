@@ -1,11 +1,8 @@
 import '../style.css'
 import agendaIcon from '../assets/agenda-icon.png'
 import { useNavigate } from 'react-router-dom';
-import { authselector } from '../redux/authSlice';
-import { useAppSelector } from '../redux/hooks';
 
 function WelcomingComponent() {
-    const selectorAuth = useAppSelector(authselector);
     const navigate = useNavigate();
 
     return (
@@ -16,12 +13,12 @@ function WelcomingComponent() {
                     <h2>Buat absensi pribadi maupun cuti dengan aplikasi ABSEN.</h2>
                     <div className="shortMenu">
                         {
-                            selectorAuth.nidn==null? 
+                            localStorage.getItem('authData')==null? 
                                 <button className="btn button blueDark" onClick={()=>navigate('/login')}>Login</button>:
                                 <button className="btn button blueDark" onClick={()=>navigate('/logout')}>Logout</button>
                         }
                         {
-                            selectorAuth.nidn==null? <></>: 
+                            localStorage.getItem('authData')==null? <></>: 
                             <>
                                 <button className="btn button blue" onClick={()=>navigate('/absensi')}>Absensi</button>
                                 <button className="btn button blue" onClick={()=>navigate('/cuti')}>Cuti</button>    

@@ -32,6 +32,7 @@ const ModalTambahCuti = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({
+                    nidn:localStorage.getItem('authData'),
                     tanggal_pengajuan: new Date(formData.tanggal_pengajuan).toISOString()?.split('T')[0] ?? "",
                     lama_cuti: formData.lama_cuti,
                     tujuan: formData.tujuan,

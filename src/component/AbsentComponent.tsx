@@ -3,46 +3,15 @@ import '../style.css'
 import CalendarComponent from './CalendarComponent';
 import { absenselector, setAbsent } from '../redux/absenSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { authselector } from '../redux/authSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Absen } from '../model/Absen';
 
 function AbsentComponent() {
-    const selectorAuth = useAppSelector(authselector);
+    const [yearMonthEvent, setYearMonthEvent] = useState<string>(moment().format("YYYY-MM"));
+    const [listEvent, setListEvent] = useState<EventData[]>([]);
+    const [listEventNow, setListEventNow] = useState<EventData[]>([]);
     const selectorAbsen = useAppSelector(absenselector);
     const dispatch = useAppDispatch();
-
-    const data: EventData[] = [
-        {
-            eventName: "Skripsi",
-            tahun_akademik: "Ganjil 2023/2024",
-            eventLocation: "STAI Al-Andina Sukabumi",
-            calendar: "penagihan",
-            color: "masuk",
-            color_dot: "#b00020;",
-            startdate: "2024-03-09",
-            enddate: "2024-03-10",
-            author: 0,
-            description: ""
-        },
-        {
-            eventName: "Pengisian KRS",
-            tahun_akademik: "Ganjil 2023/2024",
-            eventLocation: "UNU Kalbar Pontianak",
-            calendar: "penagihan",
-            color: "cuti",
-            color_dot: "#b00020;",
-            startdate: "2024-02-19",
-            enddate: "2024-03-02",
-            author: 0,
-            description: ""
-        }
-    ];
-
-    const dayEvents: EventData[] = data.filter(ev => moment(ev.startdate).format("YYYY-MM-DD") === moment().format("YYYY-MM-DD"));
-    const openDay = (date: EventData[]) => {
-        console.log(date);
-    };
 
     useEffect(() => {
         const requestOptions = {
@@ -55,7 +24,7 @@ function AbsentComponent() {
         };
 
 
-        fetch(`http://localhost:8000/absen/check/${selectorAuth.nidn}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
+        fetch(`http://localhost:8000/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
             .then(async response => {
                 if (response.ok) {
                     return response.json()
@@ -76,7 +45,7 @@ function AbsentComponent() {
                             json.data.nidn,
                             json.data.tanggal,
                             json.data.absen_masuk,
-                            json.data.absen_keluars,
+                            json.data.absen_keluar,
                         )))
                     }
                 }
@@ -89,6 +58,57 @@ function AbsentComponent() {
             })
     }, []);
 
+    async function loadCalendar(){
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        };
+
+        await fetch(`http://localhost:8000/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    throw new Error(`${response.status}`);
+                }
+            })
+            .then(async json => {
+                console.log(json)
+                if (json.status != 200) {
+                    alert(json.message ?? "terjadi masalah pada saat request ke server")
+                } else {
+                    const eventDataArray = json.list.map((item:any) => ({
+                        id: item.id,
+                        tanggal: item.tanggal,
+                        type: item.type,
+                        absen_masuk: item.type=="absen"? item.absen_masuk:null,
+                        absen_keluar: item.type=="absen"? item.absen_keluar:null,
+                        jenis_cuti: item.type=="cuti"? item.jenis_cuti:null,
+                        tujuan: item.type=="cuti"? item.tujuan:null,
+                    }));
+
+                    setListEvent(eventDataArray);
+                    setListEventNow(
+                        listEvent.filter(ev => moment(ev.tanggal).format("YYYY-MM-DD") === yearMonthEvent)
+                    )
+                }
+            })
+            .catch(error => {
+                alert(error.message)
+            })
+            .finally(() => {
+
+            })
+    }
+    useEffect(() => {
+        loadCalendar()
+    }, []);
+
+    const openDay = (events: EventData[]) => {
+        console.log(events);
+        setListEventNow(events)
+    };
+
     const absent = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -98,7 +118,7 @@ function AbsentComponent() {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                             body: JSON.stringify({
-                                "nidn": selectorAuth.nidn,
+                                "nidn": localStorage.getItem('authData'),
                                 "tanggal": new Date().toISOString().slice(0, 10),
                                 "absen_masuk": "08:00:00",
                                 "lat": position.coords.latitude,
@@ -121,7 +141,7 @@ function AbsentComponent() {
                                 } else {
                                     dispatch(setAbsent(new Absen(
                                         json.data.id,
-                                        selectorAuth.nidn,
+                                        localStorage.getItem('authData'),
                                         new Date().toISOString().slice(0, 10),
                                         "08:00:00",
                                         null
@@ -139,7 +159,7 @@ function AbsentComponent() {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                             body: JSON.stringify({
-                                "nidn": selectorAuth.nidn,
+                                "nidn": localStorage.getItem('authData'),
                                 "tanggal": new Date().toISOString().slice(0, 10),
                                 "absen_keluar": "09:00:00"
                             })
@@ -177,22 +197,30 @@ function AbsentComponent() {
             alert("Geolocation is not supported by this browser.");
         }
     }
+
+    let absenButton = <></>
+    if(localStorage.getItem('authData') != null && (selectorAbsen.absen == null || selectorAbsen.absen.absen_masuk == null)){
+        absenButton = <button className="btn button buttonSmall blueDark" onClick={absent}>Absen Masuk</button>
+    } else if(localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk != null && selectorAbsen.absen?.absen_keluar == null){
+        absenButton = <button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>
+    }
+
     return (
         <section className="absent card">
             <div className="absent__content row-container spaceBetweenRow">
                 <h3>Absensi</h3>
-                {selectorAuth.nidn != null && (selectorAbsen.absen == null || selectorAbsen.absen != null) ?
-                    <button className="btn button buttonSmall blueDark" onClick={absent}>{selectorAbsen.absen == null? "Absen masuk":"Absen keluar"}</button> : <></>}
+                {absenButton}
             </div>
             <div className="absent__content row-container spaceAroundRow">
-                <CalendarComponent events={data} click={openDay} />
+                <CalendarComponent events={listEvent} click={openDay} />
                 <div className="calendar-event">
                     {
-                        dayEvents.length > 0 ?
-                            dayEvents.map((event, i) => (
+                        listEventNow.length > 0 ?
+                            listEventNow.map((event, i) => (
                                 <div key={i} className="event-item">
-                                    <label className={`event-status ${event.color}`}>{event.calendar}</label>
-                                    <p className="event-tujuan">{event.eventLocation}</p>
+                                    <p>{moment(event.tanggal).locale("id").format('DD MMMM YYYY')}</p>
+                                    <label className={`event-status ${event.type}`}>{event.type}</label>
+                                    <p className="event-tujuan">Keterangan: {event.type=="cuti"? event.tujuan:"Masuk"}</p>
                                 </div>
                             )) :
                             <div className="event-item notFound">

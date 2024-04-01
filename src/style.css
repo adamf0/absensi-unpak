@@ -268,7 +268,7 @@ body{
 
           display: flex;
           flex-direction: column;
-          align-items: end;
+          align-items: start;
 
           .event-status{
               width: -webkit-fit-content;
