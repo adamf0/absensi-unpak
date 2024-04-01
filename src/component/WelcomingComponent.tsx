@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { authselector } from '../redux/authSlice';
 import { useAppSelector } from '../redux/hooks';
 
-function Welcoming() {
+function WelcomingComponent() {
     const selectorAuth = useAppSelector(authselector);
     const navigate = useNavigate();
 
@@ -37,4 +37,4 @@ function Welcoming() {
     );
 }
 
-export default Welcoming;
+export default WelcomingComponent;

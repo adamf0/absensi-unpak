@@ -1,14 +1,14 @@
 import { Suspense } from 'react';
 import '../style.css'
-import Welcoming from '../component/Welcoming';
-import Absent from '../component/Absent';
+import WelcomingComponent from '../component/WelcomingComponent';
+import AbsentComponent from '../component/AbsentComponent';
 
 function AbsensiPage() {
     return (
         <Suspense fallback={<></>}>
             <div className="wrapper">
-                <Welcoming />
-                <Absent />
+                <WelcomingComponent />
+                <AbsentComponent />
             </div>
         </Suspense>
     );

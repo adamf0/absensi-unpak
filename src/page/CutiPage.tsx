@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { cutiselector, fetchListCuti } from '../redux/cutiSlice';
-import Welcoming from '../component/Welcoming';
+import WelcomingComponent from '../component/WelcomingComponent';
 import TableComponent from '../component/TableComponent';
 import ModalTambahCuti from '../component/ModalTambahCuti';
 import ModalUbahCuti from '../component/ModalUbahCuti';
@@ -75,7 +75,7 @@ function CutiPage() {
     return (
         <Suspense fallback={<>Loading...</>}>
             <div className="wrapper">
-                <Welcoming />
+                <WelcomingComponent />
 
                 <section className="leave card">
                     <div className="leave__content row-container spaceBetweenRow">

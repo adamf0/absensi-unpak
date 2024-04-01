@@ -7,7 +7,7 @@ import { deletedCuti, editCuti } from '../redux/cutiSlice';
 import { useAppDispatch } from '../redux/hooks';
 // import "moment/locale/id";
 
-const Card: FC<CardProps> = ({ data, toggleDialog, boxRef, tooltipRef, styleDialog, attributes }): JSX.Element => {
+const Card: FC<CardProps> = ({ data }): JSX.Element => {
     const dispatch = useAppDispatch();
     
     return <>
