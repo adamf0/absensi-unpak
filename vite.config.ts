@@ -13,6 +13,6 @@ export default defineConfig({
    port: 81,
    strictPort: true,
    host: true,
-   origin: "https://0.0.0.0:81",
+   origin: "https://127.0.0.1:81",
   },
  });
