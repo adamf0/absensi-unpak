@@ -3,8 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { toast } from 'react-toastify';
 import * as Yup from "yup";
+import { JenisCuti } from '../model/JenisCuti';
+import { cutiselector } from '../redux/cutiSlice';
+import { useAppSelector } from '../redux/hooks';
 
 const ModalUbahCuti: React.FC<ModalEditCutiProps> = ({id,tanggal_pengajuan,jenis_cuti,lama_cuti,tujuan}) => {
+    const selectorCuti = useAppSelector(cutiselector);
     const buttonSubmitModalRef = useRef<HTMLButtonElement>(null);
     const buttonCloseModalRef = useRef<HTMLButtonElement>(null);
     
@@ -145,7 +149,11 @@ const ModalUbahCuti: React.FC<ModalEditCutiProps> = ({id,tanggal_pengajuan,jenis
                                             defaultValue={formData.jenis_cuti} 
                                             onChange={(e) => setFormData({ ...formData, jenis_cuti: e.target.value })}>
                                         <option selected={formData.jenis_cuti==""} value="">--pilih--</option>
-                                        <option selected={formData.jenis_cuti=="1"} value="1">tes</option>
+                                        {
+                                            selectorCuti.list_jenis_cuti.map((jenis_cuti:JenisCuti, _) => (
+                                                <option selected={formData.jenis_cuti==jenis_cuti.id} key={jenis_cuti.id} value={jenis_cuti.id}>{jenis_cuti.nama}</option>
+                                            ))
+                                        }
                                     </select>
                                     {errors.jenis_cuti && <div className="invalid-feedback">{errors.jenis_cuti}</div>}
                                 </div>

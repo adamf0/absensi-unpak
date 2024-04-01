@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { cutiselector, fetchListCuti } from '../redux/cutiSlice';
+import { cutiselector, fetchListCuti, fetchListJenisCuti } from '../redux/cutiSlice';
 import WelcomingComponent from '../component/WelcomingComponent';
 import TableComponent from '../component/TableComponent';
 import ModalTambahCuti from '../component/ModalTambahCuti';
@@ -17,6 +17,14 @@ function CutiPage() {
     const loadTable = async (dispatch: Dispatch<any>, page: number) => {
         await dispatch(fetchListCuti(page));
     };
+    const loadJenisCuti = async () => {
+        await dispatch(fetchListJenisCuti());
+    };
+
+    useEffect(()=>{
+        loadJenisCuti();
+        console.log(selectorCuti.list_jenis_cuti)
+    },[]);
 
     useEffect(() => {
         loadTable(dispatch, selectorCuti.paging.currentPage)
@@ -57,6 +65,7 @@ function CutiPage() {
                     },
                     success: {
                         render({ data }) {
+                            loadTable(dispatch, 1)
                             return `${data}`
                         },
                     },

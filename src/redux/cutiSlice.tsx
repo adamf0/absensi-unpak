@@ -2,14 +2,17 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CutiModel } from "../model/CutiModel";
 import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
+import { JenisCuti } from "../model/JenisCuti";
 
 interface state{
+  list_jenis_cuti: Array<JenisCuti>,
   list: Array<CutiModel>,
   paging: PagingTable,
   editCuti: CutiModel | null,
   deletedCuti: CutiModel | null
 }
 const initialState:state = {
+    list_jenis_cuti: [],
     list: [],
     paging: {
       totalData:0,
@@ -57,6 +60,36 @@ export const fetchListCuti = createAsyncThunk(
   }
 );
 
+export const fetchListJenisCuti = createAsyncThunk(
+  'jenis_cuti/fetchData',
+  async () => {
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    };
+    console.log(`http://localhost:8000/jenis_cuti`)
+    const response = await fetch(`http://localhost:8000/jenis_cuti`, requestOptions);
+    const json: any = await response.json();
+
+    if (json.status !== 200) {
+      throw new Error(json.message ?? "Terjadi masalah pada saat request ke server");
+    }
+
+    const listJenisCuti = json.list.map((item: any) =>
+      new JenisCuti(
+        item.id,
+        item.nama,
+        item.min,
+        item.max,
+        item.dokumen,
+        item.kondisi,
+      )
+    );
+
+    return { listJenisCuti };
+  }
+);
+
 export const cutilice = createSlice({
   name: "cuti",
   initialState,
@@ -84,6 +117,10 @@ export const cutilice = createSlice({
     builder.addCase(fetchListCuti.fulfilled, (state, action) => {
       state.list = action.payload.cutiList;
       state.paging = action.payload.paging;
+    });
+
+    builder.addCase(fetchListJenisCuti.fulfilled, (state, action) => {
+      state.list_jenis_cuti = action.payload.listJenisCuti;
     });
   },
 });
