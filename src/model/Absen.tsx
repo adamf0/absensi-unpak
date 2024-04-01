@@ -1,16 +1,16 @@
 export class Absen {
     id: string;
-    nidn: number;
+    nidn: string|null;
     tanggal: string;
     absen_masuk: string;
-    absen_keluar: string;
+    absen_keluar: string|null;
     
     constructor(
         id: string,
-        nidn: number,
+        nidn: string|null,
         tanggal: string,
         absen_masuk: string,
-        absen_keluar: string
+        absen_keluar: string|null
     ) {
         this.id = id;
         this.nidn = nidn;
