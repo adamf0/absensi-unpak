@@ -1,7 +1,7 @@
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import '../style.css'
-const Welcoming = lazy(() => import('../component/Welcoming'));
-const Absent = lazy(() => import('../component/Absent'));
+import Welcoming from '../component/Welcoming';
+import Absent from '../component/Absent';
 
 function Absensi() {
     return (

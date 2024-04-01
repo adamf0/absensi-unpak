@@ -1,15 +1,14 @@
 import '../style.css'
-import { Dispatch, Suspense, lazy, useEffect } from 'react';
+import { Dispatch, Suspense, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { cutiselector, fetchListCuti } from '../redux/cutiSlice';
-
-const Welcoming = lazy(() => import('../component/Welcoming'));
-const TableComponent = lazy(() => import('../component/TableComponent'));
-const ModalTambahCuti = lazy(() => import('../component/ModalTambahCuti'));
-const ModalUbahCuti = lazy(() => import('../component/ModalUbahCuti'));
+import Welcoming from '../component/Welcoming';
+import TableComponent from '../component/TableComponent';
+import ModalTambahCuti from '../component/ModalTambahCuti';
+import ModalUbahCuti from '../component/ModalUbahCuti';
 
 function Cuti() {
     const selectorCuti = useAppSelector(cutiselector);

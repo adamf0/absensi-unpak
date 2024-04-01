@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './page/home'
-import Absensi from './page/absensi';
-import Cuti from './page/cuti';
-import Login from './page/login';
 import AuthenticateRoutes from './component/AuthenticateRoutes';
 import BlockAfterAuthenticateRoutes from './component/BlockAfterAuthenticateRoutes';
-import Logout from './page/logout';
+import Home from './page/Home';
+import Absensi from './page/Absensi';
+import Cuti from './page/Cuti';
+import Login from './page/Login';
+import Logout from './page/Logout';
 
 function App() {
   return (

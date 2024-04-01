@@ -151,9 +151,9 @@ function Calendar(props) {
 }
 
 export function App(props) {
-  const data = [
-    { eventName: 'Lunch Meeting w/ Mark', calendar: 'Work', color: 'orange' }
-  ];
+  // const data = [
+  //   { eventName: 'Lunch Meeting w/ Mark', calendar: 'Work', color: 'orange' }
+  // ];
 
-  return <Calendar events={data} />;
+  return <Calendar events={data.events} />;
 }
