@@ -1,5 +1,5 @@
 import { TableProps } from '../model/TableProps';
-import Card from './Card';
+import CardComponent from './CardComponent';
 import { cutiselector } from '../redux/cutiSlice';
 import { useAppSelector } from '../redux/hooks';
 
@@ -49,7 +49,7 @@ const TableComponent: React.FC<TableProps> = ({ colums }) => {
             </thead>
             <tbody>
                 {selectorCuti.list.map((data, _) => {
-                    return <Card
+                    return <CardComponent
                         key={data.id}
                         data={data}
                     />

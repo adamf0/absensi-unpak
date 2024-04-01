@@ -1,6 +1,6 @@
 import moment from 'moment';
 import '../style.css'
-import Calendar from './Calendar';
+import CalendarComponent from './CalendarComponent';
 import { absenselector, setAbsent } from '../redux/absenSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { authselector } from '../redux/authSlice';
@@ -185,7 +185,7 @@ function AbsentComponent() {
                     <button className="btn button buttonSmall blueDark" onClick={absent}>{selectorAbsen.absen == null? "Absen masuk":"Absen keluar"}</button> : <></>}
             </div>
             <div className="absent__content row-container spaceAroundRow">
-                <Calendar events={data} click={openDay} />
+                <CalendarComponent events={data} click={openDay} />
                 <div className="calendar-event">
                     {
                         dayEvents.length > 0 ?

@@ -7,7 +7,7 @@ import { deletedCuti, editCuti } from '../redux/cutiSlice';
 import { useAppDispatch } from '../redux/hooks';
 // import "moment/locale/id";
 
-const Card: FC<CardProps> = ({ data }): JSX.Element => {
+const CardComponent: FC<CardProps> = ({ data }): JSX.Element => {
     const dispatch = useAppDispatch();
     
     return <>
@@ -44,4 +44,4 @@ const Card: FC<CardProps> = ({ data }): JSX.Element => {
     ;
 }
 
-export default Card;
+export default CardComponent;

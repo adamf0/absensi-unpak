@@ -2,7 +2,7 @@ import moment, { Moment } from "moment";
 import { useState, useEffect } from "react";
 import CalendarProps from '../model/CalendarProps';
 
-const Calendar: React.FC<CalendarProps> = ({ events, click }) => {
+const CalendarComponent: React.FC<CalendarProps> = ({ events, click }) => {
     const [current, setCurrent] = useState<Moment>(moment().date(1));
     const [calendarEvents, setCalendarEvents] = useState<EventData[]>([]);
 
@@ -130,4 +130,4 @@ const Calendar: React.FC<CalendarProps> = ({ events, click }) => {
     );
 };
 
-export default Calendar;
+export default CalendarComponent;
