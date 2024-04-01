@@ -13,6 +13,14 @@ export default defineConfig({
    port: 81,
    strictPort: true,
    host: true,
-   origin: "https://0.0.0.0:80",
+   origin: "https://0.0.0.0:81",
+   proxy: {
+    // Assuming you want to proxy requests to port 80
+    '/api': {
+      target: 'https://0.0.0.0:81',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/api/, ''),
+    },
+  },
   },
  });
