@@ -115,7 +115,7 @@ function CutiPage() {
                 <ModalUbahCuti 
                     id={selectorCuti.editCuti?.id??''}
                     tanggal_pengajuan={selectorCuti.editCuti?.tanggal??''}
-                    jenis_cuti={selectorCuti.editCuti?.jenis??''}
+                    jenis_cuti={selectorCuti.editCuti?.jenis.id??''}
                     lama_cuti={`${selectorCuti.editCuti?.lama??''}`}
                     tujuan={selectorCuti.editCuti?.tujuan??""}
                 />

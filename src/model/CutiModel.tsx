@@ -1,7 +1,9 @@
+import { JenisCuti } from "./JenisCuti";
+
 export class CutiModel {
     tanggal: string;
     lama: number;
-    jenis: string;
+    jenis: JenisCuti;
     tujuan: string;
     status: string;
     id: string;
@@ -10,7 +12,7 @@ export class CutiModel {
     constructor(
         tanggal: string,
         lama: number,
-        jenis: string,
+        jenis: JenisCuti,
         tujuan: string,
         status: string,
         id: string,

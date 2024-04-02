@@ -4,27 +4,27 @@ import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
 import { JenisCuti } from "../model/JenisCuti";
 
-interface state{
+interface state {
   list_jenis_cuti: Array<JenisCuti>,
   list: Array<CutiModel>,
   paging: PagingTable,
   editCuti: CutiModel | null,
   deletedCuti: CutiModel | null
 }
-const initialState:state = {
-    list_jenis_cuti: [],
-    list: [],
-    paging: {
-      totalData:0,
-      totalPage:10,
-      currentPage:1,
-      start:0,
-      end:0,
-      prevPage:null,
-      nextPage:null,
-    },
-    editCuti: null,
-    deletedCuti: null,
+const initialState: state = {
+  list_jenis_cuti: [],
+  list: [],
+  paging: {
+    totalData: 0,
+    totalPage: 10,
+    currentPage: 1,
+    start: 0,
+    end: 0,
+    prevPage: null,
+    nextPage: null,
+  },
+  editCuti: null,
+  deletedCuti: null,
 }
 
 export const fetchListCuti = createAsyncThunk(
@@ -43,7 +43,22 @@ export const fetchListCuti = createAsyncThunk(
     }
 
     const cutiList = json.list.data.map((item: any) =>
-      new CutiModel(item.tanggal_pengajuan, item.lama_cuti, item.jenis_cuti, item.tujuan, "Pending", item.id, false)
+      new CutiModel(
+        item.tanggal_pengajuan,
+        item.lama_cuti,
+        new JenisCuti(
+          item.JenisCuti.id,
+          item.JenisCuti.nama,
+          item.JenisCuti.min,
+          item.JenisCuti.max,
+          item.JenisCuti.dokumen,
+          item.JenisCuti.kondisi,
+        ),
+        item.tujuan,
+        "Pending",
+        item.id,
+        false
+      )
     );
 
     const paging: PagingTable = {

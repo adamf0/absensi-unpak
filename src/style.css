@@ -489,6 +489,31 @@ body{
   background-color: #EBF0F5;
 }
 
+.custom-badge.tahunan {
+  color: #fff;
+  background-color: #8f67ff;
+}
+.custom-badge.sakit {
+  color: #000;
+  background-color: #ff6767;
+}
+.custom-badge.melahirkan {
+  color: #000;
+  background-color: #67d1ff;
+}
+.custom-badge.menunaikan_ibadah {
+  color: #000;
+  background-color: #79da52;
+}
+.custom-badge.diluar_tanggungan {
+  color: #fff;
+  background-color: #000;
+}
+.custom-badge.alasan_penting {
+  color: #fff;
+  background-color: #808080;
+}
+
 .pagination{
   display: flex;
   flex-wrap: wrap;

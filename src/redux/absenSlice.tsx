@@ -9,26 +9,6 @@ const initialState:state = {
   absen: null,
 }
 
-// export const fetchDataAbsent = createAsyncThunk(
-//   'absen/fetchData',
-//   async (nidn: string) => {
-//     const requestOptions = {
-//       method: 'GET',
-//       headers: { 'Content-Type': 'application/json' }
-//     };
-//     console.log(`${process.env.base_url_api}/getabsen`)
-//     const response = await fetch(`${process.env.base_url_api}/getabsen?nidn=${nidn}`, requestOptions);
-//     const json: any = await response.json();
-
-//     if (json.status !== 200) {
-//       throw new Error(json.message ?? "Terjadi masalah pada saat request ke server");
-//     }
-
-//     const data = new Absen() //json.data
-//     return { data };
-//   }
-// );
-
 export const absenlice = createSlice({
   name: "absen",
   initialState,
@@ -39,13 +19,13 @@ export const absenlice = createSlice({
     setAbsent: (state, action: PayloadAction<Absen|null>) => {
       state.absen = action.payload;
     },
+    setOutAbsent: (state, action: PayloadAction<string>) => {
+      if (state.absen !== null) {
+        state.absen.absen_keluar = action.payload;
+      }
+    },
   },
-  // extraReducers: (builder) => {
-  //   builder.addCase(fetchDataAbsent.fulfilled, (state, action) => {
-  //     state.absen = action.payload.data;
-  //   });
-  // },
 });
-export const {setAbsent,getAbsent} = absenlice.actions;
+export const {setAbsent,setOutAbsent,getAbsent} = absenlice.actions;
 export const absenselector = (state: RootState) => state.absenReducer;
 export default absenlice.reducer;

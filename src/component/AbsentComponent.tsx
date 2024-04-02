@@ -1,7 +1,7 @@
 import moment from 'moment';
 import '../style.css'
 import CalendarComponent from './CalendarComponent';
-import { absenselector, setAbsent } from '../redux/absenSlice';
+import { absenselector, setAbsent, setOutAbsent } from '../redux/absenSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { useEffect, useState } from 'react';
 import { Absen } from '../model/Absen';
@@ -11,6 +11,7 @@ function AbsentComponent() {
     const [listEvent, setListEvent] = useState<EventData[]>([]);
     const [listEventNow, setListEventNow] = useState<EventData[]>([]);
     const selectorAbsen = useAppSelector(absenselector);
+    const [absenButton, setAbsenButton] = useState<any>(<></>);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -117,13 +118,14 @@ function AbsentComponent() {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     if (selectorAbsen.absen == null) {
+                        const absenMasuk = moment().format('H:mm:ss')
                         const requestOptions = {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                             body: JSON.stringify({
                                 "nidn": localStorage.getItem('authData'),
                                 "tanggal": new Date().toISOString().slice(0, 10),
-                                "absen_masuk": "08:00:00",
+                                "absen_masuk": absenMasuk,
                                 "lat": position.coords.latitude,
                                 "long": position.coords.longitude
                             })
@@ -146,9 +148,11 @@ function AbsentComponent() {
                                         json.data.id,
                                         localStorage.getItem('authData'),
                                         new Date().toISOString().slice(0, 10),
-                                        "08:00:00",
+                                        absenMasuk,
                                         null
                                     )))
+                                    setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>)
+                                    alert(json.message)
                                 }
                             })
                             .catch(error => {
@@ -158,13 +162,14 @@ function AbsentComponent() {
 
                             })
                     } else if (selectorAbsen.absen?.absen_keluar == null) {
+                        const absenKeluar = moment().format('H:mm:ss')
                         const requestOptions = {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                             body: JSON.stringify({
                                 "nidn": localStorage.getItem('authData'),
                                 "tanggal": new Date().toISOString().slice(0, 10),
-                                "absen_keluar": "09:00:00"
+                                "absen_keluar": absenKeluar
                             })
                         };
 
@@ -173,6 +178,7 @@ function AbsentComponent() {
                                 if (response.ok) {
                                     return response.json()
                                 } else {
+                                    console.log(response)
                                     throw new Error(`${response.status}`);
                                 }
                             })
@@ -181,7 +187,9 @@ function AbsentComponent() {
                                 if (json.status != 200) {
                                     alert(json.message ?? "terjadi masalah pada saat request ke server")
                                 } else {
-                                    
+                                    dispatch(setOutAbsent(absenKeluar))
+                                    setAbsenButton(<></>)
+                                    alert(json.message)
                                 }
                             })
                             .catch(error => {
@@ -201,12 +209,15 @@ function AbsentComponent() {
         }
     }
 
-    let absenButton = <></>
-    if(localStorage.getItem('authData') != null && (selectorAbsen.absen == null || selectorAbsen.absen.absen_masuk == null)){
-        absenButton = <button className="btn button buttonSmall blueDark" onClick={absent}>Absen Masuk</button>
-    } else if(localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk != null && selectorAbsen.absen?.absen_keluar == null){
-        absenButton = <button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>
-    }
+    useEffect(()=>{
+        if(localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk == null){
+            setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Masuk</button>)
+        } else if(localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk != null && selectorAbsen.absen?.absen_keluar == null){
+            setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>)
+        } else{
+            setAbsenButton(<></>)
+        }
+    },[selectorAbsen.absen])
 
     return (
         <section className="absent card">
