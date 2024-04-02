@@ -68,7 +68,7 @@ const ModalUbahCuti: React.FC<ModalEditCutiProps> = ({id,tanggal_pengajuan,jenis
                     }
     
                     setTimeout(() => {
-                        fetch(`${import.meta.env.BASE_URL}/cuti/update`, requestOptions)
+                        fetch(`${process.env.base_url_api}/cuti/update`, requestOptions)
                             .then(async response => response.json())
                             .then(async json => {
                                 console.log(json)

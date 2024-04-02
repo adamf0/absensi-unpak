@@ -42,7 +42,7 @@ function LoginPage() {
             //             buttonmasukRef.current.disabled = true;
             //         }
             //         setTimeout(() => {
-            //             fetch(`${import.meta.env.BASE_URL}/login`, requestOptions)
+            //             fetch(`${process.env.base_url_api}/login`, requestOptions)
             //                 .then(async response => {
             //                     if (response.ok) {
             //                         return response.json()
