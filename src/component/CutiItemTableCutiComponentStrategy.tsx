@@ -8,12 +8,19 @@ import { TableItemStrategy } from '../abstract/TableItemStrategy';
 class CutiItemTableCutiComponentStrategy implements TableItemStrategy {
     render(data: any, index:number): JSX.Element {
         const dispatch = useAppDispatch();
+        let classLabelJenisCuti = data.jenis?.nama.replace(/\s/g, "_")
+        if(classLabelJenisCuti.includes("menunaikan_ibadah")){
+            classLabelJenisCuti = "menunaikan_ibadah"
+        } else if(classLabelJenisCuti.includes("alasan_penting")){
+            classLabelJenisCuti = "alasan_penting"
+        }
+
         return (
         <tr key={index}>
             <td data-name="Tanggal">{moment(data.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</td>
             <td data-name="Lama Cuti">{data.lama} hari</td>
             <td data-name="Jenis Cuti">
-                <span className="custom-badge pending">{data.jenis?.nama??"-"}</span>
+                <span className={`custom-badge ${classLabelJenisCuti}`}>{data.jenis?.nama??"-"}</span>
             </td>
             <td data-name="Tujuan">{data.tujuan}</td>
             <td data-name="Status">
