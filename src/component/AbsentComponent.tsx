@@ -14,7 +14,52 @@ function AbsentComponent() {
     const [absenButton, setAbsenButton] = useState<any>(<></>);
     const dispatch = useAppDispatch();
 
+    async function loadCalendar() {
+        const requestOptions = {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        };
+
+        if (localStorage.getItem('authData') != null || localStorage.getItem('authData') != "null") {
+            await fetch(`${process.env.base_url_api}/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
+                .then(async response => {
+                    if (response.ok || response.status == 500) {
+                        return response.json()
+                    }
+                })
+                .then(async json => {
+                    if(json.status == 200){
+                        const eventDataArray = json.list.map((item: any) => ({
+                            id: item.id,
+                            tanggal: item.tanggal,
+                            type: item.type,
+                            absen_masuk: item.type == "absen" ? item.absen_masuk : null,
+                            absen_keluar: item.type == "absen" ? item.absen_keluar : null,
+                            jenis_cuti: item.type == "cuti" ? item.jenis_cuti : null,
+                            tujuan: item.type == "cuti" ? item.tujuan : null,
+                        }));
+
+                        setListEvent(eventDataArray);
+                        setListEventNow(
+                            listEvent.filter(ev => moment(ev.tanggal).format("YYYY-MM-DD") === yearMonthEvent)
+                        )
+                    } else if(json.status == 500){
+                        alert(json.message ?? "terjadi masalah pada saat request ke server")
+                    } else{
+                        alert(json.message ?? "terjadi masalah pada saat request ke server")
+                    }
+                })
+                .catch(error => {
+                    alert(error.message)
+                })
+                .finally(() => {
+
+                })
+        }
+    }
     useEffect(() => {
+        loadCalendar()
+
         const requestOptions = {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -24,92 +69,42 @@ function AbsentComponent() {
             // })
         };
 
-        if(localStorage.getItem('authData')!=null || localStorage.getItem('authData')!="null"){
+        if (localStorage.getItem('authData') != null || localStorage.getItem('authData') != "null") {
             fetch(`${process.env.base_url_api}/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
-            .then(async response => {
-                if (response.ok) {
-                    return response.json()
-                } else {
-                    throw new Error(`${response.status}`);
-                }
-            })
-            .then(async json => {
-                console.log(json)
-                if (json.status != 200) {
-                    alert(json.message ?? "terjadi masalah pada saat request ke server")
-                } else {
-                    if (json.data == null) {
+                .then(async response => {
+                    if (response.ok || response.status == 500) {
+                        return response.json()
+                    }
+                })
+                .then(async json => {
+                    if (json.status == 200) {
+                        if (json.data == null) {
+                            dispatch(setAbsent(null))
+                        } else {
+                            dispatch(setAbsent(new Absen(
+                                json.data.id,
+                                json.data.nidn,
+                                json.data.tanggal,
+                                json.data.absen_masuk,
+                                json.data.absen_keluar,
+                            )))
+                        }
+                    } else if (json.status == 500) {
                         dispatch(setAbsent(null))
                     } else {
-                        dispatch(setAbsent(new Absen(
-                            json.data.id,
-                            json.data.nidn,
-                            json.data.tanggal,
-                            json.data.absen_masuk,
-                            json.data.absen_keluar,
-                        )))
+                        alert(json.message ?? "terjadi masalah pada saat request ke server")
                     }
-                }
-            })
-            .catch(error => {
-                alert(error.message)
-            })
-            .finally(() => {
+                })
+                .catch(error => {
+                    alert(error.message)
+                })
+                .finally(() => {
 
-            })
+                })
         }
-    }, []);
-
-    async function loadCalendar(){
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        };
-
-        if(localStorage.getItem('authData')!=null || localStorage.getItem('authData')!="null"){
-            await fetch(`${process.env.base_url_api}/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
-            .then(async response => {
-                if (response.ok) {
-                    return response.json()
-                } else {
-                    throw new Error(`${response.status}`);
-                }
-            })
-            .then(async json => {
-                console.log(json)
-                if (json.status != 200) {
-                    alert(json.message ?? "terjadi masalah pada saat request ke server")
-                } else {
-                    const eventDataArray = json.list.map((item:any) => ({
-                        id: item.id,
-                        tanggal: item.tanggal,
-                        type: item.type,
-                        absen_masuk: item.type=="absen"? item.absen_masuk:null,
-                        absen_keluar: item.type=="absen"? item.absen_keluar:null,
-                        jenis_cuti: item.type=="cuti"? item.jenis_cuti:null,
-                        tujuan: item.type=="cuti"? item.tujuan:null,
-                    }));
-
-                    setListEvent(eventDataArray);
-                    setListEventNow(
-                        listEvent.filter(ev => moment(ev.tanggal).format("YYYY-MM-DD") === yearMonthEvent)
-                    )
-                }
-            })
-            .catch(error => {
-                alert(error.message)
-            })
-            .finally(() => {
-
-            })
-        }
-    }
-    useEffect(() => {
-        loadCalendar()
     }, []);
 
     const openDay = (events: EventData[]) => {
-        console.log(events);
         setListEventNow(events)
     };
 
@@ -133,17 +128,12 @@ function AbsentComponent() {
 
                         fetch(`${process.env.base_url_api}/absen/masuk`, requestOptions)
                             .then(async response => {
-                                if (response.ok) {
+                                if (response.ok || response.status==500) {
                                     return response.json()
-                                } else {
-                                    throw new Error(`${response.status}`);
                                 }
                             })
                             .then(async json => {
-                                console.log(json)
-                                if (json.status != 200) {
-                                    alert(json.message ?? "terjadi masalah pada saat request ke server")
-                                } else {
+                                if(json.status == 200){
                                     dispatch(setAbsent(new Absen(
                                         json.data.id,
                                         localStorage.getItem('authData'),
@@ -152,8 +142,12 @@ function AbsentComponent() {
                                         null
                                     )))
                                     setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>)
-                                    alert(json.message)
+                                } else if(json.status == 200){
+                                    
+                                } else{
+
                                 }
+                                alert(json.message ?? "terjadi masalah pada saat request ke server")
                             })
                             .catch(error => {
                                 alert(error.message)
@@ -178,12 +172,10 @@ function AbsentComponent() {
                                 if (response.ok) {
                                     return response.json()
                                 } else {
-                                    console.log(response)
                                     throw new Error(`${response.status}`);
                                 }
                             })
                             .then(async json => {
-                                console.log(json)
                                 if (json.status != 200) {
                                     alert(json.message ?? "terjadi masalah pada saat request ke server")
                                 } else {
@@ -209,15 +201,15 @@ function AbsentComponent() {
         }
     }
 
-    useEffect(()=>{
-        if(localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk == null){
+    useEffect(() => {
+        if (localStorage.getItem('authData') != null && (selectorAbsen.absen == null || selectorAbsen.absen?.absen_masuk == null)) {
             setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Masuk</button>)
-        } else if(localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk != null && selectorAbsen.absen?.absen_keluar == null){
+        } else if (localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk != null && selectorAbsen.absen?.absen_keluar == null) {
             setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>)
-        } else{
+        } else {
             setAbsenButton(<></>)
         }
-    },[selectorAbsen.absen])
+    }, [selectorAbsen.absen])
 
     return (
         <section className="absent card">
@@ -234,7 +226,7 @@ function AbsentComponent() {
                                 <div key={i} className="event-item">
                                     <p>{moment(event.tanggal).locale("id").format('DD MMMM YYYY')}</p>
                                     <label className={`event-status ${event.type}`}>{event.type}</label>
-                                    <p className="event-tujuan">Keterangan: {event.type=="cuti"? event.tujuan:"Masuk"}</p>
+                                    <p className="event-tujuan">Keterangan: {event.type == "cuti" ? event.tujuan : "Masuk"}</p>
                                 </div>
                             )) :
                             <div className="event-item notFound">
