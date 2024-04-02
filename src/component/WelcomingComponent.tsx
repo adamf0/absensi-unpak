@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 function WelcomingComponent() {
     const navigate = useNavigate();
+    const path = window.location.pathname.split('/');
 
     return (
         <section className="welcoming">
@@ -20,8 +21,9 @@ function WelcomingComponent() {
                         {
                             localStorage.getItem('authData')==null? <></>: 
                             <>
-                                <button className="btn button blue" onClick={()=>navigate('/absensi')}>Absensi</button>
-                                <button className="btn button blue" onClick={()=>navigate('/cuti')}>Cuti</button>    
+                                <button className={`btn button ${path.indexOf('absensi')==1? "":"blue"}`} onClick={()=>navigate('/absensi')}>Absensi</button>
+                                <button className={`btn button ${path.indexOf('cuti')==1? "":"blue"}`} onClick={()=>navigate('/cuti')}>Cuti</button>
+                                <button className={`btn button ${path.indexOf('izin')==1? "":"blue"}`} onClick={()=>navigate('/izin')}>Izin</button>    
                             </>
                         }
                     </div>

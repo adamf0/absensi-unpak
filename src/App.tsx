@@ -6,6 +6,7 @@ import AbsensiPage from './page/AbsensiPage';
 import CutiPage from './page/CutiPage';
 import LoginPage from './page/LoginPage';
 import LogoutPage from './page/LogoutPage';
+import IzinPage from './page/IzinPage';
 
 function App() {
   return (
@@ -20,6 +21,11 @@ function App() {
         <Route path="/cuti" element={
           <AuthenticateRoutes>
             <CutiPage />
+          </AuthenticateRoutes>
+        } />
+        <Route path="/izin" element={
+          <AuthenticateRoutes>
+            <IzinPage />
           </AuthenticateRoutes>
         } />
         <Route path="/login" element={

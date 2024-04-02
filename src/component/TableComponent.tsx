@@ -1,43 +1,6 @@
 import { TableProps } from '../model/TableProps';
-import CardComponent from './CardComponent';
-import { cutiselector } from '../redux/cutiSlice';
-import { useAppSelector } from '../redux/hooks';
 
-const TableComponent: React.FC<TableProps> = ({ colums }) => {
-    const selectorCuti = useAppSelector(cutiselector);
-    // const [list, dispatch] = useReducer(reducerCuti, []);
-    // const boxRef = useRef<HTMLDivElement>(null);
-    // const tooltipRef = useRef<HTMLDivElement>(null);
-    // const { styles, attributes } = usePopper(boxRef.current, tooltipRef.current, {
-    //     modifiers: [{ name: 'offset', options: { offset: [10, 0] } }],
-    // });
-    
-    // const toggleDialog = (id: number) => {
-    //     dispatch({type:'TOGGLE_DETAIL', id})
-    // };
-
-    // const handleOutsideClick = (event: any) => {
-    //     if (
-    //         boxRef.current &&
-    //         tooltipRef.current &&
-    //         !boxRef.current.contains(event.target) &&
-    //         !tooltipRef.current.contains(event.target)
-    //     ) {
-    //         dispatch({type:'CLOSE_DETAIL'})
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     document.addEventListener('mousedown', handleOutsideClick);
-    //     return () => {
-    //         document.removeEventListener('mousedown', handleOutsideClick);
-    //     };
-    // }, [handleOutsideClick]);
-
-    // useEffect(()=>{
-    //     dispatch({type:'STORE_LIST', list:selectorCuti.list})
-    // },[list])
-
+const TableComponent: React.FC<TableProps> = ({ colums,rows,template }) => {
     return (
         <table>
             <thead>
@@ -48,11 +11,8 @@ const TableComponent: React.FC<TableProps> = ({ colums }) => {
                 </tr>
             </thead>
             <tbody>
-                {selectorCuti.list.map((data, _) => {
-                    return <CardComponent
-                        key={data.id}
-                        data={data}
-                    />
+                {rows.map((data, _) => {
+                    return template.render(data);
                 })}
             </tbody>
         </table>

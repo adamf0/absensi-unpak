@@ -4,42 +4,34 @@ import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { cutiselector, fetchListCuti, fetchListJenisCuti } from '../redux/cutiSlice';
+import { izinselector, fetchListIzin } from '../redux/izinSlice';
 import WelcomingComponent from '../component/WelcomingComponent';
 import TableComponent from '../component/TableComponent';
-import ModalTambahCuti from '../component/ModalTambahCuti';
-import ModalUbahCuti from '../component/ModalUbahCuti';
-import CutiItemTableCutiComponentStrategy from '../component/CutiItemTableCutiComponentStrategy';
+import ModalUbahIzin from '../component/ModalUbahIzin';
+import ModalTambahIzin from '../component/ModalTambahIzin';
+import CutiItemTableIzinComponentStrategy from '../component/CutiItemTableIzinComponentStrategy';
 
-function CutiPage() {
-    const selectorCuti = useAppSelector(cutiselector);
+function IzinPage() {
+    const selectorIzin = useAppSelector(izinselector);
     const dispatch = useAppDispatch();
     
     const loadTable = async (dispatch: Dispatch<any>, page: number) => {
-        await dispatch(fetchListCuti(page));
+        await dispatch(fetchListIzin(page));
     };
-    const loadJenisCuti = async () => {
-        await dispatch(fetchListJenisCuti());
-    };
-
-    useEffect(()=>{
-        loadJenisCuti();
-        console.log(selectorCuti.list_jenis_cuti)
-    },[]);
 
     useEffect(() => {
-        loadTable(dispatch, selectorCuti.paging.currentPage)
+        loadTable(dispatch, selectorIzin.paging.currentPage)
 
         return () => {};
-    }, [selectorCuti.paging.currentPage]);
+    }, [selectorIzin.paging.currentPage]);
 
     useEffect(() => {
-        if(selectorCuti.deletedCuti?.id!=null){
+        if(selectorIzin.deletedIzin?.id!=null){
             toast.promise(
                 new Promise((resolve, reject) => {
-                    console.log(selectorCuti.deletedCuti?.id)
+                    console.log(selectorIzin.deletedIzin?.id)
                     setTimeout(() => {
-                        fetch(`${process.env.base_url_api}/cuti/delete/${selectorCuti.deletedCuti?.id}`, {})
+                        fetch(`${process.env.base_url_api}/izin/delete/${selectorIzin.deletedIzin?.id}`, {})
                             .then(async response => response.json())
                             .then(async json => {
                                 console.log(json)
@@ -80,7 +72,7 @@ function CutiPage() {
         }
 
         return () => {};
-    }, [selectorCuti.deletedCuti]);
+    }, [selectorIzin.deletedIzin]);
     
     return (
         <Suspense fallback={<>Loading...</>}>
@@ -89,27 +81,25 @@ function CutiPage() {
 
                 <section className="leave card">
                     <div className="leave__content row-container spaceBetweenRow">
-                        <h3>Cuti</h3>
+                        <h3>Izin</h3>
                         {}
                         <button id="btnModalTambah" className="button buttonSmall blueDark" data-bs-toggle="modal" data-bs-target="#modalTambah">Tambah</button>
                     </div>
                     <div className="leave__content row-container spaceAroundRow">
                         <TableComponent
-                            colums={["Tanggal","Lama","Jenis","Tujuan","Status","Aksi",]}
-                            rows={selectorCuti.list}
-                            template={new CutiItemTableCutiComponentStrategy}
+                            colums={["Tanggal","Tujuan","Status","Aksi",]}
+                            rows={selectorIzin.list}
+                            template={new CutiItemTableIzinComponentStrategy}
                         />
                         <PaginationComponent/>
                     </div>
                 </section>
 
-                <ModalTambahCuti/>
-                <ModalUbahCuti 
-                    id={selectorCuti.editCuti?.id??''}
-                    tanggal_pengajuan={selectorCuti.editCuti?.tanggal??''}
-                    jenis_cuti={selectorCuti.editCuti?.jenis??''}
-                    lama_cuti={`${selectorCuti.editCuti?.lama??''}`}
-                    tujuan={selectorCuti.editCuti?.tujuan??""}
+                <ModalTambahIzin/>
+                <ModalUbahIzin 
+                    id={selectorIzin.editIzin?.id??''}
+                    tanggal_pengajuan={selectorIzin.editIzin?.tanggal??''}
+                    tujuan={selectorIzin.editIzin?.tujuan??""}
                 />
             </div>
             <ToastContainer />
@@ -117,4 +107,4 @@ function CutiPage() {
     );
 }
 
-export default CutiPage;
+export default IzinPage;
