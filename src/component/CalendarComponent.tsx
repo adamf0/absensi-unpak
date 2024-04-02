@@ -107,7 +107,7 @@ const CalendarComponent: React.FC<CalendarProps> = ({ events, click }) => {
         return (
             <div className="legend">
                 {calendars.map((cal, index) => (
-                    <span key={index} className={`entry ${cal['color']}`}>
+                    <span key={index} className={`entry entry-${cal['name'].replace(/\s/g, "_")}`}>
                         {cal['name']}
                     </span>
                 ))}
