@@ -6,6 +6,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     define: {
+      'process.env.deploy': JSON.stringify(env.deploy),
       'process.env.base_url_api': JSON.stringify(env.base_url_api)
     },
     base: "/",

@@ -11,8 +11,8 @@ const TableComponent: React.FC<TableProps> = ({ colums,rows,template }) => {
                 </tr>
             </thead>
             <tbody>
-                {rows.map((data, _) => {
-                    return template.render(data);
+                {rows.map((row, index) => {
+                    return template.render(row,index);
                 })}
             </tbody>
         </table>

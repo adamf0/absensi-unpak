@@ -1,3 +1,3 @@
 export interface TableItemStrategy {
-    render(data: any): JSX.Element;
+    render(data: any, index:number): JSX.Element;
 } 

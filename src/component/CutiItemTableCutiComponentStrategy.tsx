@@ -7,10 +7,10 @@ import { TableItemStrategy } from '../abstract/TableItemStrategy';
 // import "moment/locale/id";
 
 class CutiItemTableCutiComponentStrategy implements TableItemStrategy {
-    render(data: any): JSX.Element {
+    render(data: any, index:number): JSX.Element {
         const dispatch = useAppDispatch();
-        return <>
-        <tr key={data.id}>
+        return (
+        <tr key={index}>
             <td data-name="Tanggal">{moment(data.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</td>
             <td data-name="Lama Cuti">{data.lama} hari</td>
             <td data-name="Jenis Cuti">
@@ -38,8 +38,7 @@ class CutiItemTableCutiComponentStrategy implements TableItemStrategy {
                 </div> */}
             </td>
         </tr>
-        
-        </>;
+        );
       }
 }
 export default CutiItemTableCutiComponentStrategy;

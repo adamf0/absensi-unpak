@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { Absen } from '../model/Absen';
 
 function AbsentComponent() {
-    const [yearMonthEvent, setYearMonthEvent] = useState<string>(moment().format("YYYY-MM"));
+    const [yearMonthEvent, _] = useState<string>(moment().format("YYYY-MM"));
     const [listEvent, setListEvent] = useState<EventData[]>([]);
     const [listEventNow, setListEventNow] = useState<EventData[]>([]);
     const selectorAbsen = useAppSelector(absenselector);
