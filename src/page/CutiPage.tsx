@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { cutiselector, fetchListCuti, fetchListJenisCuti } from '../redux/cutiSlice';
+import { cutiselector, fetchListCuti, fetchListJenisCuti, next, prev } from '../redux/cutiSlice';
 import WelcomingComponent from '../component/WelcomingComponent';
 import TableComponent from '../component/TableComponent';
 import ModalTambahCuti from '../component/ModalTambahCuti';
@@ -99,7 +99,15 @@ function CutiPage() {
                             rows={selectorCuti.list}
                             template={new CutiItemTableCutiComponentStrategy}
                         />
-                        <PaginationComponent/>
+                        <PaginationComponent 
+                        currentPage={selectorCuti.paging.currentPage}
+                        start={selectorCuti.paging.start}
+                        end={selectorCuti.paging.end}
+                        totalData={selectorCuti.paging.totalData}
+                        prevPage={selectorCuti.paging.prevPage}
+                        nextPage={selectorCuti.paging.nextPage}
+                        handlePrevPage={()=>dispatch(prev())}
+                        handleNextPage={()=>dispatch(next())}/>
                     </div>
                 </section>
 

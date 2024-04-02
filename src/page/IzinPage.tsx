@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { izinselector, fetchListIzin } from '../redux/izinSlice';
+import { izinselector, fetchListIzin, prev, next } from '../redux/izinSlice';
 import WelcomingComponent from '../component/WelcomingComponent';
 import TableComponent from '../component/TableComponent';
 import ModalUbahIzin from '../component/ModalUbahIzin';
@@ -91,7 +91,15 @@ function IzinPage() {
                             rows={selectorIzin.list}
                             template={new CutiItemTableIzinComponentStrategy}
                         />
-                        <PaginationComponent/>
+                        <PaginationComponent 
+                        currentPage={selectorIzin.paging.currentPage}
+                        start={selectorIzin.paging.start}
+                        end={selectorIzin.paging.end}
+                        totalData={selectorIzin.paging.totalData}
+                        prevPage={selectorIzin.paging.prevPage}
+                        nextPage={selectorIzin.paging.nextPage}
+                        handlePrevPage={()=>dispatch(prev())}
+                        handleNextPage={()=>dispatch(next())}/>
                     </div>
                 </section>
 
