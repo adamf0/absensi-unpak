@@ -1,5 +1,4 @@
 import '../style.css'
-import { GetJenisCuti } from '../model/JenisCutiEnum';
 import moment from 'moment';
 import { deletedCuti, editCuti } from '../redux/cutiSlice';
 import { useAppDispatch } from '../redux/hooks';
@@ -14,7 +13,7 @@ class CutiItemTableCutiComponentStrategy implements TableItemStrategy {
             <td data-name="Tanggal">{moment(data.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</td>
             <td data-name="Lama Cuti">{data.lama} hari</td>
             <td data-name="Jenis Cuti">
-                <span className="custom-badge pending">{GetJenisCuti(data.jenis)}</span>
+                <span className="custom-badge pending">{data.jenis?.nama??"-"}</span>
             </td>
             <td data-name="Tujuan">{data.tujuan}</td>
             <td data-name="Status">
