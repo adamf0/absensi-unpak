@@ -23,8 +23,8 @@ function AbsentComponent() {
             // })
         };
 
-
-        fetch(`http://localhost:8000/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
+        if(localStorage.getItem('authData')!=null || localStorage.getItem('authData')!="null"){
+            fetch(`http://localhost:8000/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
             .then(async response => {
                 if (response.ok) {
                     return response.json()
@@ -56,6 +56,7 @@ function AbsentComponent() {
             .finally(() => {
 
             })
+        }
     }, []);
 
     async function loadCalendar(){
@@ -64,7 +65,8 @@ function AbsentComponent() {
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         };
 
-        await fetch(`http://localhost:8000/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
+        if(localStorage.getItem('authData')!=null || localStorage.getItem('authData')!="null"){
+            await fetch(`http://localhost:8000/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
             .then(async response => {
                 if (response.ok) {
                     return response.json()
@@ -99,6 +101,7 @@ function AbsentComponent() {
             .finally(() => {
 
             })
+        }
     }
     useEffect(() => {
         loadCalendar()
