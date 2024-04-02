@@ -55,7 +55,7 @@ const ModalTambahCuti = () => {
                     }
     
                     setTimeout(() => {
-                        fetch(`http://localhost:8000/cuti/create`, requestOptions)
+                        fetch(`${import.meta.env.BASE_URL}/cuti/create`, requestOptions)
                             .then(async response => response.json())
                             .then(async json => {
                                 console.log(json)

@@ -24,7 +24,7 @@ function AbsentComponent() {
         };
 
         if(localStorage.getItem('authData')!=null || localStorage.getItem('authData')!="null"){
-            fetch(`http://localhost:8000/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
+            fetch(`${import.meta.env.BASE_URL}/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
             .then(async response => {
                 if (response.ok) {
                     return response.json()
@@ -66,7 +66,7 @@ function AbsentComponent() {
         };
 
         if(localStorage.getItem('authData')!=null || localStorage.getItem('authData')!="null"){
-            await fetch(`http://localhost:8000/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
+            await fetch(`${import.meta.env.BASE_URL}/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
             .then(async response => {
                 if (response.ok) {
                     return response.json()
@@ -129,7 +129,7 @@ function AbsentComponent() {
                             })
                         };
 
-                        fetch(`http://localhost:8000/absen/masuk`, requestOptions)
+                        fetch(`${import.meta.env.BASE_URL}/absen/masuk`, requestOptions)
                             .then(async response => {
                                 if (response.ok) {
                                     return response.json()
@@ -168,7 +168,7 @@ function AbsentComponent() {
                             })
                         };
 
-                        fetch(`http://localhost:8000/absen/keluar`, requestOptions)
+                        fetch(`${import.meta.env.BASE_URL}/absen/keluar`, requestOptions)
                             .then(async response => {
                                 if (response.ok) {
                                     return response.json()

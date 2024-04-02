@@ -34,8 +34,8 @@ export const fetchListCuti = createAsyncThunk(
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     };
-    console.log(`http://localhost:8000/cuti?page=${page}&pageSize=10`)
-    const response = await fetch(`http://localhost:8000/cuti?page=${page}&pageSize=10`, requestOptions);
+    console.log(`${import.meta.env.BASE_URL}/cuti?page=${page}&pageSize=10`)
+    const response = await fetch(`${import.meta.env.BASE_URL}/cuti?page=${page}&pageSize=10`, requestOptions);
     const json: any = await response.json();
 
     if (json.status !== 200) {
@@ -67,8 +67,8 @@ export const fetchListJenisCuti = createAsyncThunk(
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     };
-    console.log(`http://localhost:8000/jenis_cuti`)
-    const response = await fetch(`http://localhost:8000/jenis_cuti`, requestOptions);
+    console.log(`${import.meta.env.BASE_URL}/jenis_cuti`)
+    const response = await fetch(`${import.meta.env.BASE_URL}/jenis_cuti`, requestOptions);
     const json: any = await response.json();
 
     if (json.status !== 200) {

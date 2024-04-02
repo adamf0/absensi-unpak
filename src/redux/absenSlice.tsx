@@ -16,8 +16,8 @@ const initialState:state = {
 //       method: 'GET',
 //       headers: { 'Content-Type': 'application/json' }
 //     };
-//     console.log(`http://localhost:8000/getabsen`)
-//     const response = await fetch(`http://localhost:8000/getabsen?nidn=${nidn}`, requestOptions);
+//     console.log(`${import.meta.env.BASE_URL}/getabsen`)
+//     const response = await fetch(`${import.meta.env.BASE_URL}/getabsen?nidn=${nidn}`, requestOptions);
 //     const json: any = await response.json();
 
 //     if (json.status !== 200) {

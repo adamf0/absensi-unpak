@@ -38,7 +38,7 @@ function CutiPage() {
                 new Promise((resolve, reject) => {
                     console.log(selectorCuti.deletedCuti?.id)
                     setTimeout(() => {
-                        fetch(`http://localhost:8000/cuti/delete/${selectorCuti.deletedCuti?.id}`, {})
+                        fetch(`${import.meta.env.BASE_URL}/cuti/delete/${selectorCuti.deletedCuti?.id}`, {})
                             .then(async response => response.json())
                             .then(async json => {
                                 console.log(json)
