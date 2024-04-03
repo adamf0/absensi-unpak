@@ -1,74 +1,104 @@
 import '../style.css'
-import { Dispatch, Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { PaginationComponent } from '../component/PaginationComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { izinselector, fetchListIzin, prev, next } from '../redux/izinSlice';
+import { izinselector, prev, next, loadList, pagingTable } from '../redux/izinSlice';
 import WelcomingComponent from '../component/WelcomingComponent';
 import TableComponent from '../component/TableComponent';
 import ModalUbahIzin from '../component/ModalUbahIzin';
 import ModalTambahIzin from '../component/ModalTambahIzin';
+import { GetListIzin } from '../repo/GetListIzin';
+import PagingTable from '../model/PagingTable';
+import { IzinModel } from '../model/IzinModel';
+import { HandlerObserver } from '../abstract/HandlerObserver';
 import CutiItemTableIzinComponentStrategy from '../component/CutiItemTableIzinComponentStrategy';
+import { AlertObserver } from '../io/AlertObserver';
+import { ConsoleObserver } from '../io/ConsoleObserver';
+import { DeleteIzin } from '../repo/DeleteIzin';
 
 function IzinPage() {
     const selectorIzin = useAppSelector(izinselector);
     const dispatch = useAppDispatch();
+    const toastId = useRef<any>(null);
+
+    const handler1 = new HandlerObserver();
+    handler1.addObserver(new ConsoleObserver());
+
+    const handler2 = new HandlerObserver();
+    handler2.addObserver(new AlertObserver());
     
-    const loadTable = async (dispatch: Dispatch<any>, page: number) => {
-        await dispatch(fetchListIzin(page));
+    const loadTable = async (page: number) => {
+        const response: any = await GetListIzin(page);
+        if (response.status !== 200) {
+            throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+        }
+
+        if (response.status === 200 || response.status === 500) {
+            const { status, message, list } = response;
+
+            if (status == 200) {
+                const izinList = list.data.map((item: any) =>
+                    new IzinModel(item.tanggal_pengajuan, item.tujuan, "Pending", item.id, false)
+                );
+
+                const paging: PagingTable = {
+                    totalData: list.totalData,
+                    totalPage: list.totalPage,
+                    currentPage: list.currentPage,
+                    start: list.startIndex || 1,
+                    end: list.endIndex,
+                    prevPage: list.prevPage,
+                    nextPage: list.nextPage,
+                };
+
+                await dispatch(loadList(izinList));
+                await dispatch(pagingTable(paging));
+            } else if (status == 500) {
+                console.trace(message ?? "Terjadi masalah pada saat request ke server")
+            } else {
+                console.trace(message ?? "Terjadi masalah pada saat request ke server")
+            }
+        }
     };
+    async function deleteIzin(id:any){
+        try {
+            toastId.current = toast("Loading...", { autoClose: false });
+            
+            const response:any = await DeleteIzin(id);
+            handler1.notifyObservers(response);
+            if (response.status === 200 || response.status === 500) {
+                const { status,message } = response;
+
+                if (status == 200){
+                    toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 });
+                    loadTable(1)
+                } else if (status == 500) {
+                    toast.update(toastId.current, { render:message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+                } else {
+                    toast.update(toastId.current, { render:message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+                }
+            } else {
+                toast.update(toastId.current, { render:"terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+            }
+        } catch (error:any) {
+            toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+            throw error;
+        } finally {
+            
+        }
+    }
 
     useEffect(() => {
-        loadTable(dispatch, selectorIzin.paging.currentPage)
+        loadTable(selectorIzin.paging.currentPage)
 
-        return () => {};
+        return () => { };
     }, [selectorIzin.paging.currentPage]);
 
     useEffect(() => {
         if(selectorIzin.deletedIzin?.id!=null){
-            toast.promise(
-                new Promise((resolve, reject) => {
-                    console.log(selectorIzin.deletedIzin?.id)
-                    setTimeout(() => {
-                        fetch(`${process.env.base_url_api}/izin/delete/${selectorIzin.deletedIzin?.id}`, {})
-                            .then(async response => response.json())
-                            .then(async json => {
-                                console.log(json)
-                                if (json.status != 200) {
-                                    reject(json.message ?? "terjadi masalah pada saat request ke server")
-                                } else {
-                                    resolve(json.message)
-                                }
-                            })
-                            .catch(error => {
-                                console.log(error)
-                                reject(error)
-                            })
-                            .finally(() => {
-                                //masig gagal refresh
-                            })
-                    }, 2000)
-                }),
-                {
-                    pending: {
-                        render() {
-                            return "Loading"
-                        },
-                    },
-                    success: {
-                        render({ data }) {
-                            loadTable(dispatch, 1)
-                            return `${data}`
-                        },
-                    },
-                    error: {
-                        render({ data }) {
-                            return `${data}`
-                        }
-                    }
-                }
-            )
+            deleteIzin(selectorIzin.deletedIzin?.id)
         }
 
         return () => {};

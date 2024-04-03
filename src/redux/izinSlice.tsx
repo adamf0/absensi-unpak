@@ -24,39 +24,6 @@ const initialState:state = {
     deletedIzin: null,
 }
 
-export const fetchListIzin = createAsyncThunk(
-  'izin/fetchData',
-  async (page: number) => {
-    const requestOptions = {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    };
-    console.log(`${process.env.base_url_api}/izin?page=${page}&pageSize=10`)
-    const response = await fetch(`${process.env.base_url_api}/izin?page=${page}&pageSize=10`, requestOptions);
-    const json: any = await response.json();
-
-    if (json.status !== 200) {
-      throw new Error(json.message ?? "Terjadi masalah pada saat request ke server");
-    }
-
-    const izinList = json.list.data.map((item: any) =>
-      new IzinModel(item.tanggal_pengajuan, item.tujuan, "Pending", item.id, false)
-    );
-
-    const paging: PagingTable = {
-      totalData: json.list.totalData,
-      totalPage: json.list.totalPage,
-      currentPage: json.list.currentPage,
-      start: json.list.startIndex || 1,
-      end: json.list.endIndex,
-      prevPage: json.list.prevPage,
-      nextPage: json.list.nextPage,
-    };
-
-    return { izinList, paging };
-  }
-);
-
 export const izinlice = createSlice({
   name: "izin",
   initialState,
@@ -81,10 +48,7 @@ export const izinlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchListIzin.fulfilled, (state, action) => {
-      state.list = action.payload.izinList;
-      state.paging = action.payload.paging;
-    });
+    
   },
 });
 export const { loadList, editIzin, deletedIzin, pagingTable, prev, next } = izinlice.actions;

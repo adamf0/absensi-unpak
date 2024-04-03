@@ -5,6 +5,13 @@ import { absenselector, setAbsent, setOutAbsent } from '../redux/absenSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { useEffect, useState } from 'react';
 import { Absen } from '../model/Absen';
+import { GetListCalendar } from '../repo/GetListCalendar';
+import { CheckAvaibiliyAbsen } from '../repo/CheckAvaibiliyAbsen';
+import { HandlerObserver } from '../abstract/HandlerObserver';
+import { ConsoleObserver } from '../io/ConsoleObserver';
+import { AlertObserver } from '../io/AlertObserver';
+import { CreateAbsentMasuk } from '../repo/CreateAbsentMasuk';
+import { CreateAbsentKeluar } from '../repo/CreateAbsentKeluar';
 
 function AbsentComponent() {
     const [yearMonthEvent, _] = useState<string>(moment().format("YYYY-MM"));
@@ -14,22 +21,22 @@ function AbsentComponent() {
     const [absenButton, setAbsenButton] = useState<any>(<></>);
     const dispatch = useAppDispatch();
 
-    async function loadCalendar() {
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        };
+    const handler1 = new HandlerObserver();
+    handler1.addObserver(new ConsoleObserver());
 
-        if (localStorage.getItem('authData') != null || localStorage.getItem('authData') != "null") {
-            await fetch(`${process.env.base_url_api}/calendar/${localStorage.getItem('authData')}/${yearMonthEvent}`, requestOptions)
-                .then(async response => {
-                    if (response.ok || response.status == 500) {
-                        return response.json()
-                    }
-                })
-                .then(async json => {
-                    if(json.status == 200){
-                        const eventDataArray = json.list.map((item: any) => ({
+    const handler2 = new HandlerObserver();
+    handler2.addObserver(new AlertObserver());
+
+    async function loadCalendar() {
+        const authData = localStorage.getItem('authData');
+        if (authData != null || authData != "null") {
+            try {
+                const response:any = await GetListCalendar(yearMonthEvent);
+                handler1.notifyObservers(response);
+                if (response.status === 200 || response.status === 500) {
+                    const { status,message,list } = response;
+                    if(status == 200){
+                        const eventDataArray = list.map((item: any) => ({
                             id: item.id,
                             tanggal: item.tanggal,
                             type: item.type,
@@ -43,169 +50,159 @@ function AbsentComponent() {
                         setListEventNow(
                             listEvent.filter(ev => moment(ev.tanggal).format("YYYY-MM-DD") === yearMonthEvent)
                         )
-                    } else if(json.status == 500){
-                        alert(json.message ?? "terjadi masalah pada saat request ke server")
+                    } else if(status == 500){
+                        handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
                     } else{
-                        alert(json.message ?? "terjadi masalah pada saat request ke server")
+                        handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
                     }
-                })
-                .catch(error => {
-                    alert(error.message)
-                })
-                .finally(() => {
-
-                })
+                } else {
+                    handler2.notifyObservers("terjadi masalah pada saat request ke server");
+                }
+            } catch (error:any) {
+                handler1.notifyObservers(error);
+            }
         }
     }
+    async function checkAvaibilityAbsent() {
+        const authData = localStorage.getItem('authData');
+        if (authData != null || authData != "null") {
+            try {
+                const response:any = await CheckAvaibiliyAbsen();
+                handler1.notifyObservers(response);
+                if (response.status === 200 || response.status === 500) {
+                    const { status,message,data } = response;
+
+                    if (status == 200 && data == null) {
+                        dispatch(setAbsent(null))
+                    } else if (status == 200 && data != null){
+                        dispatch(setAbsent(new Absen(
+                            data.id,
+                            data.nidn,
+                            data.tanggal,
+                            data.absen_masuk,
+                            data.absen_keluar,
+                        )))
+                    } else if (status == 500) {
+                        dispatch(setAbsent(null))
+                        handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
+                    } else {
+                        handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
+                    }
+                } else {
+                    handler2.notifyObservers("terjadi masalah pada saat request ke server");    
+                }
+            } catch (error:any) {
+                handler1.notifyObservers(error);
+            }
+        }
+    }
+    async function AbsenMasuk(absen:any){
+        try {
+            const response:any = await CreateAbsentMasuk(absen);
+            handler1.notifyObservers(response);
+            if (response.status === 200 || response.status === 500) {
+                const { status,message,data } = response;
+
+                if (status == 200){
+                    dispatch(setAbsent(new Absen(
+                        data.id,
+                        localStorage.getItem('authData'),
+                        new Date().toISOString().slice(0, 10),
+                        absen,
+                        null
+                    )))
+                    setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={handlerAbsent}>Absen Keluar</button>)
+                    await loadCalendar()
+                    handler2.notifyObservers(message);
+                } else if (status == 500) {
+                    // dispatch(setAbsent(null))
+                    handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
+                } else {
+                    handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
+                }
+            } else {
+                handler2.notifyObservers("terjadi masalah pada saat request ke server");    
+            }
+        } catch (error) {
+            console.log(error);
+            throw error;
+        } finally {
+            // Logika untuk menangani pengaktifan tombol
+        }
+    }
+    async function AbsenKeluar(absen:any){
+        try {
+            const response:any = await CreateAbsentKeluar(absen);
+            handler1.notifyObservers(response);
+            if (response.status === 200 || response.status === 500) {
+                const { status,message } = response;
+
+                if (status == 200 ){
+                    dispatch(setOutAbsent(absen.absen_keluar))
+                    setAbsenButton(<></>)
+                    handler2.notifyObservers(message);
+                } else if (status == 500) {
+                    // dispatch(setAbsent(null))
+                    handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
+                } else {
+                    handler2.notifyObservers(message ?? "terjadi masalah pada saat request ke server");
+                }
+            } else {
+                handler2.notifyObservers("terjadi masalah pada saat request ke server");    
+            }
+        } catch (error) {
+            console.log(error);
+            throw error;
+        } finally {
+            // Logika untuk menangani pengaktifan tombol
+        }
+    }
+
     useEffect(() => {
         loadCalendar()
-
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            // body: JSON.stringify({
-            //     nidn: selectorAuth.nidn,
-            //     tanggal: new Date().toISOString().slice(0, 10),
-            // })
-        };
-
-        if (localStorage.getItem('authData') != null || localStorage.getItem('authData') != "null") {
-            fetch(`${process.env.base_url_api}/absen/check/${localStorage.getItem('authData')}/${new Date().toISOString().slice(0, 10)}`, requestOptions)
-                .then(async response => {
-                    if (response.ok || response.status == 500) {
-                        return response.json()
-                    }
-                })
-                .then(async json => {
-                    if (json.status == 200) {
-                        if (json.data == null) {
-                            dispatch(setAbsent(null))
-                        } else {
-                            dispatch(setAbsent(new Absen(
-                                json.data.id,
-                                json.data.nidn,
-                                json.data.tanggal,
-                                json.data.absen_masuk,
-                                json.data.absen_keluar,
-                            )))
-                        }
-                    } else if (json.status == 500) {
-                        dispatch(setAbsent(null))
-                    } else {
-                        alert(json.message ?? "terjadi masalah pada saat request ke server")
-                    }
-                })
-                .catch(error => {
-                    alert(error.message)
-                })
-                .finally(() => {
-
-                })
-        }
+        checkAvaibilityAbsent();
     }, []);
 
     const openDay = (events: EventData[]) => {
         setListEventNow(events)
     };
 
-    const absent = () => {
+    const handlerAbsent = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
+                async (position) => {
                     if (selectorAbsen.absen == null) {
                         const absenMasuk = moment().format('H:mm:ss')
-                        const requestOptions = {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({
-                                "nidn": localStorage.getItem('authData'),
-                                "tanggal": new Date().toISOString().slice(0, 10),
-                                "absen_masuk": absenMasuk,
-                                "lat": position.coords.latitude,
-                                "long": position.coords.longitude
-                            })
-                        };
-
-                        fetch(`${process.env.base_url_api}/absen/masuk`, requestOptions)
-                            .then(async response => {
-                                if (response.ok || response.status==500) {
-                                    return response.json()
-                                }
-                            })
-                            .then(async json => {
-                                if(json.status == 200){
-                                    dispatch(setAbsent(new Absen(
-                                        json.data.id,
-                                        localStorage.getItem('authData'),
-                                        new Date().toISOString().slice(0, 10),
-                                        absenMasuk,
-                                        null
-                                    )))
-                                    setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>)
-                                } else if(json.status == 200){
-                                    
-                                } else{
-
-                                }
-                                alert(json.message ?? "terjadi masalah pada saat request ke server")
-                            })
-                            .catch(error => {
-                                alert(error.message)
-                            })
-                            .finally(() => {
-
-                            })
+                        await AbsenMasuk({
+                            "nidn": localStorage.getItem('authData'),
+                            "tanggal": new Date().toISOString().slice(0, 10),
+                            "absen_masuk": absenMasuk,
+                            "lat": position.coords.latitude,
+                            "long": position.coords.longitude
+                        })
                     } else if (selectorAbsen.absen?.absen_keluar == null) {
                         const absenKeluar = moment().format('H:mm:ss')
-                        const requestOptions = {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                            body: JSON.stringify({
-                                "nidn": localStorage.getItem('authData'),
-                                "tanggal": new Date().toISOString().slice(0, 10),
-                                "absen_keluar": absenKeluar
-                            })
-                        };
-
-                        fetch(`${process.env.base_url_api}/absen/keluar`, requestOptions)
-                            .then(async response => {
-                                if (response.ok) {
-                                    return response.json()
-                                } else {
-                                    throw new Error(`${response.status}`);
-                                }
-                            })
-                            .then(async json => {
-                                if (json.status != 200) {
-                                    alert(json.message ?? "terjadi masalah pada saat request ke server")
-                                } else {
-                                    dispatch(setOutAbsent(absenKeluar))
-                                    setAbsenButton(<></>)
-                                    alert(json.message)
-                                }
-                            })
-                            .catch(error => {
-                                alert(error.message)
-                            })
-                            .finally(() => {
-
-                            })
+                        AbsenKeluar({
+                            "nidn": localStorage.getItem('authData'),
+                            "tanggal": new Date().toISOString().slice(0, 10),
+                            "absen_keluar": absenKeluar
+                        })
                     }
                 },
                 (error) => {
-                    alert(error.message);
+                    handler2.notifyObservers(error.message);    
                 }
             );
         } else {
-            alert("Geolocation is not supported by this browser.");
+            handler2.notifyObservers("Geolocation is not supported by this browser.");
         }
     }
 
     useEffect(() => {
         if (localStorage.getItem('authData') != null && (selectorAbsen.absen == null || selectorAbsen.absen?.absen_masuk == null)) {
-            setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Masuk</button>)
+            setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={handlerAbsent}>Absen Masuk</button>)
         } else if (localStorage.getItem('authData') != null && selectorAbsen.absen?.absen_masuk != null && selectorAbsen.absen?.absen_keluar == null) {
-            setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={absent}>Absen Keluar</button>)
+            setAbsenButton(<button className="btn button buttonSmall blueDark" onClick={handlerAbsent}>Absen Keluar</button>)
         } else {
             setAbsenButton(<></>)
         }
