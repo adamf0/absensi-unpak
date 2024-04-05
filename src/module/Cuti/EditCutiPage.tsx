@@ -134,23 +134,23 @@ const EditCutiPage = () => {
 					return !(value == undefined || value.value == "" || !dokumen);
 				}
 			),
-			dokumen: Yup.mixed().test(
+			dokumen: Yup.mixed().nullable().test(
 				'required',
 				'this is required',
 				(value: any) => {
-					return !(value == undefined || value.value == "") || dokumen
+					return value==null || (!(value == undefined || value.value == "") || dokumen)
 				}
 			).test(
 				'10mb',
 				'this is max 10mb',
 				(value: any) => {
-					return !(value.size > FILE_SIZE)
+					return value==null || !(value.size > FILE_SIZE)
 				}
 			).test(
 				'type',
 				`this is support ${SUPPORTED_FORMATS.join(",")} only`,
 				(value: any) => {
-					return SUPPORTED_FORMATS.includes(value.type) || dokumen
+					return value==null || (SUPPORTED_FORMATS.includes(value.type) || dokumen)
 				}
 			),
 		}),
@@ -201,7 +201,7 @@ const EditCutiPage = () => {
 	useEffect(()=>{
 		// const jenis_cuti_selected = SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((item:TSelectOption)=>item?.value == selectorCuti.editCuti?.jenis?.id??"");
 		formik.setFieldValue("tanggal_pengajuan", cuti?.tanggal??"")
-		formik.setFieldValue("jenis_cuti", [{value:1, label: "Tahunan"}]) //how to selected? as object or array not work
+		formik.setFieldValue("jenis_cuti", {value:1, label: "Tahunan"}) //how to selected? as object or array not work
 		formik.setFieldValue("lama_cuti", cuti?.lama??"")
 		formik.setFieldValue("tujuan_cuti", cuti?.tujuan??"")
 	},[cuti])
