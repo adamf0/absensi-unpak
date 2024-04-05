@@ -8,7 +8,7 @@ import Subheader, { SubheaderLeft } from '../../components/layouts/Subheader/Sub
 import Button from '../../components/ui/Button';
 import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
-import SelectReact, { TSelectOptions } from '../../components/form/SelectReact';
+import SelectReact, { TSelectOption } from '../../components/form/SelectReact';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
@@ -18,7 +18,6 @@ import { AlertObserver } from '../io/AlertObserver';
 import { ConsoleObserver } from '../io/ConsoleObserver';
 import { CreateCuti } from '../repo/CreateCuti';
 import { useNavigate } from 'react-router-dom';
-import * as FS from 'fs'
 import { toast } from 'react-toastify';
 import { JenisCuti } from '../model/JenisCuti';
 import { cutiselector, loadListJenisCuti } from '../redux/cutiSlice';
@@ -34,10 +33,10 @@ const NewCutiPage = () => {
 	// const toastId = useRef<any>(null);
 	const fileRef = useRef(null);
 	const selectorCuti = useAppSelector(cutiselector);
-    const dispatch = useAppDispatch();
-	const [min,setMin] = useState(1);
-	const [max,setMax] = useState(1);
-	const [dokumen,setDokumen] = useState(false);
+	const dispatch = useAppDispatch();
+	const [min, setMin] = useState<any>(1);
+	const [max, setMax] = useState<any>(1);
+	const [dokumen, setDokumen] = useState<any>(false);
 
 	const handler1 = new HandlerObserver();
 	handler1.addObserver(new ConsoleObserver());
@@ -46,38 +45,38 @@ const NewCutiPage = () => {
 	handler2.addObserver(new AlertObserver());
 
 	const loadJenisCuti = async () => {
-        const response: any = await GetListJenisCuti();
-        if (response.status !== 200) {
-            throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-        }
+		const response: any = await GetListJenisCuti();
+		if (response.status !== 200) {
+			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+		}
 
-        if (response.status === 200 || response.status === 500) {
-            const { status, message, list } = response;
+		if (response.status === 200 || response.status === 500) {
+			const { status, message, list } = response;
 
-            if (status == 200) {
-                const listJenisCuti = list.map((item: any) =>
-                    new JenisCuti(
-                        item.id,
-                        item.nama,
-                        item.min,
-                        item.max,
-                        item.dokumen,
-                        item.kondisi,
-                    )
-                )
+			if (status == 200) {
+				const listJenisCuti = list.map((item: any) =>
+					new JenisCuti(
+						item.id,
+						item.nama,
+						item.min,
+						item.max,
+						item.dokumen,
+						item.kondisi,
+					)
+				)
 
-                await dispatch(loadListJenisCuti(listJenisCuti));
-            } else if (status == 500) {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
-            } else {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
-            }
-        }
-    };
+				await dispatch(loadListJenisCuti(listJenisCuti));
+			} else if (status == 500) {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			} else {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			}
+		}
+	};
 	useEffect(() => {
 		loadJenisCuti()
-	},[])
-	
+	}, [])
+
 	const formik = useFormik({
 		initialValues: {
 			tanggal_pengajuan: '',
@@ -125,11 +124,8 @@ const NewCutiPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const formData = new FormData();
-    			formData.append('dokumen', value.dokumen[0]);
-
-				const response:any = await CreateCuti({
-					nidn:localStorage.getItem('authData')??"-",
+				const response: any = await CreateCuti({
+					nidn: localStorage.getItem('authData') ?? "-",
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					lama_cuti: value.lama_cuti,
 					tujuan: value.tujuan_cuti,
@@ -138,9 +134,9 @@ const NewCutiPage = () => {
 				});
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
-					const { status,message } = response;
+					const { status, message } = response;
 
-					if (status == 200){
+					if (status == 200) {
 						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
 						alert(message);
 						navigate(`/izin`)
@@ -152,7 +148,7 @@ const NewCutiPage = () => {
 				} else {
 					alert("terjadi masalah pada saat request ke server");
 				}
-			} catch (error:any) {
+			} catch (error: any) {
 				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
 				throw error;
 			} finally {
@@ -216,12 +212,12 @@ const NewCutiPage = () => {
 													id='jenis_cuti'
 													name='jenis_cuti'
 													value={formik.values.jenis_cuti}
-													onChange={(selected:any) => {
-														const jenisCuti:JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
+													onChange={(selected: any) => {
+														const jenisCuti: JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
 														setMin(parseInt(jenisCuti.min))
 														setMax(parseInt(jenisCuti.max))
 														setDokumen(jenisCuti.dokumen)
-														if(!dokumen){
+														if (!dokumen) {
 															formik.setFieldValue("dokumen", null)
 														}
 														formik.setFieldValue('jenis_cuti', selected)
@@ -289,28 +285,28 @@ const NewCutiPage = () => {
 												/>
 												{
 													formik.values.dokumen?.name ? <div className="bg-blue-50 border-b border-blue-400 text-blue-800 text-sm p-4 flex justify-between">
-													<div className="flex items-center">
-														<p>
-															{formik.values.dokumen?.name}
-														</p>
-													</div>
-													<div>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															className="h-6 w-6"
-															fill="none"
-															viewBox="0 0 24 24"
-															stroke="currentColor"
-															onClick={()=>formik.setFieldValue("dokumen", null)}>
-															<path
-																stroke-linecap="round"
-																stroke-linejoin="round"
-																stroke-width="2"
-																d="M6 18L18 6M6 6l12 12"
-															/>
-														</svg>
-													</div>
-												</div> : <></>
+														<div className="flex items-center">
+															<p>
+																{formik.values.dokumen?.name}
+															</p>
+														</div>
+														<div>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																className="h-6 w-6"
+																fill="none"
+																viewBox="0 0 24 24"
+																stroke="currentColor"
+																onClick={() => formik.setFieldValue("dokumen", null)}>
+																<path
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="2"
+																	d="M6 18L18 6M6 6l12 12"
+																/>
+															</svg>
+														</div>
+													</div> : <></>
 												}
 											</>
 										</Validation>

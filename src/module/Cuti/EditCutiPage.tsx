@@ -8,77 +8,171 @@ import Subheader, { SubheaderLeft } from '../../components/layouts/Subheader/Sub
 import Button from '../../components/ui/Button';
 import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
-import SelectReact, { TSelectOptions } from '../../components/form/SelectReact';
+import SelectReact, { TSelectOption } from '../../components/form/SelectReact';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../io/AlertObserver';
 import { ConsoleObserver } from '../io/ConsoleObserver';
 import { CreateCuti } from '../repo/CreateCuti';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { JenisCuti } from '../model/JenisCuti';
+import { cutiselector, editCuti, loadListJenisCuti } from '../redux/cutiSlice';
+import { GetListJenisCuti } from '../repo/GetListJenisCuti';
+import { useAppSelector, useAppDispatch } from '../redux/hooks';
+import { SelectOptionsAdapter } from '../io/SelectOptionsAdapter';
+import { CutiModel } from '../model/CutiModel';
+import { GetCuti } from '../repo/GetCuti';
 
 const EditCutiPage = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const FILE_SIZE = 1024 * 1024 * 10; // 10 MB
 	const SUPPORTED_FORMATS = ['application/pdf'];
-	const [disableButton,setDisableButton] = useState<boolean>(false);
-	const toastId = useRef<any>(null);
+	const [disableButton, setDisableButton] = useState<boolean>(false);
+	// const toastId = useRef<any>(null);
+	const fileRef = useRef(null);
+	const selectorCuti = useAppSelector(cutiselector);
+	const dispatch = useAppDispatch();
+	const [min, setMin] = useState<any>(1);
+	const [max, setMax] = useState<any>(1);
+	const [dokumen, setDokumen] = useState<any>(false);
+	const [cuti, setCuti] = useState<CutiModel|null>(null);
 
-    const handler1 = new HandlerObserver();
-    handler1.addObserver(new ConsoleObserver());
+	const handler1 = new HandlerObserver();
+	handler1.addObserver(new ConsoleObserver());
 
-    const handler2 = new HandlerObserver();
-    handler2.addObserver(new AlertObserver());
-	
-	const jenisCutiOptions: TSelectOptions = [
-		{ value: '1', label: 'Tahunan' },
-		{ value: '2', label: 'Sakit' },
-		{ value: '3', label: 'Melahirkan' },
-	];
+	const handler2 = new HandlerObserver();
+	handler2.addObserver(new AlertObserver());
+
+	const loadJenisCuti = async () => {
+		const response: any = await GetListJenisCuti();
+		if (response.status !== 200) {
+			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+		}
+
+		if (response.status === 200 || response.status === 500) {
+			const { status, message, list } = response;
+
+			if (status == 200) {
+				const listJenisCuti = list.map((item: any) =>
+					new JenisCuti(
+						item.id,
+						item.nama,
+						item.min,
+						item.max,
+						item.dokumen,
+						item.kondisi,
+					)
+				)
+
+				await dispatch(loadListJenisCuti(listJenisCuti));
+			} else if (status == 500) {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			} else {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			}
+		}
+	};
+	const loadCuti = async (id:any) => {
+		const response: any = await GetCuti(id);
+		if (response.status !== 200) {
+			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+		}
+
+		if (response.status === 200 || response.status === 500) {
+			const { status, message, data } = response;
+
+			if (status == 200) {
+				const cutiParse = new CutiModel(
+					data.tanggal_pengajuan,
+					data.lama_cuti,
+					new JenisCuti(
+						data.jenis_cuti,
+						"",
+						"",
+						"",
+						false,
+						null
+					),
+					data.tujuan,data.status,
+					data.id,
+					false
+				);
+				setCuti(cutiParse)
+				await dispatch(editCuti(cutiParse));
+			} else if (status == 500) {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			} else {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			}
+		}
+	}
+
 	const formik = useFormik({
 		initialValues: {
 			tanggal_pengajuan: "",
 			jenis_cuti: "",
 			lama_cuti: "",
-			tujuan_cuti: '',
-			dokumen: '',
+			tujuan_cuti: "",
+			dokumen: null,
 		},
 		validationSchema: Yup.object({
 			tanggal_pengajuan: Yup.date().required("this is required"),
 			lama_cuti: Yup.number()
-						.typeError("must be a number")
-						.min(1, "this must be at least 1 day")
-						.required("this is required"),
+				.typeError("must be a number")
+				.min(1, "this must be at least 1 day")
+				.required("this is required"),
 			tujuan_cuti: Yup.string().required("this is required"),
 			jenis_cuti: Yup.mixed().test(
 				'is-selected',
 				'Jenis cuti harus dipilih',
-				(value:any) => {
-				  return !(value == undefined || value.value=="");
+				(value: any) => {
+					return !(value == undefined || value.value == "" || !dokumen);
 				}
-			  ),
-			dokumen: Yup.string().required("this is required"),
+			),
+			dokumen: Yup.mixed().test(
+				'required',
+				'this is required',
+				(value: any) => {
+					return !(value == undefined || value.value == "") || dokumen
+				}
+			).test(
+				'10mb',
+				'this is max 10mb',
+				(value: any) => {
+					return !(value.size > FILE_SIZE)
+				}
+			).test(
+				'type',
+				`this is support ${SUPPORTED_FORMATS.join(",")} only`,
+				(value: any) => {
+					return SUPPORTED_FORMATS.includes(value.type) || dokumen
+				}
+			),
 		}),
-		onSubmit: async (value:any) => {
+		onSubmit: async (value: any) => {
 			try {
+				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
-				
-				const response:any = await CreateCuti({
-					id: id,
-					nidn:localStorage.getItem('authData')??"-",
+
+				const response: any = await CreateCuti({
+					nidn: localStorage.getItem('authData') ?? "-",
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					lama_cuti: value.lama_cuti,
 					tujuan: value.tujuan_cuti,
 					jenis_cuti: value.jenis_cuti?.value,
+					dokumen: value.dokumen
 				});
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
-					const { status,message } = response;
-	
-					if (status == 200){
+					const { status, message } = response;
+
+					if (status == 200) {
+						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
 						alert(message);
 						navigate(`/izin`)
 					} else if (status == 500) {
@@ -89,7 +183,7 @@ const EditCutiPage = () => {
 				} else {
 					alert("terjadi masalah pada saat request ke server");
 				}
-			} catch (error:any) {
+			} catch (error: any) {
 				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
 				throw error;
 			} finally {
@@ -98,6 +192,27 @@ const EditCutiPage = () => {
 			console.log(value)
 		},
 	});
+
+	useEffect(() => {
+		loadJenisCuti()
+		loadCuti(id)
+	}, [])
+
+	useEffect(()=>{
+		// const jenis_cuti_selected = SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((item:TSelectOption)=>item?.value == selectorCuti.editCuti?.jenis?.id??"");
+		formik.setFieldValue("tanggal_pengajuan", cuti?.tanggal??"")
+		formik.setFieldValue("jenis_cuti", {value:1, label: "Tahunan"}) //how to selected? as object or array not work
+		formik.setFieldValue("lama_cuti", cuti?.lama??"")
+		formik.setFieldValue("tujuan_cuti", cuti?.tujuan??"")
+	},[cuti])
+
+	const handleFileChange = (event: any) => {
+		if (event.currentTarget.files) {
+			const files = event.currentTarget.files[0];
+			console.log(files);
+			formik.setFieldValue("dokumen", files);
+		}
+	};
 
 	return (
 		<PageWrapper name='Input'>
@@ -115,11 +230,11 @@ const EditCutiPage = () => {
 							<CardBody>
 								<div className='grid gap-4'>
 									<div key={"tanggal_pengajuan"} className='col-span-12 lg:col-span-4'>
-									<Validation
-										isValid={formik.isValid}
-										isTouched={formik.touched.tanggal_pengajuan}
-										invalidFeedback={formik.errors.tanggal_pengajuan}
-										validFeedback='Good'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.tanggal_pengajuan}
+											invalidFeedback={formik.errors.tanggal_pengajuan}
+											validFeedback='Good'>
 											<>
 												<Label htmlFor={"tanggal_pengajuan"}>Tanggal Pengajuan</Label>
 												<Input
@@ -130,7 +245,7 @@ const EditCutiPage = () => {
 													type={"date" as TInputTypes}
 												/>
 											</>
-									</Validation>
+										</Validation>
 									</div>
 									<div key={"jenis_cuti"} className='col-span-12 lg:col-span-4'>
 										<Validation
@@ -138,18 +253,25 @@ const EditCutiPage = () => {
 											isTouched={formik.touched.jenis_cuti}
 											invalidFeedback={formik.errors.jenis_cuti}
 											validFeedback='Good'>
-												<>
-													<Label htmlFor={"jenis_cuti"}>Jenis Cuti</Label>
-													<SelectReact
-														options={jenisCutiOptions}
-														id='jenis_cuti'
-														name='jenis_cuti'
-														value={formik.values.jenis_cuti}
-														onChange={(value) =>
-															formik.setFieldValue('jenis_cuti', value)
+											<>
+												<Label htmlFor={"jenis_cuti"}>Jenis Cuti</Label>
+												<SelectReact
+													options={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti)}
+													id='jenis_cuti'
+													name='jenis_cuti'
+													value={formik.values.jenis_cuti}
+													onChange={(selected: any) => {
+														const jenisCuti: JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
+														setMin(parseInt(jenisCuti.min))
+														setMax(parseInt(jenisCuti.max))
+														setDokumen(jenisCuti.dokumen)
+														if (!dokumen) {
+															formik.setFieldValue("dokumen", null)
 														}
-													/>
-												</>
+														formik.setFieldValue('jenis_cuti', selected)
+													}}
+												/>
+											</>
 										</Validation>
 									</div>
 									<div key={"lama_cuti"} className='col-span-12 lg:col-span-4'>
@@ -158,18 +280,20 @@ const EditCutiPage = () => {
 											isTouched={formik.touched.lama_cuti}
 											invalidFeedback={formik.errors.lama_cuti}
 											validFeedback='Good'>
-												<>
-													<Label htmlFor={"lama_cuti"}>Lama Cuti</Label>
-													<Input
-														id={"lama_cuti"}
-														name={"lama_cuti"}
-														onChange={formik.handleChange}
-														// @ts-ignore
-														// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-														value={formik.values["lama_cuti"]}
-														type={"number" as TInputTypes}
-													/>
-												</>
+											<>
+												<Label htmlFor={"lama_cuti"}>Lama Cuti</Label>
+												<Input
+													id={"lama_cuti"}
+													name={"lama_cuti"}
+													onChange={formik.handleChange}
+													min={min}
+													max={max}
+													// @ts-ignore
+													// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+													value={formik.values["lama_cuti"]}
+													type={"number" as TInputTypes}
+												/>
+											</>
 										</Validation>
 									</div>
 									<div key={"tujuan_cuti"} className='col-span-12 lg:col-span-4'>
@@ -178,16 +302,16 @@ const EditCutiPage = () => {
 											isTouched={formik.touched.tujuan_cuti}
 											invalidFeedback={formik.errors.tujuan_cuti}
 											validFeedback='Good'>
-												<>
-													<Label htmlFor={"tujuan_cuti"}>Tujuan</Label>
-													<Textarea
-														id='tujuan_cuti'
-														name='tujuan_cuti'
-														onChange={formik.handleChange}
-														value={formik.values.tujuan_cuti}
-														placeholder='masukkan tujuan cuti...'
-														rows={8}/>
-												</>
+											<>
+												<Label htmlFor={"tujuan_cuti"}>Tujuan</Label>
+												<Textarea
+													id='tujuan_cuti'
+													name='tujuan_cuti'
+													onChange={formik.handleChange}
+													value={formik.values.tujuan_cuti}
+													placeholder='masukkan tujuan cuti...'
+													rows={8} />
+											</>
 										</Validation>
 									</div>
 									<div key={"dokumen"} className='col-span-12 lg:col-span-4'>
@@ -196,18 +320,43 @@ const EditCutiPage = () => {
 											isTouched={formik.touched.dokumen}
 											invalidFeedback={formik.errors.dokumen}
 											validFeedback='Good'>
-												<>
-													<Label htmlFor={"dokumen"}>Dokumen</Label>
-													<Input
-														id={"dokumen"}
-														name={"dokumen"}
-														onChange={formik.handleChange}
-														// @ts-ignore
-														// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-														value={formik.values["dokumen"]}
-														type={"file" as TInputTypes}
-													/>
-												</>
+											<>
+												<Label htmlFor={"dokumen"}>Dokumen</Label>
+												<Input
+													id={"dokumen"}
+													name={"dokumen"}
+													ref={fileRef}
+													onChange={handleFileChange}
+													// @ts-ignore
+													// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+													type={"file" as TInputTypes}
+												/>
+												{
+													formik.values.dokumen?.name ? <div className="bg-blue-50 border-b border-blue-400 text-blue-800 text-sm p-4 flex justify-between">
+														<div className="flex items-center">
+															<p>
+																{formik.values.dokumen?.name}
+															</p>
+														</div>
+														<div>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																className="h-6 w-6"
+																fill="none"
+																viewBox="0 0 24 24"
+																stroke="currentColor"
+																onClick={() => formik.setFieldValue("dokumen", null)}>
+																<path
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="2"
+																	d="M6 18L18 6M6 6l12 12"
+																/>
+															</svg>
+														</div>
+													</div> : <></>
+												}
+											</>
 										</Validation>
 									</div>
 									<div key={"end"} className='col-span-12 lg:col-span-4'>
