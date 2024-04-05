@@ -92,12 +92,12 @@ const EditCutiPage = () => {
 					data.tanggal_pengajuan,
 					data.lama_cuti,
 					new JenisCuti(
-						data.jenis_cuti,
-						"",
-						"",
-						"",
-						false,
-						null
+						data.JenisCuti?.id,
+						data.JenisCuti?.nama,
+						data.JenisCuti?.min,
+						data.JenisCuti?.max,
+						data.JenisCuti?.dokumen,
+						data.JenisCuti?.kondisi
 					),
 					data.tujuan,data.status,
 					data.id,
