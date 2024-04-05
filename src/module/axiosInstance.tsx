@@ -9,7 +9,7 @@ instance.interceptors.request.use(config => {
     // if (authData && authData !== "null") {
     //     config.headers['Authorization'] = authData;
     // }
-    config.headers['Content-Type'] = 'application/json';
+    config.headers['Content-Type'] = 'multipart/form-data';
     config.headers['Accept'] = 'application/json';
     config.headers['Access-Control-Allow-Origin'] = '*';
     return config;

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/layouts/PageWrapper/PageWrapper';
 import Button from '../components/ui/Button';
 import { useAuth } from '../context/authContext';
@@ -11,6 +11,8 @@ import LogoTemplate from '../templates/layouts/Logo/Logo.template';
 import FieldWrap from '../components/form/FieldWrap';
 import Icon from '../components/icon/Icon';
 import Validation from '../components/form/Validation';
+import useLocalStorage from '../hooks/useLocalStorage';
+import { DoLogin } from '../module/repo/DoLogin';
 
 type TValues = {
 	username: string;
@@ -18,14 +20,15 @@ type TValues = {
 };
 
 const LoginPage = () => {
-	const { onLogin } = useAuth();
-
+	const navigate = useNavigate();
+	// const { onLogin } = useAuth();
+	
 	const [passwordShowStatus, setPasswordShowStatus] = useState<boolean>(false);
 
 	const formik = useFormik({
 		initialValues: {
-			username: usersDb[5].username,
-			password: usersDb[5].password,
+			username: "",
+			password: "",
 		},
 		validate: (values: TValues) => {
 			const errors: Partial<TValues> = {};
@@ -40,18 +43,45 @@ const LoginPage = () => {
 
 			return errors;
 		},
-		onSubmit: (values: TValues, { setFieldError }) => {
-			onLogin(values.username, values.password)
-				.then(() => {})
-				.catch((e: Error) => {
-					if (e.cause === 'username') {
-						setFieldError('username', e.message);
-						setFieldError('password', e.message);
-					}
-					if (e.cause === 'password') setFieldError('password', e.message);
+		onSubmit: async (values: TValues, { setFieldError }) => {
+			try {
+				const response:any = await DoLogin({
+					"username":values.username,
+					"password":values.password,
 				});
+				console.log(response);
+				if (response.status === 200 || response.status === 500) {
+					const { status,message,data } = response;
+	
+					if (status == 200){
+						alert(message);
+						localStorage.setItem('user', values.username);
+						localStorage.setItem('infoUser', JSON.stringify(data));
+						// const info = localStorage.getItem('infoUser')??"{}";
+						// console.log(JSON.parse(info))
+						navigate('/')
+					} else if (status == 500) {
+						alert(message ?? "terjadi masalah pada saat request ke server")
+					} else {
+						alert(message ?? "terjadi masalah pada saat request ke server")
+					}
+				} else {
+					alert("terjadi masalah pada saat request ke server")
+				}
+			} catch (error:any) {
+				alert(error.message ?? "terjadi masalah pada saat request ke server")
+				throw error;
+			} finally {
+	
+			}
 		},
 	});
+
+	useEffect(() => {
+		if (localStorage.getItem('user')) {
+		  navigate('/home');
+		}
+	  }, [navigate]);
 
 	return (
 		<PageWrapper isProtectedRoute={false} className='bg-white dark:bg-inherit' name='Sign In'>

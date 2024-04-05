@@ -29,6 +29,8 @@ import EditCutiPage from '../module/Cuti/EditCutiPage';
 import IzinPage from '../module/Izin/IzinPage';
 import EditIzinPage from '../module/Izin/EditIzinPage';
 import NewIzinPage from '../module/Izin/NewIzinPage';
+import LoginPage from '../pages/Login.page';
+import LogoutPage from '../module/LogoutPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -41,128 +43,148 @@ const App = () => {
 		<>
 			<style>{`:root {font-size: ${fontSize}px}`}</style>
 			<div data-component-name='App' className='flex grow flex-col'>
-				<Aside>
-					<AsideHead>
-						<LogoAndAsideTogglePart />
-					</AsideHead>
-					<AsideBody>
-						<Nav>
-							<NavItem {...{
-								id: 'homePage',
-								to: '/home',
-								text: 'Home',
-								icon: 'HeroRectangleGroup',
-							}} />
-							<NavItem {...{
-								id: 'cutiPage',
-								to: '/cuti',
-								text: 'Cuti',
-								icon: 'HeroRectangleGroup',
-							}} />
-							<NavItem {...{
-								id: 'izinPage',
-								to: '/izin',
-								text: 'Izin',
-								icon: 'HeroRectangleGroup',
-							}} />
-						</Nav>
-					</AsideBody>
-				</Aside>
+				<Routes>
+					<Route path="/login" element={null} />
+					<Route path="*" element={
+						<Aside>
+							<AsideHead>
+								<LogoAndAsideTogglePart />
+							</AsideHead>
+							<AsideBody>
+								<Nav>
+									<NavItem {...{
+										id: 'homePage',
+										to: '/home',
+										text: 'Home',
+										icon: 'HeroRectangleGroup',
+									}} />
+									<NavItem {...{
+										id: 'cutiPage',
+										to: '/cuti',
+										text: 'Cuti',
+										icon: 'HeroRectangleGroup',
+									}} />
+									<NavItem {...{
+										id: 'izinPage',
+										to: '/izin',
+										text: 'Izin',
+										icon: 'HeroRectangleGroup',
+									}} />
+								</Nav>
+							</AsideBody>
+						</Aside>
+					} />
+				</Routes>
+
 				<Wrapper>
-					<Header>
-						<HeaderLeft>
-							<SearchPartial />
-						</HeaderLeft>
-						<HeaderRight>
-							<MessagesPartial />
-							<NotificationPartial />
-							<SettingsPartial />
-						</HeaderRight>
-					</Header>
-					<Suspense
-						fallback={
-							<>
-								<Header>
-									<HeaderLeft>
-										<div className='h-10 w-40 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
-									</HeaderLeft>
-									<HeaderRight>
-										<div className='flex gap-4'>
-											<div className='h-10 w-10 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
-											<div className='h-10 w-10 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
-											<div className='h-10 w-10 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
-										</div>
-									</HeaderRight>
-								</Header>
-								<PageWrapper>
-									<Subheader>
-										<SubheaderLeft>
-											<div className='h-10 w-40 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
-										</SubheaderLeft>
-										<SubheaderRight>
-											<div className='h-10 w-40 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
-										</SubheaderRight>
-									</Subheader>
-									<Container>
-										<div className='grid grid-cols-12 gap-4'>
-											<div className='col-span-3'>
-												<Card className='h-[15vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
-											<div className='col-span-3 '>
-												<Card className='h-[15vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
-											<div className='col-span-3'>
-												<Card className='h-[15vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
-											<div className='col-span-3'>
-												<Card className='h-[15vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
+					<Routes>
+						<Route path="/login" element={null} />
+						<Route path="*" element={
+							<Header>
+								<HeaderLeft>
+									<SearchPartial />
+								</HeaderLeft>
+								<HeaderRight>
+									<MessagesPartial />
+									<NotificationPartial />
+									<SettingsPartial />
+								</HeaderRight>
+							</Header>
+						} />
+					</Routes>
 
-											<div className='col-span-6'>
-												<Card className='h-[50vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
-											<div className='col-span-6'>
-												<Card className='h-[50vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
+					<Routes>
+						<Route path="/login" element={<LoginPage />} />
+						<Route path="*" element={
+							<Suspense
+								fallback={
+									<>
+										<Header>
+											<HeaderLeft>
+												<div className='h-10 w-40 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
+											</HeaderLeft>
+											<HeaderRight>
+												<div className='flex gap-4'>
+													<div className='h-10 w-10 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
+													<div className='h-10 w-10 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
+													<div className='h-10 w-10 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
+												</div>
+											</HeaderRight>
+										</Header>
+										<PageWrapper>
+											<Subheader>
+												<SubheaderLeft>
+													<div className='h-10 w-40 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
+												</SubheaderLeft>
+												<SubheaderRight>
+													<div className='h-10 w-40 animate-pulse rounded-full bg-zinc-800/25 dark:bg-zinc-200/25' />
+												</SubheaderRight>
+											</Subheader>
+											<Container>
+												<div className='grid grid-cols-12 gap-4'>
+													<div className='col-span-3'>
+														<Card className='h-[15vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
+													<div className='col-span-3 '>
+														<Card className='h-[15vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
+													<div className='col-span-3'>
+														<Card className='h-[15vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
+													<div className='col-span-3'>
+														<Card className='h-[15vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
 
-											<div className='col-span-12'>
-												<Card className='h-[15vh] animate-pulse'>
-													<div className='invisible'>Loading...</div>
-												</Card>
-											</div>
-										</div>
-									</Container>
-								</PageWrapper>
-							</>
-						}>
-						<Routes>
-							<Route path="/" element={<InputPage />} />
-							{/* <Route path="/absensi" element={<InputPage />} /> */}
-							<Route path="/cuti" element={<CutiPage/>} />
-							<Route path="/cuti/tambah" element={<NewCutiPage/>} />
-							<Route path="/cuti/edit/:id" element={<EditCutiPage/>} />
-							<Route path="/izin" element={<IzinPage />} />
-							<Route path="/izin/tambah" element={<NewIzinPage />} />
-							<Route path="/izin/edit/:id" element={<EditIzinPage />} />
-							<Route path="/login" element={<InputPage />} />
-							<Route path="/logout" element={<InputPage />} />
-							{/* Tambahkan route berikut sebagai route terakhir */}
-							<Route path="*" element={<NotFoundPage />} />
-						</Routes>
-					</Suspense>
-					<FooterRouter />
+													<div className='col-span-6'>
+														<Card className='h-[50vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
+													<div className='col-span-6'>
+														<Card className='h-[50vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
+
+													<div className='col-span-12'>
+														<Card className='h-[15vh] animate-pulse'>
+															<div className='invisible'>Loading...</div>
+														</Card>
+													</div>
+												</div>
+											</Container>
+										</PageWrapper>
+									</>
+								}>
+								<Routes>
+									<Route path="/" element={<InputPage />} />
+									{/* <Route path="/absensi" element={<InputPage />} /> */}
+									<Route path="/cuti" element={<CutiPage />} />
+									<Route path="/cuti/tambah" element={<NewCutiPage />} />
+									<Route path="/cuti/edit/:id" element={<EditCutiPage />} />
+									<Route path="/izin" element={<IzinPage />} />
+									<Route path="/izin/tambah" element={<NewIzinPage />} />
+									<Route path="/izin/edit/:id" element={<EditIzinPage />} />
+									<Route path="/logout" element={<LogoutPage />} />
+									{/* Tambahkan route berikut sebagai route terakhir */}
+									<Route path="*" element={<NotFoundPage />} />
+								</Routes>
+							</Suspense>
+						} />
+					</Routes>
+
+					<Routes>
+						<Route path="/login" element={null} />
+						<Route path="*" element={<FooterRouter />}/>
+					</Routes>
 				</Wrapper>
 			</div>
 		</>

@@ -14,7 +14,7 @@ import { IValidationBaseProps } from './Validation';
 export type TSelectVariant = 'solid';
 export type TSelectDimension = 'sm' | 'default' | 'lg' | 'xl';
 
-type TSelectOption =
+export type TSelectOption =
 	| {
 			value: string;
 			label: string;

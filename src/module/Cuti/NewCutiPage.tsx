@@ -12,7 +12,7 @@ import SelectReact, { TSelectOptions } from '../../components/form/SelectReact';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../io/AlertObserver';
 import { ConsoleObserver } from '../io/ConsoleObserver';
@@ -20,14 +20,24 @@ import { CreateCuti } from '../repo/CreateCuti';
 import { useNavigate } from 'react-router-dom';
 import * as FS from 'fs'
 import { toast } from 'react-toastify';
+import { JenisCuti } from '../model/JenisCuti';
+import { cutiselector, loadListJenisCuti } from '../redux/cutiSlice';
+import { GetListJenisCuti } from '../repo/GetListJenisCuti';
+import { useAppSelector, useAppDispatch } from '../redux/hooks';
+import { SelectOptionsAdapter } from '../io/SelectOptionsAdapter';
 
 const NewCutiPage = () => {
 	const navigate = useNavigate();
 	const FILE_SIZE = 1024 * 1024 * 10; // 10 MB
 	const SUPPORTED_FORMATS = ['application/pdf'];
 	const [disableButton, setDisableButton] = useState<boolean>(false);
-	const toastId = useRef<any>(null);
+	// const toastId = useRef<any>(null);
 	const fileRef = useRef(null);
+	const selectorCuti = useAppSelector(cutiselector);
+    const dispatch = useAppDispatch();
+	const [min,setMin] = useState(1);
+	const [max,setMax] = useState(1);
+	const [dokumen,setDokumen] = useState(false);
 
 	const handler1 = new HandlerObserver();
 	handler1.addObserver(new ConsoleObserver());
@@ -35,17 +45,45 @@ const NewCutiPage = () => {
 	const handler2 = new HandlerObserver();
 	handler2.addObserver(new AlertObserver());
 
-	const jenisCutiOptions: TSelectOptions = [
-		{ value: '1', label: 'Tahunan' },
-		{ value: '2', label: 'Sakit' },
-		{ value: '3', label: 'Melahirkan' },
-	];
+	const loadJenisCuti = async () => {
+        const response: any = await GetListJenisCuti();
+        if (response.status !== 200) {
+            throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+        }
+
+        if (response.status === 200 || response.status === 500) {
+            const { status, message, list } = response;
+
+            if (status == 200) {
+                const listJenisCuti = list.map((item: any) =>
+                    new JenisCuti(
+                        item.id,
+                        item.nama,
+                        item.min,
+                        item.max,
+                        item.dokumen,
+                        item.kondisi,
+                    )
+                )
+
+                await dispatch(loadListJenisCuti(listJenisCuti));
+            } else if (status == 500) {
+                console.trace(message ?? "Terjadi masalah pada saat request ke server")
+            } else {
+                console.trace(message ?? "Terjadi masalah pada saat request ke server")
+            }
+        }
+    };
+	useEffect(() => {
+		loadJenisCuti()
+	},[])
+	
 	const formik = useFormik({
 		initialValues: {
-			tanggal_pengajuan: '2024-01-01',
-			jenis_cuti: jenisCutiOptions[1],
-			lama_cuti: "1",
-			tujuan_cuti: 'a',
+			tanggal_pengajuan: '',
+			jenis_cuti: "",
+			lama_cuti: "",
+			tujuan_cuti: '',
 			dokumen: null,
 		},
 		validationSchema: Yup.object({
@@ -59,45 +97,67 @@ const NewCutiPage = () => {
 				'is-selected',
 				'Jenis cuti harus dipilih',
 				(value: any) => {
-					return !(value == undefined || value.value == "");
+					return !(value == undefined || value.value == "" || !dokumen);
 				}
 			),
-			dokumen: Yup.mixed().required("this is required"),
+			dokumen: Yup.mixed().test(
+				'required',
+				'this is required',
+				(value: any) => {
+					return !(value == undefined || value.value == "") || dokumen
+				}
+			).test(
+				'10mb',
+				'this is max 10mb',
+				(value: any) => {
+					return !(value.size > FILE_SIZE)
+				}
+			).test(
+				'type',
+				`this is support ${SUPPORTED_FORMATS.join(",")} only`,
+				(value: any) => {
+					return SUPPORTED_FORMATS.includes(value.type) || dokumen
+				}
+			),
 		}),
 		onSubmit: async (value: any) => {
-			// try {
-			// 	toastId.current = toast("Loading...", { autoClose: false });
-			// 	setDisableButton(true);
+			try {
+				// toastId.current = toast("Loading...", { autoClose: false });
+				setDisableButton(true);
 
-			// 	const response:any = await CreateCuti({
-			// 		nidn:localStorage.getItem('authData')??"-",
-			// 		tanggal_pengajuan: value.tanggal_pengajuan,
-			// 		lama_cuti: value.lama_cuti,
-			// 		tujuan: value.tujuan_cuti,
-			// 		jenis_cuti: value.jenis_cuti?.value,
-			// 	});
-			// 	handler1.notifyObservers(response);
-			// 	if (response.status === 200 || response.status === 500) {
-			// 		const { status,message } = response;
+				const formData = new FormData();
+    			formData.append('dokumen', value.dokumen[0]);
 
-			// 		if (status == 200){
-			// 			toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
-			// 			alert(message);
-			// 			navigate(`/izin`)
-			// 		} else if (status == 500) {
-			// 			alert(message ?? "terjadi masalah pada saat request ke server");
-			// 		} else {
-			// 			alert(message ?? "terjadi masalah pada saat request ke server");
-			// 		}
-			// 	} else {
-			// 		alert("terjadi masalah pada saat request ke server");
-			// 	}
-			// } catch (error:any) {
-			// 	// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
-			// 	throw error;
-			// } finally {
-			// 	setDisableButton(false);
-			// }
+				const response:any = await CreateCuti({
+					nidn:localStorage.getItem('authData')??"-",
+					tanggal_pengajuan: value.tanggal_pengajuan,
+					lama_cuti: value.lama_cuti,
+					tujuan: value.tujuan_cuti,
+					jenis_cuti: value.jenis_cuti?.value,
+					dokumen: value.dokumen
+				});
+				handler1.notifyObservers(response);
+				if (response.status === 200 || response.status === 500) {
+					const { status,message } = response;
+
+					if (status == 200){
+						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
+						alert(message);
+						navigate(`/izin`)
+					} else if (status == 500) {
+						alert(message ?? "terjadi masalah pada saat request ke server");
+					} else {
+						alert(message ?? "terjadi masalah pada saat request ke server");
+					}
+				} else {
+					alert("terjadi masalah pada saat request ke server");
+				}
+			} catch (error:any) {
+				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+				throw error;
+			} finally {
+				setDisableButton(false);
+			}
 			console.log(value)
 		},
 	});
@@ -152,13 +212,20 @@ const NewCutiPage = () => {
 											<>
 												<Label htmlFor={"jenis_cuti"}>Jenis Cuti</Label>
 												<SelectReact
-													options={jenisCutiOptions}
+													options={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti)}
 													id='jenis_cuti'
 													name='jenis_cuti'
 													value={formik.values.jenis_cuti}
-													onChange={(value) =>
-														formik.setFieldValue('jenis_cuti', value)
-													}
+													onChange={(selected:any) => {
+														const jenisCuti:JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
+														setMin(parseInt(jenisCuti.min))
+														setMax(parseInt(jenisCuti.max))
+														setDokumen(jenisCuti.dokumen)
+														if(!dokumen){
+															formik.setFieldValue("dokumen", null)
+														}
+														formik.setFieldValue('jenis_cuti', selected)
+													}}
 												/>
 											</>
 										</Validation>
@@ -175,6 +242,8 @@ const NewCutiPage = () => {
 													id={"lama_cuti"}
 													name={"lama_cuti"}
 													onChange={formik.handleChange}
+													min={min}
+													max={max}
 													// @ts-ignore
 													// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 													value={formik.values["lama_cuti"]}
