@@ -72,7 +72,7 @@ const NewIzinPage = () => {
 	});
 
 	return (
-		<PageWrapper name='Input'>
+		<PageWrapper name='Izin'>
 			<Subheader>
 				<SubheaderLeft>
 					<Breadcrumb currentPage='Tambah Izin' />

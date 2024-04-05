@@ -45,7 +45,7 @@ const IzinPage = () => {
                     new IzinModel(
                         item.tanggal_pengajuan,
                         item.tujuan,
-                        "Pending",
+                        item.status,
                         item.id,
                         false
                     )
@@ -114,7 +114,7 @@ const IzinPage = () => {
 
     return (
         <>
-            <PageWrapper name='Input'>
+            <PageWrapper name='Izin'>
                 <Subheader>
                     <SubheaderLeft>
                         <Breadcrumb currentPage='Izin' />
@@ -142,7 +142,7 @@ const IzinPage = () => {
                             <TBody>
                                 {
                                     selectorIzin.list.map((item,index)=>
-                                    <Tr>
+                                    <Tr className="text-center">
                                         <Td>{item.id}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.tujuan}</Td>

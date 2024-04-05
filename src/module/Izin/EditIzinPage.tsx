@@ -11,25 +11,59 @@ import { TInputTypes } from '../../types/input.type';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../io/AlertObserver';
 import { ConsoleObserver } from '../io/ConsoleObserver';
 import { CreateIzin } from '../repo/CreateIzin';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UpdateIzin } from '../repo/UpdateIzin';
+import { IzinModel } from '../model/IzinModel';
+import { GetIzin } from '../repo/GetIzin';
+import { editIzin, izinselector } from '../redux/izinSlice';
+import { useAppSelector, useAppDispatch } from '../redux/hooks';
 
 const EditIzinPage = () => {
 	const { id } = useParams();
+	const selectorIzin = useAppSelector(izinselector);
+    const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const [disableButton,setDisableButton] = useState<boolean>(false);
-	
+	const [izin, setIzin] = useState<IzinModel|null>(null);
+
     const handler1 = new HandlerObserver();
     handler1.addObserver(new ConsoleObserver());
 
     const handler2 = new HandlerObserver();
     handler2.addObserver(new AlertObserver());
 	
+	const loadIzin = async (id:any) => {
+		const response: any = await GetIzin(id);
+		if (response.status !== 200) {
+			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+		}
+
+		if (response.status === 200 || response.status === 500) {
+			const { status, message, data } = response;
+
+			if (status == 200) {
+				const izinParse = new IzinModel(
+					data.tanggal_pengajuan,
+					data.tujuan,
+					data.status,
+					data.id,
+					false
+				);
+				setIzin(izinParse)
+				await dispatch(editIzin(izinParse));
+			} else if (status == 500) {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			} else {
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			}
+		}
+	}
+
 	const formik = useFormik({
 		initialValues: {
 			tanggal_pengajuan: '',
@@ -74,8 +108,17 @@ const EditIzinPage = () => {
 		},
 	});
 
+	useEffect(() => {
+		loadIzin(id)
+	}, [])
+
+	useEffect(()=>{
+		formik.setFieldValue("tanggal_pengajuan", izin?.tanggal??"")
+		formik.setFieldValue("tujuan_izin", izin?.tujuan??"")
+	},[izin])
+
 	return (
-		<PageWrapper name='Input'>
+		<PageWrapper name='Izin'>
 			<Subheader>
 				<SubheaderLeft>
 					<Breadcrumb currentPage='Tambah Izin' />

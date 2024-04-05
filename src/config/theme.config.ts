@@ -38,8 +38,8 @@ type TThemeConfigs = {
 };
 
 const themeConfig: TThemeConfigs = {
-	projectTitle: 'Fyr',
-	projectName: 'React TypeScript Tailwind Admin & AI Chat Template',
+	projectTitle: 'HR Unpak',
+	projectName: '',
 	language: 'en',
 	theme: DARK_MODE.SYSTEM,
 	themeColor: 'blue',

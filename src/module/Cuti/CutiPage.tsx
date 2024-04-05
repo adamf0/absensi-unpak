@@ -6,7 +6,7 @@ import Subheader, { SubheaderLeft } from "../../components/layouts/Subheader/Sub
 import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { AlertObserver } from "../io/AlertObserver";
 import { ConsoleObserver } from "../io/ConsoleObserver";
 import { CutiModel } from "../model/CutiModel";
@@ -54,7 +54,7 @@ const CutiPage = () => {
                             item.JenisCuti?.kondisi ?? "",
                         ),
                         item.tujuan,
-                        "Pending",
+                        item.status,
                         item.id,
                         false
                     )
@@ -123,7 +123,7 @@ const CutiPage = () => {
 
     return (
         <>
-            <PageWrapper name='Input'>
+            <PageWrapper name='Cuti'>
                 <Subheader>
                     <SubheaderLeft>
                         <Breadcrumb currentPage='Cuti' />
@@ -154,7 +154,7 @@ const CutiPage = () => {
                             <TBody>
                                 {
                                     selectorCuti.list.map((item,index)=>
-                                    <Tr>
+                                    <Tr className="text-center">
                                         <Td>{item.id}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.lama} hari</Td>

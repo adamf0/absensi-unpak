@@ -8,7 +8,7 @@ import Subheader, { SubheaderLeft } from '../../components/layouts/Subheader/Sub
 import Button from '../../components/ui/Button';
 import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
-import SelectReact, { TSelectOption } from '../../components/form/SelectReact';
+import SelectReact from '../../components/form/SelectReact';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
@@ -18,7 +18,6 @@ import { AlertObserver } from '../io/AlertObserver';
 import { ConsoleObserver } from '../io/ConsoleObserver';
 import { CreateCuti } from '../repo/CreateCuti';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { JenisCuti } from '../model/JenisCuti';
 import { cutiselector, loadListJenisCuti } from '../redux/cutiSlice';
 import { GetListJenisCuti } from '../repo/GetListJenisCuti';
@@ -139,7 +138,7 @@ const NewCutiPage = () => {
 					if (status == 200) {
 						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
 						alert(message);
-						navigate(`/izin`)
+						navigate(`/cuti`)
 					} else if (status == 500) {
 						alert(message ?? "terjadi masalah pada saat request ke server");
 					} else {
@@ -167,7 +166,7 @@ const NewCutiPage = () => {
 	};
 
 	return (
-		<PageWrapper name='Input'>
+		<PageWrapper name='Cuti'>
 			<Subheader>
 				<SubheaderLeft>
 					<Breadcrumb currentPage='Tambah Cuti' />

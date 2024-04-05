@@ -8,7 +8,7 @@ import Subheader, { SubheaderLeft } from '../../components/layouts/Subheader/Sub
 import Button from '../../components/ui/Button';
 import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
-import SelectReact, { TSelectOption } from '../../components/form/SelectReact';
+import SelectReact from '../../components/form/SelectReact';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
@@ -26,6 +26,7 @@ import { useAppSelector, useAppDispatch } from '../redux/hooks';
 import { SelectOptionsAdapter } from '../io/SelectOptionsAdapter';
 import { CutiModel } from '../model/CutiModel';
 import { GetCuti } from '../repo/GetCuti';
+import { UpdateCuti } from '../repo/UpdateCuti';
 
 const EditCutiPage = () => {
 	const { id } = useParams();
@@ -159,7 +160,8 @@ const EditCutiPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await CreateCuti({
+				const response: any = await UpdateCuti({
+					id:id,
 					nidn: localStorage.getItem('authData') ?? "-",
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					lama_cuti: value.lama_cuti,
@@ -174,7 +176,7 @@ const EditCutiPage = () => {
 					if (status == 200) {
 						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
 						alert(message);
-						navigate(`/izin`)
+						navigate(`/cuti`)
 					} else if (status == 500) {
 						alert(message ?? "terjadi masalah pada saat request ke server");
 					} else {
@@ -215,7 +217,7 @@ const EditCutiPage = () => {
 	};
 
 	return (
-		<PageWrapper name='Input'>
+		<PageWrapper name='Cuti'>
 			<Subheader>
 				<SubheaderLeft>
 					<Breadcrumb currentPage='Tambah Cuti' />
