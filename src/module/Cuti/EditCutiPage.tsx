@@ -201,7 +201,7 @@ const EditCutiPage = () => {
 	useEffect(()=>{
 		// const jenis_cuti_selected = SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((item:TSelectOption)=>item?.value == selectorCuti.editCuti?.jenis?.id??"");
 		formik.setFieldValue("tanggal_pengajuan", cuti?.tanggal??"")
-		formik.setFieldValue("jenis_cuti", {value:1, label: "Tahunan"}) //how to selected? as object or array not work
+		formik.setFieldValue("jenis_cuti", [{value:1, label: "Tahunan"}]) //how to selected? as object or array not work
 		formik.setFieldValue("lama_cuti", cuti?.lama??"")
 		formik.setFieldValue("tujuan_cuti", cuti?.tujuan??"")
 	},[cuti])
