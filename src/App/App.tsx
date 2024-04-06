@@ -31,6 +31,9 @@ import EditIzinPage from '../module/Izin/EditIzinPage';
 import NewIzinPage from '../module/Izin/NewIzinPage';
 import LoginPage from '../pages/Login.page';
 import LogoutPage from '../module/LogoutPage';
+import { hasLevel } from '../module/CheckLevels';
+import ApprovalCutiPage from '../module/Cuti/ApprovalCutiPage';
+import ApprovalIzinPage from '../module/Izin/ApprovalIzinPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -39,6 +42,40 @@ const App = () => {
 	const { fontSize } = useFontSize();
 	dayjs.extend(localizedFormat);
 
+	function loadSideNav(){
+		if(hasLevel("sdm")){
+			return <>
+						<NavItem {...{
+							id: 'cutiApprovalPage',
+							to: '/approval/cuti',
+							text: 'Cuti',
+							icon: 'HeroRectangleGroup',
+						}} />
+						<NavItem {...{
+							id: 'izinApprovalPage',
+							to: '/approval/izin',
+							text: 'Izin',
+							icon: 'HeroRectangleGroup',
+						}} />
+					</>
+		} else if(hasLevel("dosen")){
+			return <>
+					<NavItem {...{
+						id: 'cutiPage',
+						to: '/cuti',
+						text: 'Cuti',
+						icon: 'HeroRectangleGroup',
+					}} />
+					<NavItem {...{
+						id: 'izinPage',
+						to: '/izin',
+						text: 'Izin',
+						icon: 'HeroRectangleGroup',
+					}} />
+				</>
+		}
+		return <></>
+	}
 	return (
 		<>
 			<style>{`:root {font-size: ${fontSize}px}`}</style>
@@ -58,18 +95,7 @@ const App = () => {
 										text: 'Home',
 										icon: 'HeroRectangleGroup',
 									}} />
-									<NavItem {...{
-										id: 'cutiPage',
-										to: '/cuti',
-										text: 'Cuti',
-										icon: 'HeroRectangleGroup',
-									}} />
-									<NavItem {...{
-										id: 'izinPage',
-										to: '/izin',
-										text: 'Izin',
-										icon: 'HeroRectangleGroup',
-									}} />
+									{loadSideNav()}
 								</Nav>
 							</AsideBody>
 						</Aside>
@@ -170,9 +196,15 @@ const App = () => {
 									<Route path="/cuti" element={<CutiPage />} />
 									<Route path="/cuti/tambah" element={<NewCutiPage />} />
 									<Route path="/cuti/edit/:id" element={<EditCutiPage />} />
+
+									<Route path="/approval/cuti" element={<ApprovalCutiPage />} />
+
 									<Route path="/izin" element={<IzinPage />} />
 									<Route path="/izin/tambah" element={<NewIzinPage />} />
 									<Route path="/izin/edit/:id" element={<EditIzinPage />} />
+
+									<Route path="/approval/izin" element={<ApprovalIzinPage />} />
+
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}
 									<Route path="*" element={<NotFoundPage />} />

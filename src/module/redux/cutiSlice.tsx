@@ -3,13 +3,14 @@ import { CutiModel } from "../model/CutiModel";
 import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
 import { JenisCuti } from "../model/JenisCuti";
+import { Approval } from "../model/Approval";
 
 interface state {
   list_jenis_cuti: Array<JenisCuti>,
   list: Array<CutiModel>,
   paging: PagingTable,
   editCuti: CutiModel | null,
-  deletedCuti: CutiModel | null
+  deletedCuti: CutiModel | null,
 }
 const initialState: state = {
   list_jenis_cuti: [],

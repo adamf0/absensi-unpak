@@ -6,7 +6,7 @@ import Subheader, { SubheaderLeft } from "../../components/layouts/Subheader/Sub
 import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AlertObserver } from "../io/AlertObserver";
 import { ConsoleObserver } from "../io/ConsoleObserver";
 import { CutiModel } from "../model/CutiModel";
@@ -18,8 +18,14 @@ import { DeleteCuti } from "../repo/DeleteCuti";
 import { GetListCuti } from "../repo/GetListCuti";
 import { HandlerObserver } from "../abstract/HandlerObserver";
 import moment from "moment";
+import { ApprovalCuti } from "../repo/ApprovalCuti";
+import { Approval } from "../model/Approval";
+import Modal, { ModalHeader, ModalBody, ModalFooter, ModalFooterChild } from "../../components/ui/Modal";
+import Textarea from "../../components/form/Textarea";
 
-const CutiPage = () => {
+const ApprovalCutiPage = () => {
+    const [modalTolak, setModalTolak] = useState<boolean>(false);
+    const [approval, setApproval] = useState<Approval|null>(null);
     const navigate = useNavigate();
 
     const selectorCuti = useAppSelector(cutiselector);
@@ -81,16 +87,22 @@ const CutiPage = () => {
         }
     };
 
-    async function deleteCuti(id:any){
+    async function sendApproval(){
         try {
-            const response:any = await DeleteCuti(id);
+            const response:any = await ApprovalCuti({
+                "id":approval?.id,
+                "type":approval?.type,
+                "note":approval?.note,
+            });
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
                 const { status,message } = response;
 
                 if (status == 200){
                     alert(message);
-                    loadTable(1)
+                    loadTable(selectorCuti.paging.currentPage)
+                    setModalTolak(false)
+                    setApproval(null)
                 } else if (status == 500) {
                     alert(message ?? "terjadi masalah pada saat request ke server")
                 } else {
@@ -114,19 +126,20 @@ const CutiPage = () => {
     }, [selectorCuti.paging.currentPage]);
 
     useEffect(() => {
-        if (selectorCuti.deletedCuti?.id != null) {
-            deleteCuti(selectorCuti.deletedCuti?.id)
+        if(approval?.execute){
+            sendApproval()
+        } else if(approval?.execute==false){
+            setModalTolak(true)
         }
-
         return () => { };
-    }, [selectorCuti.deletedCuti]);
+    }, [approval]);
 
     return (
         <>
-            <PageWrapper name='Cuti'>
+            <PageWrapper name='ApprovalCuti'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Cuti' />
+                        <Breadcrumb currentPage='ApprovalCuti' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
@@ -163,12 +176,17 @@ const CutiPage = () => {
                                         <Td>-</Td>
                                         <Td>{item.status}</Td>
                                         <Td className="flex flex-wrap gap-2">
-                                            <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/cuti/edit/${item.id}`)}>
-                                                edit
-                                            </Button>
-                                            <Button variant='solid' className="grow" color="red" onClick={()=>deleteCuti(item.id)}>
-                                                hapus
-                                            </Button>
+                                            {
+                                                item.status!="tolak"? 
+                                                <>
+                                                    <Button variant='solid' className="grow"  color="green" onClick={()=>setApproval(new Approval(true,item.id,"terima"))}>
+                                                        Terima
+                                                    </Button>
+                                                    <Button variant='solid' className="grow" color="red" onClick={()=>setApproval(new Approval(false,item.id,"tolak"))}>
+                                                        Tolak
+                                                    </Button>
+                                                </>:null
+                                            }
                                         </Td>
                                     </Tr>
                                     )
@@ -183,7 +201,37 @@ const CutiPage = () => {
                             <Button color='red' icon='HeroArrowRight' isDisable={selectorCuti.paging.nextPage==null} onClick={() => dispatch(next())}>
                                 next
                             </Button>
-                            </div>
+                        </div>
+                        <Modal isStaticBackdrop={true} isOpen={modalTolak} setIsOpen={setModalTolak}>
+                            <ModalHeader>Alasan Penolakan</ModalHeader>
+                            <ModalBody>
+                                <Textarea
+                                    id='alasan_penolakan_cuti'
+                                    name='alasan_penolakan_cuti'
+                                    onChange={(e)=>setApproval(prevState=>{
+                                        if(prevState!=null){
+                                            return new Approval(prevState.execute, prevState?.id, prevState?.type, e.target.value)
+                                        }
+                                        return prevState
+                                    })}
+                                    value={approval?.note??""}
+                                    placeholder='masukkan alasan penolakan...'
+                                    rows={8} />
+                            </ModalBody>
+                            <ModalFooter>
+                                <ModalFooterChild>
+                                    <Button color='red' onClick={()=>setModalTolak(false)}>batal</Button>
+                                    <Button variant='solid' onClick={()=>{
+                                        return setApproval(prevState=>{
+                                            if(prevState!=null){
+                                                return new Approval(true, prevState?.id, prevState?.type, prevState?.note)
+                                            }
+                                            return prevState
+                                        })
+                                    }}>Kirim</Button>
+                                </ModalFooterChild>
+                            </ModalFooter>
+                        </Modal>
                     </CardBody>
                 </Container>
             </PageWrapper>
@@ -191,4 +239,4 @@ const CutiPage = () => {
     );
 };
 
-export default CutiPage;
+export default ApprovalCutiPage;

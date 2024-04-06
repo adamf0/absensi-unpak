@@ -54,8 +54,8 @@ const LoginPage = () => {
 					const { status,message,data } = response;
 	
 					if (status == 200){
-						alert(message);
-						localStorage.setItem('user', values.username);
+						localStorage.setItem('user', data.userid!=null? data.userid:values.username);
+						localStorage.setItem('level', JSON.stringify(data.level));
 						localStorage.setItem('infoUser', JSON.stringify(data));
 						// const info = localStorage.getItem('infoUser')??"{}";
 						// console.log(JSON.parse(info))

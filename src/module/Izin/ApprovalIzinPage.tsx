@@ -6,23 +6,28 @@ import Subheader, { SubheaderLeft } from "../../components/layouts/Subheader/Sub
 import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AlertObserver } from "../io/AlertObserver";
 import { ConsoleObserver } from "../io/ConsoleObserver";
-import { CutiModel } from "../model/CutiModel";
-import { JenisCuti } from "../model/JenisCuti";
+import { IzinModel } from "../model/IzinModel";
 import PagingTable from "../model/PagingTable";
-import { cutiselector, loadList, next, pagingTable, prev } from "../redux/cutiSlice";
+import { loadList, next, pagingTable, prev } from "../redux/izinSlice";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { DeleteCuti } from "../repo/DeleteCuti";
-import { GetListCuti } from "../repo/GetListCuti";
+import { GetListIzin } from "../repo/GetListIzin";
 import { HandlerObserver } from "../abstract/HandlerObserver";
 import moment from "moment";
+import { izinselector } from "../redux/izinSlice";
+import { Approval } from "../model/Approval";
+import { ApprovalIzin } from "../repo/ApprovalIzin";
+import Textarea from "../../components/form/Textarea";
+import Modal, { ModalHeader, ModalBody, ModalFooter, ModalFooterChild } from "../../components/ui/Modal";
 
-const CutiPage = () => {
+const ApprovalIzinPage = () => {
+    const [modalTolak, setModalTolak] = useState<boolean>(false);
+    const [approval, setApproval] = useState<Approval|null>(null);
     const navigate = useNavigate();
 
-    const selectorCuti = useAppSelector(cutiselector);
+    const selectorIzin = useAppSelector(izinselector);
     const dispatch = useAppDispatch();
 
     const handler1 = new HandlerObserver();
@@ -32,7 +37,7 @@ const CutiPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListCuti(page);
+        const response: any = await GetListIzin(page);
         if (response.status !== 200) {
             throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         }
@@ -41,18 +46,9 @@ const CutiPage = () => {
             const { status, message, list } = response;
 
             if (status == 200) {
-                const cutiList = list.data.map((item: any) =>
-                    new CutiModel(
+                const izinList = list.data.map((item: any) =>
+                    new IzinModel(
                         item.tanggal_pengajuan,
-                        item.lama_cuti,
-                        new JenisCuti(
-                            item.JenisCuti?.id ?? "",
-                            item.JenisCuti?.nama ?? "",
-                            item.JenisCuti?.min ?? "",
-                            item.JenisCuti?.max ?? "",
-                            item.JenisCuti?.dokumen ?? false,
-                            item.JenisCuti?.kondisi ?? "",
-                        ),
                         item.tujuan,
                         item.status,
                         item.id,
@@ -71,7 +67,7 @@ const CutiPage = () => {
                     nextPage: list.nextPage,
                 };
 
-                await dispatch(loadList(cutiList));
+                await dispatch(loadList(izinList));
                 await dispatch(pagingTable(paging));
             } else if (status == 500) {
                 console.trace(message ?? "Terjadi masalah pada saat request ke server")
@@ -81,16 +77,22 @@ const CutiPage = () => {
         }
     };
 
-    async function deleteCuti(id:any){
+    async function sendApproval(){
         try {
-            const response:any = await DeleteCuti(id);
+            const response:any = await ApprovalIzin({
+                "id":approval?.id,
+                "type":approval?.type,
+                "note":approval?.note,
+            });
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
                 const { status,message } = response;
 
                 if (status == 200){
                     alert(message);
-                    loadTable(1)
+                    loadTable(selectorIzin.paging.currentPage)
+                    setModalTolak(false)
+                    setApproval(null)
                 } else if (status == 500) {
                     alert(message ?? "terjadi masalah pada saat request ke server")
                 } else {
@@ -108,31 +110,32 @@ const CutiPage = () => {
     }
 
     useEffect(() => {
-        loadTable(selectorCuti.paging.currentPage)
+        loadTable(selectorIzin.paging.currentPage)
 
         return () => { };
-    }, [selectorCuti.paging.currentPage]);
+    }, [selectorIzin.paging.currentPage]);
 
     useEffect(() => {
-        if (selectorCuti.deletedCuti?.id != null) {
-            deleteCuti(selectorCuti.deletedCuti?.id)
+        if(approval?.execute){
+            sendApproval()
+        } else if(approval?.execute==false){
+            setModalTolak(true)
         }
-
         return () => { };
-    }, [selectorCuti.deletedCuti]);
+    }, [approval]);
 
     return (
         <>
-            <PageWrapper name='Cuti'>
+            <PageWrapper name='Izin'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Cuti' />
+                        <Breadcrumb currentPage='Izin' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
                     <CardHeader>
                         <CardHeaderChild>
-                            <Button variant='solid' onClick={()=>navigate('/cuti/tambah')}>
+                            <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
                                 Tambah
                             </Button>
                         </CardHeaderChild>
@@ -143,32 +146,31 @@ const CutiPage = () => {
                                 <Tr>
                                     <Th>#</Th>
                                     <Th>Tanggal</Th>
-                                    <Th>Lama</Th>
-                                    <Th>Jenis Cuti</Th>
                                     <Th>Tujuan</Th>
-                                    <Th>Dokumen</Th>
                                     <Th>Status</Th>
                                     <Th>Aksi</Th>
                                 </Tr>
                             </THead>
                             <TBody>
                                 {
-                                    selectorCuti.list.map((item,index)=>
+                                    selectorIzin.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
                                         <Td>{item.id}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
-                                        <Td>{item.lama} hari</Td>
-                                        <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
-                                        <Td>-</Td>
                                         <Td>{item.status}</Td>
                                         <Td className="flex flex-wrap gap-2">
-                                            <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/cuti/edit/${item.id}`)}>
-                                                edit
-                                            </Button>
-                                            <Button variant='solid' className="grow" color="red" onClick={()=>deleteCuti(item.id)}>
-                                                hapus
-                                            </Button>
+                                            {
+                                                item.status!="tolak"? 
+                                                <>
+                                                    <Button variant='solid' className="grow"  color="green" onClick={()=>setApproval(new Approval(true,item.id,"terima"))}>
+                                                        Terima
+                                                    </Button>
+                                                    <Button variant='solid' className="grow" color="red" onClick={()=>setApproval(new Approval(false,item.id,"tolak"))}>
+                                                        Tolak
+                                                    </Button>
+                                                </>:null
+                                            }
                                         </Td>
                                     </Tr>
                                     )
@@ -176,14 +178,44 @@ const CutiPage = () => {
                             </TBody>
                         </Table>
                         <div className="flex items-center gap-8">
-                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorCuti.paging.prevPage==null} onClick={() => dispatch(prev())}>
+                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorIzin.paging.prevPage==null} onClick={() => dispatch(prev())}>
                                 prev
                             </Button>
-                            Page < b > {selectorCuti.paging.currentPage}</b > of < b > {selectorCuti.paging.totalPage}</b>
-                            <Button color='red' icon='HeroArrowRight' isDisable={selectorCuti.paging.nextPage==null} onClick={() => dispatch(next())}>
+                            Page < b > {selectorIzin.paging.currentPage}</b > of < b > {selectorIzin.paging.totalPage}</b>
+                            <Button color='red' icon='HeroArrowRight' isDisable={selectorIzin.paging.nextPage==null} onClick={() => dispatch(next())}>
                                 next
                             </Button>
-                            </div>
+                        </div>
+                        <Modal isStaticBackdrop={true} isOpen={modalTolak} setIsOpen={setModalTolak}>
+                            <ModalHeader>Alasan Penolakan</ModalHeader>
+                            <ModalBody>
+                                <Textarea
+                                    id='alasan_penolakan_izin'
+                                    name='alasan_penolakan_izin'
+                                    onChange={(e)=>setApproval(prevState=>{
+                                        if(prevState!=null){
+                                            return new Approval(prevState.execute, prevState?.id, prevState?.type, e.target.value)
+                                        }
+                                        return prevState
+                                    })}
+                                    value={approval?.note??""}
+                                    placeholder='masukkan alasan penolakan...'
+                                    rows={8} />
+                            </ModalBody>
+                            <ModalFooter>
+                                <ModalFooterChild>
+                                    <Button color='red' onClick={()=>setModalTolak(false)}>batal</Button>
+                                    <Button variant='solid' onClick={()=>{
+                                        return setApproval(prevState=>{
+                                            if(prevState!=null){
+                                                return new Approval(true, prevState?.id, prevState?.type, prevState?.note)
+                                            }
+                                            return prevState
+                                        })
+                                    }}>Kirim</Button>
+                                </ModalFooterChild>
+                            </ModalFooter>
+                        </Modal>
                     </CardBody>
                 </Container>
             </PageWrapper>
@@ -191,4 +223,4 @@ const CutiPage = () => {
     );
 };
 
-export default CutiPage;
+export default ApprovalIzinPage;

@@ -142,7 +142,7 @@ const IzinPage = () => {
                             <TBody>
                                 {
                                     selectorIzin.list.map((item,index)=>
-                                    <Tr className="text-center">
+                                    <Tr className="text-center" key={index}>
                                         <Td>{item.id}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.tujuan}</Td>
