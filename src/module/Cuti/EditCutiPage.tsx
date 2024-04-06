@@ -162,7 +162,7 @@ const EditCutiPage = () => {
 
 				const response: any = await UpdateCuti({
 					id:id,
-					nidn: localStorage.getItem('authData') ?? "-",
+					nidn: localStorage.getItem('userRef') ?? "-",
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					lama_cuti: value.lama_cuti,
 					tujuan: value.tujuan_cuti,

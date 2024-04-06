@@ -42,7 +42,7 @@ const NewIzinPage = () => {
 				setDisableButton(true);
 				
 				const response:any = await CreateIzin({
-					nidn:localStorage.getItem('authData')??"-",
+					nidn:localStorage.getItem('userRef')??"-",
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					tujuan: value.tujuan_izin,
 				});

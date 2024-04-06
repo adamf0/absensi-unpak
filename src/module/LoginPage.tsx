@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import { Link, useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/layouts/PageWrapper/PageWrapper';
 import Button from '../components/ui/Button';
-import { useAuth } from '../context/authContext';
 import Input from '../components/form/Input';
-import usersDb from '../mocks/db/users.db';
 import LogoTemplate from '../templates/layouts/Logo/Logo.template';
 import FieldWrap from '../components/form/FieldWrap';
 import Icon from '../components/icon/Icon';
 import Validation from '../components/form/Validation';
-import useLocalStorage from '../hooks/useLocalStorage';
-import { DoLogin } from '../module/repo/DoLogin';
+import { DoLogin } from './repo/DoLogin';
+import useLevelMode from '../hooks/useLevelMode';
+import useUserRef from '../hooks/useUserRef';
 
 type TValues = {
 	username: string;
@@ -21,6 +20,8 @@ type TValues = {
 
 const LoginPage = () => {
 	const navigate = useNavigate();
+	const { levelMode, setLevelMode } = useLevelMode();
+	const { userRef, setUserRef } = useUserRef();
 	// const { onLogin } = useAuth();
 	
 	const [passwordShowStatus, setPasswordShowStatus] = useState<boolean>(false);
@@ -54,9 +55,13 @@ const LoginPage = () => {
 					const { status,message,data } = response;
 	
 					if (status == 200){
-						localStorage.setItem('user', data.userid!=null? data.userid:values.username);
 						localStorage.setItem('level', JSON.stringify(data.level));
 						localStorage.setItem('infoUser', JSON.stringify(data));
+						if(data.level.length>0){
+							const level = data.level[0]
+							setLevelMode(level)
+							setUserRef(level!="dosen"? data.id:data?.NIDN)
+						}
 						// const info = localStorage.getItem('infoUser')??"{}";
 						// console.log(JSON.parse(info))
 						navigate('/')
@@ -78,7 +83,7 @@ const LoginPage = () => {
 	});
 
 	useEffect(() => {
-		if (localStorage.getItem('user')) {
+		if (localStorage.getItem('userInfo')) {
 		  navigate('/home');
 		}
 	  }, [navigate]);

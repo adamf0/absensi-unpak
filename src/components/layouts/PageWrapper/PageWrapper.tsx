@@ -20,7 +20,7 @@ const PageWrapper: FC<IPageWrapperProps> = (props) => {
 	// const { usernameStorage } = useAuth();
 
 
-	if (isProtectedRoute && !localStorage.getItem('user')) {
+	if (isProtectedRoute && !localStorage.getItem('infoUser')) {
 		// user is not authenticated
 		return <Navigate to={authPages.loginPage.to} />;
 	}

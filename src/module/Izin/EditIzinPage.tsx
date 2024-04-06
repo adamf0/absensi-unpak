@@ -79,7 +79,7 @@ const EditIzinPage = () => {
 				
 				const response:any = await UpdateIzin({
 					id:id,
-					nidn:localStorage.getItem('authData')??"-",
+					nidn:localStorage.getItem('userRef')??"-",
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					tujuan: value.tujuan_izin,
 				});

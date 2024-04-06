@@ -19,6 +19,10 @@ import useDeviceScreen from '../hooks/useDeviceScreen';
 import { TLang } from '../types/lang.type';
 
 export interface IThemeContextProps {
+	levelMode: string;
+	setLevelMode: Dispatch<SetStateAction<string>>;
+	userRef: string;
+	setUserRef: Dispatch<SetStateAction<string>>;
 	isDarkTheme: boolean;
 	darkModeStatus: TDarkMode | null;
 	setDarkModeStatus: Dispatch<SetStateAction<TDarkMode | null>>;
@@ -121,8 +125,27 @@ export const ThemeContextProvider: FC<IThemeContextProviderProps> = ({ children 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [fontSize]);
 
+	/**
+	 * Level Mode
+	 */
+	const [levelMode, setLevelMode] = useState<string>(localStorage.getItem('levelMode')??"");
+	useLayoutEffect(() => {
+		localStorage.setItem('levelMode', levelMode);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [levelMode]);
+
+	const [userRef, setUserRef] = useState<string>(localStorage.getItem('userRef')??"");
+	useLayoutEffect(() => {
+		localStorage.setItem('userRef', userRef);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userRef]);
+
 	const values: IThemeContextProps = useMemo(
 		() => ({
+			levelMode,
+			setLevelMode,
+			userRef,
+			setUserRef,
 			isDarkTheme,
 			darkModeStatus,
 			setDarkModeStatus,
@@ -133,7 +156,7 @@ export const ThemeContextProvider: FC<IThemeContextProviderProps> = ({ children 
 			language,
 			setLanguage,
 		}),
-		[isDarkTheme, darkModeStatus, asideStatus, fontSize, language],
+		[levelMode, userRef, isDarkTheme, darkModeStatus, asideStatus, fontSize, language],
 	);
 
 	return <ThemeContext.Provider value={values}>{children}</ThemeContext.Provider>;

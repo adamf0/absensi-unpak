@@ -1,10 +1,7 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import dayjs from 'dayjs';
-import AsideRouter from '../components/router/AsideRouter';
 import Wrapper from '../components/layouts/Wrapper/Wrapper';
-import HeaderRouter from '../components/router/HeaderRouter';
-import ContentRouter from '../components/router/ContentRouter';
 import FooterRouter from '../components/router/FooterRouter';
 import useFontSize from '../hooks/useFontSize';
 import getOS from '../utils/getOS.util';
@@ -19,31 +16,31 @@ import Card from '../components/ui/Card';
 import NotFoundPage from '../pages/NotFound.page';
 import InputPage from '../pages/componentsAndTemplates/form/InputPage/Input.page';
 import LogoAndAsideTogglePart from '../templates/layouts/Asides/_parts/LogoAndAsideToggle.part';
-import MessagesPartial from '../templates/layouts/Headers/_partial/Messages.partial';
-import NotificationPartial from '../templates/layouts/Headers/_partial/Notification.partial';
 import SearchPartial from '../templates/layouts/Headers/_partial/Search.partial';
-import SettingsPartial from '../templates/layouts/Headers/_partial/Settings.partial';
 import CutiPage from '../module/Cuti/CutiPage';
 import NewCutiPage from '../module/Cuti/NewCutiPage';
 import EditCutiPage from '../module/Cuti/EditCutiPage';
 import IzinPage from '../module/Izin/IzinPage';
 import EditIzinPage from '../module/Izin/EditIzinPage';
 import NewIzinPage from '../module/Izin/NewIzinPage';
-import LoginPage from '../pages/Login.page';
 import LogoutPage from '../module/LogoutPage';
-import { hasLevel } from '../module/CheckLevels';
 import ApprovalCutiPage from '../module/Cuti/ApprovalCutiPage';
 import ApprovalIzinPage from '../module/Izin/ApprovalIzinPage';
+import SettingsComponent from '../module/component/SettingsComponent';
+import LoginPage from '../module/LoginPage';
+import useLevelMode from '../hooks/useLevelMode';
 
 const App = () => {
 	const navigate = useNavigate();
+	const { levelMode } = useLevelMode();
+
 	getOS();
 
 	const { fontSize } = useFontSize();
 	dayjs.extend(localizedFormat);
 
 	function loadSideNav(){
-		if(hasLevel("sdm")){
+		if(levelMode=="sdm"){
 			return <>
 						<NavItem {...{
 							id: 'cutiApprovalPage',
@@ -58,7 +55,7 @@ const App = () => {
 							icon: 'HeroRectangleGroup',
 						}} />
 					</>
-		} else if(hasLevel("dosen")){
+		} else if(levelMode=="dosen"){
 			return <>
 					<NavItem {...{
 						id: 'cutiPage',
@@ -111,9 +108,9 @@ const App = () => {
 									<SearchPartial />
 								</HeaderLeft>
 								<HeaderRight>
-									<MessagesPartial />
-									<NotificationPartial />
-									<SettingsPartial />
+									{/* <MessagesPartial />
+									<NotificationPartial /> */}
+									<SettingsComponent />
 								</HeaderRight>
 							</Header>
 						} />
