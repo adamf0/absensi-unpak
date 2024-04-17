@@ -2,14 +2,17 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
 import { IzinModel } from "../model/IzinModel";
+import { JenisIzin } from "../model/JenisIzin";
 
 interface state{
+  list_jenis_izin: Array<JenisIzin>,
   list: Array<IzinModel>,
   paging: PagingTable,
   editIzin: IzinModel | null,
   deletedIzin: IzinModel | null
 }
 const initialState:state = {
+    list_jenis_izin: [],
     list: [],
     paging: {
       totalData:0,
@@ -31,6 +34,9 @@ export const izinlice = createSlice({
     loadList: (state, action: PayloadAction<Array<IzinModel>>) => {
       state.list = action.payload;
     },
+    loadListJenisIzin: (state, action: PayloadAction<Array<JenisIzin>>) => {
+      state.list_jenis_izin = action.payload;
+    },
     editIzin: (state, action: PayloadAction<IzinModel>) => {
       state.editIzin = action.payload;
     },
@@ -51,6 +57,6 @@ export const izinlice = createSlice({
     
   },
 });
-export const { loadList, editIzin, deletedIzin, pagingTable, prev, next } = izinlice.actions;
+export const { loadList, loadListJenisIzin, editIzin, deletedIzin, pagingTable, prev, next } = izinlice.actions;
 export const izinselector = (state: RootState) => state.izinReducer;
 export default izinlice.reducer;

@@ -21,6 +21,7 @@ import { Approval } from "../model/Approval";
 import { ApprovalIzin } from "../repo/ApprovalIzin";
 import Textarea from "../../components/form/Textarea";
 import Modal, { ModalHeader, ModalBody, ModalFooter, ModalFooterChild } from "../../components/ui/Modal";
+import { JenisIzin } from "../model/JenisIzin";
 
 const ApprovalIzinPage = () => {
     const [modalTolak, setModalTolak] = useState<boolean>(false);
@@ -49,7 +50,12 @@ const ApprovalIzinPage = () => {
                 const izinList = list.data.map((item: any) =>
                     new IzinModel(
                         item.tanggal_pengajuan,
+                        new JenisIzin(
+                            item.JenisIzin?.id ?? "",
+                            item.JenisIzin?.nama ?? ""
+                        ),
                         item.tujuan,
+                        item.dokumen,
                         item.status,
                         item.id,
                         false

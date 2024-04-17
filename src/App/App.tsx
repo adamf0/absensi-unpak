@@ -54,6 +54,12 @@ const App = () => {
 							text: 'Izin',
 							icon: 'HeroRectangleGroup',
 						}} />
+						<NavItem {...{
+							id: 'logout',
+							to: '/logout',
+							text: 'Logout',
+							icon: 'HeroRectangleGroup',
+						}} />
 					</>
 		} else if(levelMode=="dosen"){
 			return <>
@@ -67,6 +73,12 @@ const App = () => {
 						id: 'izinPage',
 						to: '/izin',
 						text: 'Izin',
+						icon: 'HeroRectangleGroup',
+					}} />
+					<NavItem {...{
+						id: 'logout',
+						to: '/logout',
+						text: 'Logout',
 						icon: 'HeroRectangleGroup',
 					}} />
 				</>

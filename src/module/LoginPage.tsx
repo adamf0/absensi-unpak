@@ -98,10 +98,10 @@ const LoginPage = () => {
 					<div>
 						<span className='text-4xl font-semibold'>Sign in</span>
 					</div>
-					<div>
+					{/* <div>
 						<span>Sign up with Open account</span>
-					</div>
-					<div className='grid grid-cols-12 gap-4'>
+					</div> */}
+					{/* <div className='grid grid-cols-12 gap-4'>
 						<div className='col-span-6'>
 							<Button
 								icon='CustomGoogle'
@@ -122,11 +122,11 @@ const LoginPage = () => {
 								Apple
 							</Button>
 						</div>
-					</div>
+					</div> */}
 					<div className='border border-zinc-500/25 dark:border-zinc-500/50' />
-					<div>
+					{/* <div>
 						<span>Or continue with email address</span>
-					</div>
+					</div> */}
 					<form className='flex flex-col gap-4' noValidate>
 						<div
 							className={classNames({
@@ -196,12 +196,12 @@ const LoginPage = () => {
 							</Button>
 						</div>
 					</form>
-					<div>
+					{/* <div>
 						<span className='text-zinc-500'>
 							This site is protected by reCAPTCHA and the Google Privacy Policy.
 						</span>
-					</div>
-					<div>
+					</div> */}
+					{/* <div>
 						<span className='flex gap-2 text-sm'>
 							<span className='text-zinc-400 dark:text-zinc-600'>
 								Don’t have an account?
@@ -210,7 +210,7 @@ const LoginPage = () => {
 								Sign up
 							</Link>
 						</span>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</PageWrapper>

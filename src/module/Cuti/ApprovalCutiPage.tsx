@@ -60,6 +60,7 @@ const ApprovalCutiPage = () => {
                             item.JenisCuti?.kondisi ?? "",
                         ),
                         item.tujuan,
+                        item.dokumen,
                         item.status,
                         item.id,
                         false
@@ -174,18 +175,18 @@ const ApprovalCutiPage = () => {
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
                                         <Td>-</Td>
-                                        <Td>{item.status}</Td>
+                                        <Td>{item.status!="tolak"}</Td>
                                         <Td className="flex flex-wrap gap-2">
                                             {
-                                                item.status!="tolak"? 
+                                                item.status==""||item.status=="menunggu"? 
                                                 <>
-                                                    <Button variant='solid' className="grow"  color="green" onClick={()=>setApproval(new Approval(true,item.id,"terima"))}>
+                                                    <Button variant='solid' className="grow" color="blue" onClick={()=>setApproval(new Approval(true,item.id,"terima"))}>
                                                         Terima
                                                     </Button>
                                                     <Button variant='solid' className="grow" color="red" onClick={()=>setApproval(new Approval(false,item.id,"tolak"))}>
                                                         Tolak
                                                     </Button>
-                                                </>:null
+                                                </>:""
                                             }
                                         </Td>
                                     </Tr>

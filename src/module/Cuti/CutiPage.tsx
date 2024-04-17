@@ -54,6 +54,7 @@ const CutiPage = () => {
                             item.JenisCuti?.kondisi ?? "",
                         ),
                         item.tujuan,
+                        item.dokumen,
                         item.status,
                         item.id,
                         false
@@ -155,20 +156,25 @@ const CutiPage = () => {
                                 {
                                     selectorCuti.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{item.id}</Td>
+                                        <Td>{((selectorCuti.paging.currentPage-1)*10 + (index+1))}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
                                         <Td>-</Td>
                                         <Td>{item.status}</Td>
-                                        <Td className="flex flex-wrap gap-2">
-                                            <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/cuti/edit/${item.id}`)}>
-                                                edit
-                                            </Button>
-                                            <Button variant='solid' className="grow" color="red" onClick={()=>deleteCuti(item.id)}>
-                                                hapus
-                                            </Button>
+                                        <Td>
+                                            {
+                                                item.status=="" || item.status=="menunggu"? 
+                                                <div className="flex flex-wrap gap-2">
+                                                    <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/cuti/edit/${item.id}`)}>
+                                                        edit
+                                                    </Button>
+                                                    <Button variant='solid' className="grow" color="red" onClick={()=>deleteCuti(item.id)}>
+                                                        hapus
+                                                    </Button>
+                                                </div>:null
+                                            }
                                         </Td>
                                     </Tr>
                                     )

@@ -4,7 +4,7 @@ export const UpdateIzin = async (formData:any) => {
     try {
         const response = await axiosInstance.post('/izin/update', formData, {
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data",
             }
         });
         return response;

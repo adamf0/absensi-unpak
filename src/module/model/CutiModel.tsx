@@ -5,6 +5,7 @@ export class CutiModel {
     lama: number;
     jenis: JenisCuti;
     tujuan: string;
+    dokumen: string|null;
     status: string;
     id: string;
     openDetail: boolean;
@@ -14,6 +15,7 @@ export class CutiModel {
         lama: number,
         jenis: JenisCuti,
         tujuan: string,
+        dokumen: string|null,
         status: string,
         id: string,
         openDetail: boolean,
@@ -22,6 +24,7 @@ export class CutiModel {
         this.lama = lama;
         this.jenis = jenis;
         this.tujuan = tujuan;
+        this.dokumen = dokumen;
         this.status = status;
         this.id = id;
         this.openDetail = openDetail;    

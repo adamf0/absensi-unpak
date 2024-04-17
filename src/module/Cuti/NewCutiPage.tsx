@@ -77,11 +77,12 @@ const NewCutiPage = () => {
 	}, [])
 
 	const formik = useFormik({
+		enableReinitialize: true,
 		initialValues: {
-			tanggal_pengajuan: '',
+			tanggal_pengajuan: "",
 			jenis_cuti: "",
 			lama_cuti: "",
-			tujuan_cuti: '',
+			tujuan_cuti: "",
 			dokumen: null,
 		},
 		validationSchema: Yup.object({
@@ -95,26 +96,27 @@ const NewCutiPage = () => {
 				'is-selected',
 				'Jenis cuti harus dipilih',
 				(value: any) => {
-					return !(value == undefined || value.value == "" || !dokumen);
+					return !(value == undefined || value == "");
 				}
 			),
-			dokumen: Yup.mixed().test(
+			dokumen: Yup.mixed().nullable().test(
 				'required',
 				'this is required',
 				(value: any) => {
-					return !(value == undefined || value.value == "") || dokumen
+					console.log(value,dokumen);
+					return (dokumen? !(value == undefined || value == ""):true)
 				}
 			).test(
 				'10mb',
 				'this is max 10mb',
 				(value: any) => {
-					return !(value.size > FILE_SIZE)
+					return value==null || !(value.size > FILE_SIZE)
 				}
 			).test(
 				'type',
 				`this is support ${SUPPORTED_FORMATS.join(",")} only`,
 				(value: any) => {
-					return SUPPORTED_FORMATS.includes(value.type) || dokumen
+					return value==null || (SUPPORTED_FORMATS.includes(value.type) || dokumen)
 				}
 			),
 		}),
@@ -128,7 +130,7 @@ const NewCutiPage = () => {
 					tanggal_pengajuan: value.tanggal_pengajuan,
 					lama_cuti: value.lama_cuti,
 					tujuan: value.tujuan_cuti,
-					jenis_cuti: value.jenis_cuti?.value,
+					jenis_cuti: value.jenis_cuti,
 					dokumen: value.dokumen
 				});
 				handler1.notifyObservers(response);
@@ -183,8 +185,8 @@ const NewCutiPage = () => {
 									<div key={"tanggal_pengajuan"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.tanggal_pengajuan}
-											invalidFeedback={formik.errors.tanggal_pengajuan}
+											isTouched={formik.touched.tanggal_pengajuan as boolean}
+											invalidFeedback={formik.errors.tanggal_pengajuan as any}
 											validFeedback='Good'>
 											<>
 												<Label htmlFor={"tanggal_pengajuan"}>Tanggal Pengajuan</Label>
@@ -201,8 +203,8 @@ const NewCutiPage = () => {
 									<div key={"jenis_cuti"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.jenis_cuti}
-											invalidFeedback={formik.errors.jenis_cuti}
+											isTouched={formik.touched.jenis_cuti as boolean}
+											invalidFeedback={formik.errors.jenis_cuti as any}
 											validFeedback='Good'>
 											<>
 												<Label htmlFor={"jenis_cuti"}>Jenis Cuti</Label>
@@ -210,7 +212,7 @@ const NewCutiPage = () => {
 													options={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti)}
 													id='jenis_cuti'
 													name='jenis_cuti'
-													value={formik.values.jenis_cuti}
+													value={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((option:any) => option.value === formik.values.jenis_cuti )}
 													onChange={(selected: any) => {
 														const jenisCuti: JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
 														setMin(parseInt(jenisCuti.min))
@@ -219,7 +221,7 @@ const NewCutiPage = () => {
 														if (!dokumen) {
 															formik.setFieldValue("dokumen", null)
 														}
-														formik.setFieldValue('jenis_cuti', selected)
+														formik.setFieldValue('jenis_cuti', selected.value)
 													}}
 												/>
 											</>
@@ -228,8 +230,8 @@ const NewCutiPage = () => {
 									<div key={"lama_cuti"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.lama_cuti}
-											invalidFeedback={formik.errors.lama_cuti}
+											isTouched={formik.touched.lama_cuti as boolean}
+											invalidFeedback={formik.errors.lama_cuti as any}
 											validFeedback='Good'>
 											<>
 												<Label htmlFor={"lama_cuti"}>Lama Cuti</Label>
@@ -250,8 +252,8 @@ const NewCutiPage = () => {
 									<div key={"tujuan_cuti"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.tujuan_cuti}
-											invalidFeedback={formik.errors.tujuan_cuti}
+											isTouched={formik.touched.tujuan_cuti as boolean}
+											invalidFeedback={formik.errors.tujuan_cuti as any}
 											validFeedback='Good'>
 											<>
 												<Label htmlFor={"tujuan_cuti"}>Tujuan</Label>
@@ -268,8 +270,8 @@ const NewCutiPage = () => {
 									<div key={"dokumen"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.dokumen}
-											invalidFeedback={formik.errors.dokumen}
+											isTouched={formik.touched.dokumen as boolean}
+											invalidFeedback={formik.errors.dokumen as any}
 											validFeedback='Good'>
 											<>
 												<Label htmlFor={"dokumen"}>Dokumen</Label>

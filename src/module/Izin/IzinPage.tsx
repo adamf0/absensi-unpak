@@ -18,6 +18,7 @@ import { GetListIzin } from "../repo/GetListIzin";
 import { HandlerObserver } from "../abstract/HandlerObserver";
 import moment from "moment";
 import { izinselector } from "../redux/izinSlice";
+import { JenisIzin } from "../model/JenisIzin";
 
 const IzinPage = () => {
     const navigate = useNavigate();
@@ -44,7 +45,12 @@ const IzinPage = () => {
                 const izinList = list.data.map((item: any) =>
                     new IzinModel(
                         item.tanggal_pengajuan,
+                        new JenisIzin(
+                            item.JenisIzin?.id ?? "",
+                            item.JenisIzin?.nama ?? ""
+                        ),
                         item.tujuan,
+                        item.dokumen,
                         item.status,
                         item.id,
                         false
@@ -143,17 +149,22 @@ const IzinPage = () => {
                                 {
                                     selectorIzin.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{item.id}</Td>
+                                        <Td>{((selectorIzin.paging.currentPage-1)*10 + (index+1))}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.tujuan}</Td>
                                         <Td>{item.status}</Td>
-                                        <Td className="flex flex-wrap gap-2">
-                                            <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/izin/edit/${item.id}`)}>
-                                                edit
-                                            </Button>
-                                            <Button variant='solid' className="grow" color="red" onClick={()=>deleteIzin(item.id)}>
-                                                hapus
-                                            </Button>
+                                        <Td>
+                                            {
+                                                item.status=="" || item.status=="menunggu"? 
+                                                <div className="flex flex-wrap gap-2">
+                                                    <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/izin/edit/${item.id}`)}>
+                                                        edit
+                                                    </Button>
+                                                    <Button variant='solid' className="grow" color="red" onClick={()=>deleteIzin(item.id)}>
+                                                        hapus
+                                                    </Button>
+                                                </div>:null
+                                            }
                                         </Td>
                                     </Tr>
                                     )

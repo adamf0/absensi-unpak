@@ -70,9 +70,9 @@ export const ThemeContextProvider: FC<IThemeContextProviderProps> = ({ children 
 	const [darkModeStatus, setDarkModeStatus] = useState<TDarkMode | null>(
 		(localStorage.getItem('theme') || themeConfig.theme) as TDarkMode,
 	);
-	const [isDarkTheme, setIsDarkTheme] = useState<boolean>(darkModeStatus === DARK_MODE.DARK);
+	const [isDarkTheme, setIsDarkTheme] = useState<boolean>(darkModeStatus === DARK_MODE.LIGHT);
 	useLayoutEffect(() => {
-		localStorage.setItem('theme', darkModeStatus as string);
+		localStorage.setItem('theme', darkModeStatus as string??DARK_MODE.LIGHT);
 
 		if (
 			localStorage.getItem('theme') === DARK_MODE.DARK ||

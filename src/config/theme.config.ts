@@ -41,13 +41,13 @@ const themeConfig: TThemeConfigs = {
 	projectTitle: 'HR Unpak',
 	projectName: '',
 	language: 'en',
-	theme: DARK_MODE.SYSTEM,
+	theme: DARK_MODE.LIGHT,
 	themeColor: 'blue',
 	themeColorShade: '500',
 	rounded: 'rounded-lg',
 	borderWidth: 'border-2',
 	transition: 'transition-all duration-300 ease-in-out',
-	fontSize: 13,
+	fontSize: 14,
 };
 
 export default themeConfig;
