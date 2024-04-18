@@ -1,4 +1,4 @@
-export class JenisIzin {
+export class JenisIzinModel {
     id: string;
     nama: string;
     

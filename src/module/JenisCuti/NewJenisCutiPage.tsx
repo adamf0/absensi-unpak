@@ -10,20 +10,19 @@ import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../IO/AlertObserver';
 import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';
-import SelectReact from '../../components/form/SelectReact';
-import { CreatePengguna } from '../repo/CreatePengguna';
-import FieldWrap from '../../components/form/FieldWrap';
-import Icon from '../../components/icon/Icon';
+import Textarea from '../../components/form/Textarea';
+import Radio, { RadioGroup } from '../../components/form/Radio';
+import { CreateJenisCuti } from '../repo/CreateJenisCuti';
 
-const NewPenggunaPage = () => {
+const NewJenisCutiPage = () => {
 	const navigate = useNavigate();
-	const [passwordShowStatus, setPasswordShowStatus] = useState<boolean>(false);
+	const maxRef = useRef<any>(null);
 	const [disableButton, setDisableButton] = useState<boolean>(false);
 	// const toastId = useRef<any>(null);
 	const dispatch = useAppDispatch();
@@ -34,39 +33,38 @@ const NewPenggunaPage = () => {
 	const handler2 = new HandlerObserver();
 	handler2.addObserver(new AlertObserver());
 
-	const listLevel = () => {
-		return [
-			{ value: 'admin', label: 'Admin' },
-			{ value: 'sdm', label: 'SDM' },
-			{ value: 'warek', label: 'Wakil rektor' }
-		]
-	}
+	const options: { value: string; content: ReactNode }[] = [
+		{ value: "1", content: "wajib upload file" },
+		{ value: "0", content: "tidak wajib upload file" },
+	];
+
 	const formik = useFormik({
 		enableReinitialize: true,
 		initialValues: {
 			nama: "",
-			username: "",
-			password: "",
-			level: "",
-			nidn: "",
+			min: "",
+			max: "",
+			kondisi: "{}",
+			dokumen: "",
 		},
 		validationSchema: Yup.object({
 			nama: Yup.string().required("this is required"),
-			username: Yup.string().required("this is required"),
-			password: Yup.string().required("this is required"),
-			level: Yup.string().required("this is required"),
+			min: Yup.string().required("this is required"),
+			max: Yup.string().required("this is required"),
+			kondisi: Yup.string().required("this is required"),
+			dokumen: Yup.string().required("this is required"),
 		}),
 		onSubmit: async (value: any) => {
 			try {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await CreatePengguna({
+				const response: any = await CreateJenisCuti({
 					nama: value.nama,
-					username: value.username,
-					password: value.password,
-					level: value.level,
-					nidn: value.nidn,
+					min: value.min,
+					max: value.max,
+					kondisi: value.kondisi,
+					dokumen: value.dokumen,
 				});
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
@@ -75,7 +73,7 @@ const NewPenggunaPage = () => {
 					if (status == 200) {
 						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
 						alert(message);
-						navigate(`/pengguna`)
+						navigate(`/jenis_cuti`)
 					} else if (status == 500) {
 						alert(message ?? "terjadi masalah pada saat request ke server");
 					} else {
@@ -95,10 +93,10 @@ const NewPenggunaPage = () => {
 	});
 
 	return (
-		<PageWrapper name='Pengguna'>
+		<PageWrapper name='JenisCuti'>
 			<Subheader>
 				<SubheaderLeft>
-					<Breadcrumb currentPage='Tambah Pengguna' />
+					<Breadcrumb currentPage='Tambah JenisCuti' />
 				</SubheaderLeft>
 			</Subheader>
 			<Container>
@@ -127,92 +125,89 @@ const NewPenggunaPage = () => {
 											</>
 										</Validation>
 									</div>
-									<div key={"username"} className='col-span-12 lg:col-span-4'>
+									<div key={"min"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.username as boolean}
-											invalidFeedback={formik.errors.username as any}
+											isTouched={formik.touched.min as boolean}
+											invalidFeedback={formik.errors.min as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"username"}>Username</Label>
+												<Label htmlFor={"min"}>Minimum Cuti<small>(hari)</small></Label>
 												<Input
-													id={"username"}
-													name={"username"}
-													onChange={formik.handleChange}
-													value={formik.values["username"]}
-													type={"text" as TInputTypes}
-												/>
-											</>
-										</Validation>
-									</div>
-									<div key={"password"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.password as boolean}
-											invalidFeedback={formik.errors.password as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"password"}>Password</Label>
-												<FieldWrap
-													lastSuffix={
-														<Icon
-															className='mx-2 cursor-pointer'
-															icon={passwordShowStatus ? 'HeroEyeSlash' : 'HeroEye'}
-															onClick={() => {
-																setPasswordShowStatus(!passwordShowStatus);
-															}}
-														/>
-													}>
-													<Input
-														dimension='lg'
-														type={passwordShowStatus ? 'text' : 'password'}
-														autoComplete='current-password'
-														id='password'
-														name='password'
-														value={formik.values.password}
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-													/>
-												</FieldWrap>
-											</>
-										</Validation>
-									</div>
-									<div key={"nidn"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.nidn as boolean}
-											invalidFeedback={formik.errors.nidn as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"nidn"}>NIDN</Label>
-												<Input
-													id={"nidn"}
-													name={"nidn"}
-													onChange={formik.handleChange}
-													value={formik.values["nidn"]}
-													type={"text" as TInputTypes}
-												/>
-											</>
-										</Validation>
-									</div>
-									<div key={"level"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.level as boolean}
-											invalidFeedback={formik.errors.level as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"level"}>Level Pengguna</Label>
-												<SelectReact
-													options={listLevel()}
-													id='level'
-													name='level'
-													value={listLevel().filter((option:any) => option.value === formik.values.level )}
-													onChange={(selected: any) => {
-														formik.setFieldValue('level', selected.value)
+													id={"min"}
+													name={"min"}
+													min={0}
+													onChange={(e)=>{
+														formik.setFieldValue("min",e.target.value)
+														if(parseInt(formik.values.max) < parseInt(e.target.value)){
+															formik.setFieldValue("max","")
+															maxRef.current.min = e.target.value
+														}
 													}}
+													value={formik.values["min"]}
+													type={"number" as TInputTypes}
 												/>
 											</>
+										</Validation>
+									</div>
+									<div key={"max"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.max as boolean}
+											invalidFeedback={formik.errors.max as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"max"}>Maksimum Cuti<small>(hari)</small></Label>
+												<Input
+													id={"max"}
+													name={"max"}
+													ref={maxRef}
+													min={formik.values["min"]}
+													onChange={formik.handleChange}
+													value={formik.values["max"]}
+													type={"number" as TInputTypes}
+												/>
+											</>
+										</Validation>
+									</div>
+									<div key={"kondisi"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.kondisi as boolean}
+											invalidFeedback={formik.errors.kondisi as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"kondisi"}>Kondisi</Label>
+												<Textarea
+													onChange={(e)=>formik.setFieldValue("kondisi",e.target.value)}
+													value={formik.values["kondisi"]??"{}"}
+													placeholder='masukkan rule json kondisi...'
+													rows={8} />
+											</>
+										</Validation>
+									</div>
+									<div key={"dokumen"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.dokumen as boolean}
+											invalidFeedback={formik.errors.dokumen as any}
+											validFeedback='Good'>
+												<>
+													<Label htmlFor={"kondisi"}>Kondisi</Label>
+													<RadioGroup>
+														{options.map((i) => (
+															<Radio
+																key={i.value}
+																label={i.content}
+																name='dokumen'
+																value={i.value}
+																selectedValue={formik.values.dokumen}
+																onChange={formik.handleChange}
+																color='emerald'
+															/>
+														))}
+													</RadioGroup>
+												</>
 										</Validation>
 									</div>
 									<div key={"end"} className='col-span-12 lg:col-span-4'>
@@ -230,4 +225,4 @@ const NewPenggunaPage = () => {
 	);
 };
 
-export default NewPenggunaPage;
+export default NewJenisCutiPage;

@@ -32,6 +32,12 @@ import useLevelMode from '../hooks/useLevelMode';
 import EditPenggunaPage from '../module/Pengguna/EditPenggunaPage';
 import NewPenggunaPage from '../module/Pengguna/NewPenggunaPage';
 import PenggunaPage from '../module/Pengguna/PenggunaPage';
+import JenisCutiPage from '../module/JenisCuti/JenisCutiPage';
+import NewJenisCutiPage from '../module/JenisCuti/NewJenisCutiPage';
+import EditJenisCutiPage from '../module/JenisCuti/EditJenisCutiPage';
+import EditJenisIzinPage from '../module/JenisCuti copy/EditJenisCutiPage';
+import JenisIzinPage from '../module/JenisCuti copy/JenisCutiPage';
+import NewJenisIzinPage from '../module/JenisCuti copy/NewJenisCutiPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -233,6 +239,14 @@ const App = () => {
 									<Route path="/pengguna" element={<PenggunaPage />} />
 									<Route path="/pengguna/tambah" element={<NewPenggunaPage />} />
 									<Route path="/pengguna/edit/:id" element={<EditPenggunaPage />} />
+
+									<Route path="/jenis_cuti" element={<JenisCutiPage />} />
+									<Route path="/jenis_cuti/tambah" element={<NewJenisCutiPage />} />
+									<Route path="/jenis_cuti/edit/:id" element={<EditJenisCutiPage />} />
+
+									<Route path="/jenis_izin" element={<JenisIzinPage />} />
+									<Route path="/jenis_izin/tambah" element={<NewJenisIzinPage />} />
+									<Route path="/jenis_izin/edit/:id" element={<EditJenisIzinPage />} />
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}

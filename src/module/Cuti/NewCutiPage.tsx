@@ -14,15 +14,15 @@ import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
 import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
-import { AlertObserver } from '../io/AlertObserver';
-import { ConsoleObserver } from '../io/ConsoleObserver';
+import { AlertObserver } from '../IO/AlertObserver';
+import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { CreateCuti } from '../repo/CreateCuti';
 import { useNavigate } from 'react-router-dom';
-import { JenisCuti } from '../model/JenisCuti';
+import { JenisCutiModel } from '../model/JenisCutiModel';
 import { cutiselector, loadListJenisCuti } from '../redux/cutiSlice';
 import { GetListJenisCuti } from '../repo/GetListJenisCuti';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { SelectOptionsAdapter } from '../io/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
 
 const NewCutiPage = () => {
 	const navigate = useNavigate();
@@ -54,7 +54,7 @@ const NewCutiPage = () => {
 
 			if (status == 200) {
 				const listJenisCuti = list.map((item: any) =>
-					new JenisCuti(
+					new JenisCutiModel(
 						item.id,
 						item.nama,
 						item.min,
@@ -214,7 +214,7 @@ const NewCutiPage = () => {
 													name='jenis_cuti'
 													value={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((option:any) => option.value === formik.values.jenis_cuti )}
 													onChange={(selected: any) => {
-														const jenisCuti: JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
+														const jenisCuti: JenisCutiModel = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
 														setMin(parseInt(jenisCuti.min))
 														setMax(parseInt(jenisCuti.max))
 														setDokumen(jenisCuti.dokumen)

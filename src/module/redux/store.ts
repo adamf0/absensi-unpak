@@ -3,6 +3,8 @@ import cutiReducer from './cutiSlice';
 import absenReducer from './absenSlice';
 import izinReducer from './izinSlice';
 import penggunaReducer from './penggunaSlice';
+import jenisCutiReducer from './jenisCutiSlice';
+import jenisIzinReducer from './jenisIzinSlice';
 
 export const storeRoot = configureStore({
   reducer: {
@@ -10,6 +12,8 @@ export const storeRoot = configureStore({
     absenReducer,
     izinReducer,
     penggunaReducer,
+    jenisCutiReducer,
+    jenisIzinReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: false

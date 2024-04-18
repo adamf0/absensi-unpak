@@ -14,14 +14,14 @@ import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
 import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
-import { AlertObserver } from '../io/AlertObserver';
-import { ConsoleObserver } from '../io/ConsoleObserver';
+import { AlertObserver } from '../IO/AlertObserver';
+import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { useNavigate, useParams } from 'react-router-dom';
-import { JenisCuti } from '../model/JenisCuti';
+import { JenisCutiModel } from '../model/JenisCutiModel';
 import { cutiselector, editCuti, loadListJenisCuti } from '../redux/cutiSlice';
 import { GetListJenisCuti } from '../repo/GetListJenisCuti';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { SelectOptionsAdapter } from '../io/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
 import { CutiModel } from '../model/CutiModel';
 import { GetCuti } from '../repo/GetCuti';
 import { UpdateCuti } from '../repo/UpdateCuti';
@@ -58,7 +58,7 @@ const EditCutiPage = () => {
 
 			if (status == 200) {
 				const listJenisCuti = list.map((item: any) =>
-					new JenisCuti(
+					new JenisCutiModel(
 						item.id,
 						item.nama,
 						item.min,
@@ -90,7 +90,7 @@ const EditCutiPage = () => {
 					data.id,
 					data.tanggal_pengajuan,
 					data.lama_cuti,
-					new JenisCuti(
+					new JenisCutiModel(
 						data.JenisCuti?.id,
 						data.JenisCuti?.nama,
 						data.JenisCuti?.min,
@@ -274,7 +274,7 @@ const EditCutiPage = () => {
 													name='jenis_cuti'
 													value={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((option:any) => option.value === formik.values.jenis_cuti )}
 													onChange={(selected: any) => {
-														const jenisCuti: JenisCuti = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
+														const jenisCuti: JenisCutiModel = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
 														setMin(parseInt(jenisCuti.min))
 														setMax(parseInt(jenisCuti.max))
 														setDokumen(jenisCuti.dokumen)

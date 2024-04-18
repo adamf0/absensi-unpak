@@ -13,16 +13,16 @@ import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
 import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
-import { AlertObserver } from '../io/AlertObserver';
-import { ConsoleObserver } from '../io/ConsoleObserver';
+import { AlertObserver } from '../IO/AlertObserver';
+import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { CreateIzin } from '../repo/CreateIzin';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { izinselector, loadListJenisIzin } from '../redux/izinSlice';
 import { GetListJenisIzin } from '../repo/GetListJenisIzin';
-import { JenisIzin } from '../model/JenisIzin';
+import { JenisIzinModel } from '../model/JenisIzinModel';
 import SelectReact from '../../components/form/SelectReact';
-import { SelectOptionsAdapter } from '../io/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
 
 const NewIzinPage = () => {
 	const navigate = useNavigate();
@@ -51,7 +51,7 @@ const NewIzinPage = () => {
 
 			if (status == 200) {
 				const listJenisIzin = list.map((item: any) =>
-					new JenisIzin(
+					new JenisIzinModel(
 						item.id,
 						item.nama,
 					)
@@ -200,7 +200,7 @@ const NewIzinPage = () => {
 													name='jenis_izin'
 													value={SelectOptionsAdapter.adaptFromJenisIzin(selectorIzin.list_jenis_izin).filter((option:any) => option.value === formik.values.jenis_izin )}
 													onChange={(selected: any) => {
-														const jenisIzin: JenisIzin = selectorIzin.list_jenis_izin.filter(jenisIzin => jenisIzin.id == selected.value)[0];
+														const jenisIzin: JenisIzinModel = selectorIzin.list_jenis_izin.filter(jenisIzin => jenisIzin.id == selected.value)[0];
 														formik.setFieldValue('jenis_izin', selected.value)
 													}}
 												/>

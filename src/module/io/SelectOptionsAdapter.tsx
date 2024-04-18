@@ -1,9 +1,9 @@
 import { TSelectOption } from "../../components/form/SelectReact";
-import { JenisCuti } from "../model/JenisCuti";
-import { JenisIzin } from "../model/JenisIzin";
+import { JenisCutiModel } from "../model/JenisCutiModel";
+import { JenisIzinModel } from "../model/JenisIzinModel";
 
 export class SelectOptionsAdapter {
-    static adaptFromJenisCuti(list: JenisCuti[]): TSelectOption[] {
+    static adaptFromJenisCuti(list: JenisCutiModel[]): TSelectOption[] {
         if (!list || list.length === 0) return [];
 
         return list.reduce((acc: TSelectOption[], jenisCuti) => {
@@ -16,7 +16,7 @@ export class SelectOptionsAdapter {
             return acc;
         }, []);
     }
-    static adaptFromJenisIzin(list: JenisIzin[]): TSelectOption[] {
+    static adaptFromJenisIzin(list: JenisIzinModel[]): TSelectOption[] {
         if (!list || list.length === 0) return [];
 
         return list.reduce((acc: TSelectOption[], jenisIzin) => {

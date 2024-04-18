@@ -8,28 +8,26 @@ import Subheader, { SubheaderLeft } from '../../components/layouts/Subheader/Sub
 import Button from '../../components/ui/Button';
 import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
-import SelectReact from '../../components/form/SelectReact';
 import Textarea from '../../components/form/Textarea';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../IO/AlertObserver';
 import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PenggunaModel } from '../model/PenggunaModel';
 import { useAppDispatch } from '../redux/hooks';
-import { editPengguna } from '../redux/penggunaSlice';
-import { UpdatePengguna } from '../repo/UpdatePengguna';
-import { GetPengguna } from '../repo/GetPengguna';
-import FieldWrap from '../../components/form/FieldWrap';
-import Icon from '../../components/icon/Icon';
+import { JenisCutiModel } from '../model/JenisCutiModel';
+import Radio, { RadioGroup } from '../../components/form/Radio';
+import { editJenisCuti } from '../redux/jenisCutiSlice';
+import { GetJenisCuti } from '../repo/GetJenisCuti';
+import { UpdateJenisCuti } from '../repo/UpdateJenisCuti';
 
-const EditPenggunaPage = () => {
+const EditJenisCutiPage = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const [passwordShowStatus, setPasswordShowStatus] = useState<boolean>(false);
-	const [pengguna,setPengguna] = useState<PenggunaModel|null>(null); 
+	const maxRef = useRef<any>(null);
+	const [jenisCuti,setJenisCuti] = useState<JenisCutiModel|null>(null); 
 	const [disableButton, setDisableButton] = useState<boolean>(false);
 	// const toastId = useRef<any>(null);
 	const dispatch = useAppDispatch();
@@ -40,16 +38,13 @@ const EditPenggunaPage = () => {
 	const handler2 = new HandlerObserver();
 	handler2.addObserver(new AlertObserver());
 
-	const listLevel = () => {
-		return [
-			{ value: 'admin', label: 'Admin' },
-			{ value: 'sdm', label: 'SDM' },
-			{ value: 'warek', label: 'Wakil rektor' }
-		]
-	}
+	const options: { value: string; content: ReactNode }[] = [
+		{ value: "1", content: "wajib upload file" },
+		{ value: "0", content: "tidak wajib upload file" },
+	];
 
-	const loadPengguna = async (id:any) => {
-		const response: any = await GetPengguna(id);
+	const loadJenisCuti = async (id:any) => {
+		const response: any = await GetJenisCuti(id);
 		if (response.status !== 200) {
 			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 		}
@@ -58,16 +53,16 @@ const EditPenggunaPage = () => {
 			const { status, message, data } = response;
 
 			if (status == 200) {
-				const penggunaParse = new PenggunaModel(
+				const jenisCutiParse = new JenisCutiModel(
 					data.id,
-					data.username,
-					data.password,
 					data.nama,
-					data.level,
-					data.nidn,
+					data.min,
+					data.max,
+					data.dokumen,
+					data.kondisi,
 				)
-				setPengguna(penggunaParse)
-				await dispatch(editPengguna(penggunaParse));
+				setJenisCuti(jenisCutiParse)
+				await dispatch(editJenisCuti(jenisCutiParse));
 			} else if (status == 500) {
 				console.trace(message ?? "Terjadi masalah pada saat request ke server")
 			} else {
@@ -80,29 +75,30 @@ const EditPenggunaPage = () => {
 		enableReinitialize: true,
 		initialValues: {
 			nama: "",
-			username: "",
-			password: "",
-			level: "",
-			nidn: "",
+			min: "",
+			max: "",
+			kondisi: "",
+			dokumen: "",
 		},
 		validationSchema: Yup.object({
 			nama: Yup.string().required("this is required"),
-			username: Yup.string().required("this is required"),
-			password: Yup.string().required("this is required"),
-			level: Yup.string().required("this is required"),
+			min: Yup.string().required("this is required"),
+			max: Yup.string().required("this is required"),
+			kondisi: Yup.string().required("this is required"),
+			dokumen: Yup.string().required("this is required"),
 		}),
 		onSubmit: async (value: any) => {
 			try {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await UpdatePengguna({
+				const response: any = await UpdateJenisCuti({
 					id: id,
 					nama: value.nama,
-					username: value.username,
-					password: value.password,
-					level: value.level,
-					nidn: value.nidn,
+					min: value.min,
+					max: value.max,
+					kondisi: value.kondisi,
+					dokumen: value.dokumen,
 				});
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
@@ -111,7 +107,7 @@ const EditPenggunaPage = () => {
 					if (status == 200) {
 						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
 						alert(message);
-						navigate(`/pengguna`)
+						navigate(`/jenis_cuti`)
 					} else if (status == 500) {
 						alert(message ?? "terjadi masalah pada saat request ke server");
 					} else {
@@ -131,16 +127,16 @@ const EditPenggunaPage = () => {
 	});
 
 	useEffect(() => {
-		loadPengguna(id)
+		loadJenisCuti(id)
 	}, [])
 
 	useEffect(()=>{
-		formik.setFieldValue("nama", pengguna?.nama??"")
-		formik.setFieldValue("username", pengguna?.username??"")
-		formik.setFieldValue("password", pengguna?.password??"")
-		formik.setFieldValue("level", pengguna?.level??"")
-		formik.setFieldValue("nidn", pengguna?.nidn??"")
-	},[pengguna])
+		formik.setFieldValue("nama", jenisCuti?.nama??"")
+		formik.setFieldValue("min", jenisCuti?.min??"")
+		formik.setFieldValue("max", jenisCuti?.max??"")
+		formik.setFieldValue("kondisi", jenisCuti?.kondisi??"")
+		formik.setFieldValue("dokumen", jenisCuti?.dokumen??"")
+	},[jenisCuti])
 
 	return (
 		<PageWrapper name='Izin'>
@@ -175,92 +171,89 @@ const EditPenggunaPage = () => {
 											</>
 										</Validation>
 									</div>
-									<div key={"username"} className='col-span-12 lg:col-span-4'>
+									<div key={"min"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.username as boolean}
-											invalidFeedback={formik.errors.username as any}
+											isTouched={formik.touched.min as boolean}
+											invalidFeedback={formik.errors.min as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"username"}>Username</Label>
+												<Label htmlFor={"min"}>Minimum Cuti <b>(hari)</b></Label>
 												<Input
-													id={"username"}
-													name={"username"}
-													onChange={formik.handleChange}
-													value={formik.values["username"]}
-													type={"text" as TInputTypes}
-												/>
-											</>
-										</Validation>
-									</div>
-									<div key={"password"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.password as boolean}
-											invalidFeedback={formik.errors.password as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"password"}>Password</Label>
-												<FieldWrap
-													lastSuffix={
-														<Icon
-															className='mx-2 cursor-pointer'
-															icon={passwordShowStatus ? 'HeroEyeSlash' : 'HeroEye'}
-															onClick={() => {
-																setPasswordShowStatus(!passwordShowStatus);
-															}}
-														/>
-													}>
-													<Input
-														dimension='lg'
-														type={passwordShowStatus ? 'text' : 'password'}
-														autoComplete='current-password'
-														id='password'
-														name='password'
-														value={formik.values.password}
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-													/>
-												</FieldWrap>
-											</>
-										</Validation>
-									</div>
-									<div key={"nidn"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.nidn as boolean}
-											invalidFeedback={formik.errors.nidn as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"nidn"}>NIDN</Label>
-												<Input
-													id={"nidn"}
-													name={"nidn"}
-													onChange={formik.handleChange}
-													value={formik.values["nidn"]}
-													type={"text" as TInputTypes}
-												/>
-											</>
-										</Validation>
-									</div>
-									<div key={"level"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.level as boolean}
-											invalidFeedback={formik.errors.level as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"level"}>Level Pengguna</Label>
-												<SelectReact
-													options={listLevel()}
-													id='level'
-													name='level'
-													value={listLevel().filter((option:any) => option.value === formik.values.level )}
-													onChange={(selected: any) => {
-														formik.setFieldValue('level', selected.value)
+													id={"min"}
+													name={"min"}
+													min={0}
+													onChange={(e)=>{
+														formik.setFieldValue("min",e.target.value)
+														if(parseInt(formik.values.max) < parseInt(e.target.value)){
+															formik.setFieldValue("max","")
+															maxRef.current.min = e.target.value
+														}
 													}}
+													value={formik.values["min"]}
+													type={"number" as TInputTypes}
 												/>
 											</>
+										</Validation>
+									</div>
+									<div key={"max"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.max as boolean}
+											invalidFeedback={formik.errors.max as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"max"}>Maksimum Cuti <b>(hari)</b></Label>
+												<Input
+													id={"max"}
+													name={"max"}
+													min={formik.values["min"]}
+													ref={maxRef}
+													onChange={formik.handleChange}
+													value={formik.values["max"]}
+													type={"number" as TInputTypes}
+												/>
+											</>
+										</Validation>
+									</div>
+									<div key={"kondisi"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.kondisi as boolean}
+											invalidFeedback={formik.errors.kondisi as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"kondisi"}>Kondisi</Label>
+												<Textarea
+													onChange={(e)=>formik.setFieldValue("kondisi",e.target.value)}
+													value={formik.values["kondisi"]??"{}"}
+													placeholder='masukkan rule json kondisi...'
+													rows={8} />
+											</>
+										</Validation>
+									</div>
+									<div key={"dokumen"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.dokumen as boolean}
+											invalidFeedback={formik.errors.dokumen as any}
+											validFeedback='Good'>
+												<>
+													<Label htmlFor={"kondisi"}>Dokumen</Label>
+													<RadioGroup>
+														{options.map((i) => (
+															<Radio
+																key={i.value}
+																label={i.content}
+																name='dokumen'
+																value={i.value}
+																selectedValue={formik.values.dokumen? "1":"0"}
+																onChange={formik.handleChange}
+																color="emerald"
+															/>
+														))}
+													</RadioGroup>
+												</>
 										</Validation>
 									</div>
 									<div key={"end"} className='col-span-12 lg:col-span-4'>
@@ -278,4 +271,4 @@ const EditPenggunaPage = () => {
 	);
 };
 
-export default EditPenggunaPage;
+export default EditJenisCutiPage;

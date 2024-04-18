@@ -9,21 +9,19 @@ import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
 import { useEffect } from "react";
 import { AlertObserver } from "../IO/AlertObserver";
 import { ConsoleObserver } from "../IO/ConsoleObserver";
-import { IzinModel } from "../model/IzinModel";
 import PagingTable from "../model/PagingTable";
-import { loadList, next, pagingTable, prev } from "../redux/izinSlice";
+import { loadList, next, pagingTable, prev } from "../redux/jenisIzinSlice";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { DeleteIzin } from "../repo/DeleteIzin";
-import { GetListIzin } from "../repo/GetListIzin";
 import { HandlerObserver } from "../abstract/HandlerObserver";
-import moment from "moment";
-import { izinselector } from "../redux/izinSlice";
+import { jenisizinselector } from "../redux/jenisIzinSlice";
+import { DeleteJenisIzin } from "../repo/DeleteJenisIzin";
+import { GetListJenisIzin } from "../repo/GetListJenisIzin";
 import { JenisIzinModel } from "../model/JenisIzinModel";
 
-const IzinPage = () => {
+const JenisIzinPage = () => {
     const navigate = useNavigate();
 
-    const selectorIzin = useAppSelector(izinselector);
+    const selectorJenisIzin = useAppSelector(jenisizinselector);
     const dispatch = useAppDispatch();
 
     const handler1 = new HandlerObserver();
@@ -33,7 +31,7 @@ const IzinPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListIzin(page);
+        const response: any = await GetListJenisIzin(page);
         if (response.status !== 200) {
             throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         }
@@ -42,17 +40,10 @@ const IzinPage = () => {
             const { status, message, list } = response;
 
             if (status == 200) {
-                const izinList = list.data.map((item: any) =>
-                    new IzinModel(
+                const jenisizinList = list.data.map((item: any) =>
+                    new JenisIzinModel(
                         item.id,
-                        item.tanggal_pengajuan,
-                        new JenisIzinModel(
-                            item.JenisIzin?.id ?? "",
-                            item.JenisIzin?.nama ?? ""
-                        ),
-                        item.tujuan,
-                        item.dokumen,
-                        item.status,
+                        item.nama,
                     )
                 );
 
@@ -67,7 +58,7 @@ const IzinPage = () => {
                     nextPage: list.nextPage,
                 };
 
-                await dispatch(loadList(izinList));
+                await dispatch(loadList(jenisizinList));
                 await dispatch(pagingTable(paging));
             } else if (status == 500) {
                 console.trace(message ?? "Terjadi masalah pada saat request ke server")
@@ -77,9 +68,9 @@ const IzinPage = () => {
         }
     };
 
-    async function deleteIzin(id:any){
+    async function deleteJenisIzin(id:any){
         try {
-            const response:any = await DeleteIzin(id);
+            const response:any = await DeleteJenisIzin(id);
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
                 const { status,message } = response;
@@ -104,31 +95,31 @@ const IzinPage = () => {
     }
 
     useEffect(() => {
-        loadTable(selectorIzin.paging.currentPage)
+        loadTable(selectorJenisIzin.paging.currentPage)
 
         return () => { };
-    }, [selectorIzin.paging.currentPage]);
+    }, [selectorJenisIzin.paging.currentPage]);
 
     useEffect(() => {
-        if (selectorIzin.deletedIzin?.id != null) {
-            deleteIzin(selectorIzin.deletedIzin?.id)
+        if (selectorJenisIzin.deletedJenisIzin?.id != null) {
+            deleteJenisIzin(selectorJenisIzin.deletedJenisIzin?.id)
         }
 
         return () => { };
-    }, [selectorIzin.deletedIzin]);
+    }, [selectorJenisIzin.deletedJenisIzin]);
 
     return (
         <>
-            <PageWrapper name='Izin'>
+            <PageWrapper name='Jenis Izin'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Izin' />
+                        <Breadcrumb currentPage='Jenis Izin' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
                     <CardHeader>
                         <CardHeaderChild>
-                            <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
+                            <Button variant='solid' onClick={()=>navigate('/jenis_izin/tambah')}>
                                 Tambah
                             </Button>
                         </CardHeaderChild>
@@ -138,32 +129,25 @@ const IzinPage = () => {
                             <THead>
                                 <Tr>
                                     <Th>#</Th>
-                                    <Th>Tanggal</Th>
-                                    <Th>Tujuan</Th>
-                                    <Th>Status</Th>
+                                    <Th>Nama</Th>
                                     <Th>Aksi</Th>
                                 </Tr>
                             </THead>
                             <TBody>
                                 {
-                                    selectorIzin.list.map((item,index)=>
+                                    selectorJenisIzin.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{((selectorIzin.paging.currentPage-1)*10 + (index+1))}</Td>
-                                        <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
-                                        <Td>{item.tujuan}</Td>
-                                        <Td>{item.status}</Td>
+                                        <Td>{((selectorJenisIzin.paging.currentPage-1)*10 + (index+1))}</Td>
+                                        <Td>{item.nama}</Td>
                                         <Td>
-                                            {
-                                                item.status=="" || item.status=="menunggu"? 
-                                                <div className="flex flex-wrap gap-2">
-                                                    <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/izin/edit/${item.id}`)}>
-                                                        edit
-                                                    </Button>
-                                                    <Button variant='solid' className="grow" color="red" onClick={()=>deleteIzin(item.id)}>
-                                                        hapus
-                                                    </Button>
-                                                </div>:null
-                                            }
+                                            <div className="flex flex-wrap gap-2">
+                                                <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/jenis_izin/edit/${item.id}`)}>
+                                                    edit
+                                                </Button>
+                                                <Button variant='solid' className="grow" color="red" onClick={()=>deleteJenisIzin(item.id)}>
+                                                    hapus
+                                                </Button>
+                                            </div>
                                         </Td>
                                     </Tr>
                                     )
@@ -171,11 +155,11 @@ const IzinPage = () => {
                             </TBody>
                         </Table>
                         <div className="flex items-center gap-8">
-                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorIzin.paging.prevPage==null} onClick={() => dispatch(prev())}>
+                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorJenisIzin.paging.prevPage==null} onClick={() => dispatch(prev())}>
                                 prev
                             </Button>
-                            Page < b > {selectorIzin.paging.currentPage}</b > of < b > {selectorIzin.paging.totalPage}</b>
-                            <Button color='red' icon='HeroArrowRight' isDisable={selectorIzin.paging.nextPage==null} onClick={() => dispatch(next())}>
+                            Page < b > {selectorJenisIzin.paging.currentPage}</b > of < b > {selectorJenisIzin.paging.totalPage}</b>
+                            <Button color='red' icon='HeroArrowRight' isDisable={selectorJenisIzin.paging.nextPage==null} onClick={() => dispatch(next())}>
                                 next
                             </Button>
                             </div>
@@ -186,4 +170,4 @@ const IzinPage = () => {
     );
 };
 
-export default IzinPage;
+export default JenisIzinPage;

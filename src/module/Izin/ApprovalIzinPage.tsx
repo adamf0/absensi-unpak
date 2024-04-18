@@ -7,8 +7,8 @@ import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
 import { useEffect, useState } from "react";
-import { AlertObserver } from "../io/AlertObserver";
-import { ConsoleObserver } from "../io/ConsoleObserver";
+import { AlertObserver } from "../IO/AlertObserver";
+import { ConsoleObserver } from "../IO/ConsoleObserver";
 import { IzinModel } from "../model/IzinModel";
 import PagingTable from "../model/PagingTable";
 import { loadList, next, pagingTable, prev } from "../redux/izinSlice";
@@ -21,7 +21,7 @@ import { Approval } from "../model/Approval";
 import { ApprovalIzin } from "../repo/ApprovalIzin";
 import Textarea from "../../components/form/Textarea";
 import Modal, { ModalHeader, ModalBody, ModalFooter, ModalFooterChild } from "../../components/ui/Modal";
-import { JenisIzin } from "../model/JenisIzin";
+import { JenisIzinModel } from "../model/JenisIzinModel";
 
 const ApprovalIzinPage = () => {
     const [modalTolak, setModalTolak] = useState<boolean>(false);
@@ -51,7 +51,7 @@ const ApprovalIzinPage = () => {
                     new IzinModel(
                         item.id,
                         item.tanggal_pengajuan,
-                        new JenisIzin(
+                        new JenisIzinModel(
                             item.JenisIzin?.id ?? "",
                             item.JenisIzin?.nama ?? ""
                         ),

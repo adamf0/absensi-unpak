@@ -1,9 +1,9 @@
-import { JenisIzin } from "./JenisIzin";
+import { JenisIzinModel } from "./JenisIzinModel";
 
 export class IzinModel {
     id: string;
     tanggal: string;
-    jenis: JenisIzin;
+    jenis: JenisIzinModel;
     tujuan: string;
     dokumen: string|null;
     status: string;
@@ -11,7 +11,7 @@ export class IzinModel {
     constructor(
         id: string,
         tanggal: string,
-        jenis: JenisIzin,
+        jenis: JenisIzinModel,
         tujuan: string,
         dokumen: string|null,
         status: string,

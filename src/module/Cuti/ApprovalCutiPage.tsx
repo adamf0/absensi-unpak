@@ -7,10 +7,10 @@ import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
 import { useEffect, useState } from "react";
-import { AlertObserver } from "../io/AlertObserver";
-import { ConsoleObserver } from "../io/ConsoleObserver";
+import { AlertObserver } from "../IO/AlertObserver";
+import { ConsoleObserver } from "../IO/ConsoleObserver";
 import { CutiModel } from "../model/CutiModel";
-import { JenisCuti } from "../model/JenisCuti";
+import { JenisCutiModel } from "../model/JenisCutiModel";
 import PagingTable from "../model/PagingTable";
 import { cutiselector, loadList, next, pagingTable, prev } from "../redux/cutiSlice";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
@@ -52,7 +52,7 @@ const ApprovalCutiPage = () => {
                         item.id,
                         item.tanggal_pengajuan,
                         item.lama_cuti,
-                        new JenisCuti(
+                        new JenisCutiModel(
                             item.JenisCuti?.id ?? "",
                             item.JenisCuti?.nama ?? "",
                             item.JenisCuti?.min ?? "",

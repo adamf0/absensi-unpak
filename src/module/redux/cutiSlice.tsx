@@ -2,11 +2,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CutiModel } from "../model/CutiModel";
 import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
-import { JenisCuti } from "../model/JenisCuti";
+import { JenisCutiModel } from "../model/JenisCutiModel";
 import { Approval } from "../model/Approval";
 
 interface state {
-  list_jenis_cuti: Array<JenisCuti>,
+  list_jenis_cuti: Array<JenisCutiModel>,
   list: Array<CutiModel>,
   paging: PagingTable,
   editCuti: CutiModel | null,
@@ -36,7 +36,7 @@ export const cutilice = createSlice({
     loadList: (state, action: PayloadAction<Array<CutiModel>>) => {
       state.list = action.payload;
     },
-    loadListJenisCuti: (state, action: PayloadAction<Array<JenisCuti>>) => {
+    loadListJenisCuti: (state, action: PayloadAction<Array<JenisCutiModel>>) => {
       state.list_jenis_cuti = action.payload;
     },
     editCuti: (state, action: PayloadAction<CutiModel>) => {

@@ -1,4 +1,4 @@
-export class JenisCuti {
+export class JenisCutiModel {
     id: string;
     nama: string;
     min: string;
