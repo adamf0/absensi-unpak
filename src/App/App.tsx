@@ -29,6 +29,9 @@ import ApprovalIzinPage from '../module/Izin/ApprovalIzinPage';
 import SettingsComponent from '../module/component/SettingsComponent';
 import LoginPage from '../module/LoginPage';
 import useLevelMode from '../hooks/useLevelMode';
+import EditPenggunaPage from '../module/Pengguna/EditPenggunaPage';
+import NewPenggunaPage from '../module/Pengguna/NewPenggunaPage';
+import PenggunaPage from '../module/Pengguna/PenggunaPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -54,12 +57,6 @@ const App = () => {
 							text: 'Izin',
 							icon: 'HeroRectangleGroup',
 						}} />
-						<NavItem {...{
-							id: 'logout',
-							to: '/logout',
-							text: 'Logout',
-							icon: 'HeroRectangleGroup',
-						}} />
 					</>
 		} else if(levelMode=="dosen"){
 			return <>
@@ -75,13 +72,28 @@ const App = () => {
 						text: 'Izin',
 						icon: 'HeroRectangleGroup',
 					}} />
-					<NavItem {...{
-						id: 'logout',
-						to: '/logout',
-						text: 'Logout',
-						icon: 'HeroRectangleGroup',
-					}} />
 				</>
+		} else if(levelMode=="admin"){
+			return <>
+			<NavItem {...{
+				id: 'pengguna',
+				to: '/pengguna',
+				text: 'Pengguna',
+				icon: 'HeroRectangleGroup',
+			}} />
+			<NavItem {...{
+				id: 'Jenis Cuti',
+				to: '/jenis_cuti',
+				text: 'Jenis Cuti',
+				icon: 'HeroRectangleGroup',
+			}} />
+			<NavItem {...{
+				id: 'Jenis Izin',
+				to: '/jenis_izin',
+				text: 'Jenis Izin',
+				icon: 'HeroRectangleGroup',
+			}} />
+		</>
 		}
 		return <></>
 	}
@@ -105,6 +117,12 @@ const App = () => {
 										icon: 'HeroRectangleGroup',
 									}} />
 									{loadSideNav()}
+									<NavItem {...{
+										id: 'logout',
+										to: '/logout',
+										text: 'Logout',
+										icon: 'HeroRectangleGroup',
+									}} />
 								</Nav>
 							</AsideBody>
 						</Aside>
@@ -205,14 +223,16 @@ const App = () => {
 									<Route path="/cuti" element={<CutiPage />} />
 									<Route path="/cuti/tambah" element={<NewCutiPage />} />
 									<Route path="/cuti/edit/:id" element={<EditCutiPage />} />
-
 									<Route path="/approval/cuti" element={<ApprovalCutiPage />} />
 
 									<Route path="/izin" element={<IzinPage />} />
 									<Route path="/izin/tambah" element={<NewIzinPage />} />
 									<Route path="/izin/edit/:id" element={<EditIzinPage />} />
-
 									<Route path="/approval/izin" element={<ApprovalIzinPage />} />
+
+									<Route path="/pengguna" element={<PenggunaPage />} />
+									<Route path="/pengguna/tambah" element={<NewPenggunaPage />} />
+									<Route path="/pengguna/edit/:id" element={<EditPenggunaPage />} />
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}

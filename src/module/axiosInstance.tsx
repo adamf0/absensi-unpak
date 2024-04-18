@@ -9,13 +9,31 @@ instance.interceptors.request.use(config => {
     // if (authData && authData !== "null") {
     //     config.headers['Authorization'] = authData;
     // }
-    // config.headers['Content-Type'] = 'multipart/form-data';
-    config.headers['Accept'] = 'application/json';
+
+    if (config.data instanceof Object) {
+        config.headers['Content-Type'] = 'application/json';
+    } else {
+        config.headers['Content-Type'] = 'multipart/form-data';
+    }
+    // config.headers['Accept'] = 'application/json';
     config.headers['Access-Control-Allow-Origin'] = '*';
+    if (config.method?.toLowerCase() === 'post') {
+        config.params = {
+          ...config.params,
+          '_': new Date().getTime(),
+        };
+    }
     return config;
 });
 
 instance.interceptors.response.use(response => {
+    if (response.config.method?.toLowerCase() === 'post') {
+        const requestId = response.config.url;
+        if (requestId) {
+          console.log(`Cache entry removed for request ID: ${requestId}`);
+        }
+    }
+
     return response.data;
 }, error => {
     if (error.response) {

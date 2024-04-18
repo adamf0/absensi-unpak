@@ -1,22 +1,20 @@
 import { JenisIzin } from "./JenisIzin";
 
 export class IzinModel {
+    id: string;
     tanggal: string;
     jenis: JenisIzin;
     tujuan: string;
     dokumen: string|null;
     status: string;
-    id: string;
-    openDetail: boolean;
     
     constructor(
+        id: string,
         tanggal: string,
         jenis: JenisIzin,
         tujuan: string,
         dokumen: string|null,
         status: string,
-        id: string,
-        openDetail: boolean,
     ) {
         this.tanggal = tanggal;
         this.jenis = jenis;
@@ -24,6 +22,5 @@ export class IzinModel {
         this.dokumen = dokumen;
         this.status = status;
         this.id = id;
-        this.openDetail = openDetail;    
     }
   }

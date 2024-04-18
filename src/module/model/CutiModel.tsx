@@ -1,24 +1,22 @@
 import { JenisCuti } from "./JenisCuti";
 
 export class CutiModel {
+    id: string;
     tanggal: string;
     lama: number;
     jenis: JenisCuti;
     tujuan: string;
     dokumen: string|null;
     status: string;
-    id: string;
-    openDetail: boolean;
     
     constructor(
+        id: string,
         tanggal: string,
         lama: number,
         jenis: JenisCuti,
         tujuan: string,
         dokumen: string|null,
         status: string,
-        id: string,
-        openDetail: boolean,
     ) {
         this.tanggal = tanggal;
         this.lama = lama;
@@ -27,6 +25,5 @@ export class CutiModel {
         this.dokumen = dokumen;
         this.status = status;
         this.id = id;
-        this.openDetail = openDetail;    
     }
   }

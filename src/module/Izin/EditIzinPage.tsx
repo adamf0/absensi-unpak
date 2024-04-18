@@ -80,6 +80,7 @@ const EditIzinPage = () => {
 
 			if (status == 200) {
 				const izinParse = new IzinModel(
+					data.id,
 					data.tanggal_pengajuan,
 					new JenisIzin(
 						data.JenisIzin?.id,
@@ -88,8 +89,6 @@ const EditIzinPage = () => {
 					data.tujuan,
 					data.dokumen,
 					data.status,
-					data.id,
-					false
 				);
 				setIzin(izinParse)
 				await dispatch(editIzin(izinParse));

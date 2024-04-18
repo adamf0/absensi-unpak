@@ -87,6 +87,7 @@ const EditCutiPage = () => {
 
 			if (status == 200) {
 				const cutiParse = new CutiModel(
+					data.id,
 					data.tanggal_pengajuan,
 					data.lama_cuti,
 					new JenisCuti(
@@ -100,8 +101,6 @@ const EditCutiPage = () => {
 					data.tujuan,
 					data.dokumen,
 					data.status,
-					data.id,
-					false
 				);
 				setCuti(cutiParse)
 				await dispatch(editCuti(cutiParse));

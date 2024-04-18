@@ -9,21 +9,19 @@ import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
 import { useEffect } from "react";
 import { AlertObserver } from "../io/AlertObserver";
 import { ConsoleObserver } from "../io/ConsoleObserver";
-import { IzinModel } from "../model/IzinModel";
+import { PenggunaModel } from "../model/PenggunaModel";
 import PagingTable from "../model/PagingTable";
-import { loadList, next, pagingTable, prev } from "../redux/izinSlice";
+import { loadList, next, pagingTable, prev } from "../redux/penggunaSlice";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { DeleteIzin } from "../repo/DeleteIzin";
-import { GetListIzin } from "../repo/GetListIzin";
 import { HandlerObserver } from "../abstract/HandlerObserver";
-import moment from "moment";
-import { izinselector } from "../redux/izinSlice";
-import { JenisIzin } from "../model/JenisIzin";
+import { penggunaselector } from "../redux/penggunaSlice";
+import { DeletePengguna } from "../repo/DeletePengguna";
+import { GetListPengguna } from "../repo/GetListPengguna";
 
-const IzinPage = () => {
+const PenggunaPage = () => {
     const navigate = useNavigate();
 
-    const selectorIzin = useAppSelector(izinselector);
+    const selectorPengguna = useAppSelector(penggunaselector);
     const dispatch = useAppDispatch();
 
     const handler1 = new HandlerObserver();
@@ -33,7 +31,7 @@ const IzinPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListIzin(page);
+        const response: any = await GetListPengguna(page);
         if (response.status !== 200) {
             throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         }
@@ -42,17 +40,14 @@ const IzinPage = () => {
             const { status, message, list } = response;
 
             if (status == 200) {
-                const izinList = list.data.map((item: any) =>
-                    new IzinModel(
+                const penggunaList = list.data.map((item: any) =>
+                    new PenggunaModel(
                         item.id,
-                        item.tanggal_pengajuan,
-                        new JenisIzin(
-                            item.JenisIzin?.id ?? "",
-                            item.JenisIzin?.nama ?? ""
-                        ),
-                        item.tujuan,
-                        item.dokumen,
-                        item.status,
+                        item.username,
+                        item.password,
+                        item.nama,
+                        item.level,
+                        item.nidn,
                     )
                 );
 
@@ -67,7 +62,7 @@ const IzinPage = () => {
                     nextPage: list.nextPage,
                 };
 
-                await dispatch(loadList(izinList));
+                await dispatch(loadList(penggunaList));
                 await dispatch(pagingTable(paging));
             } else if (status == 500) {
                 console.trace(message ?? "Terjadi masalah pada saat request ke server")
@@ -77,9 +72,9 @@ const IzinPage = () => {
         }
     };
 
-    async function deleteIzin(id:any){
+    async function deletePengguna(id:any){
         try {
-            const response:any = await DeleteIzin(id);
+            const response:any = await DeletePengguna(id);
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
                 const { status,message } = response;
@@ -104,31 +99,31 @@ const IzinPage = () => {
     }
 
     useEffect(() => {
-        loadTable(selectorIzin.paging.currentPage)
+        loadTable(selectorPengguna.paging.currentPage)
 
         return () => { };
-    }, [selectorIzin.paging.currentPage]);
+    }, [selectorPengguna.paging.currentPage]);
 
     useEffect(() => {
-        if (selectorIzin.deletedIzin?.id != null) {
-            deleteIzin(selectorIzin.deletedIzin?.id)
+        if (selectorPengguna.deletedPengguna?.id != null) {
+            deletePengguna(selectorPengguna.deletedPengguna?.id)
         }
 
         return () => { };
-    }, [selectorIzin.deletedIzin]);
+    }, [selectorPengguna.deletedPengguna]);
 
     return (
         <>
-            <PageWrapper name='Izin'>
+            <PageWrapper name='Pengguna'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Izin' />
+                        <Breadcrumb currentPage='Pengguna' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
                     <CardHeader>
                         <CardHeaderChild>
-                            <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
+                            <Button variant='solid' onClick={()=>navigate('/pengguna/tambah')}>
                                 Tambah
                             </Button>
                         </CardHeaderChild>
@@ -138,32 +133,31 @@ const IzinPage = () => {
                             <THead>
                                 <Tr>
                                     <Th>#</Th>
-                                    <Th>Tanggal</Th>
-                                    <Th>Tujuan</Th>
-                                    <Th>Status</Th>
+                                    <Th>Nama</Th>
+                                    <Th>Username</Th>
+                                    <Th>Level</Th>
+                                    <Th>NIDN</Th>
                                     <Th>Aksi</Th>
                                 </Tr>
                             </THead>
                             <TBody>
                                 {
-                                    selectorIzin.list.map((item,index)=>
+                                    selectorPengguna.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{((selectorIzin.paging.currentPage-1)*10 + (index+1))}</Td>
-                                        <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
-                                        <Td>{item.tujuan}</Td>
-                                        <Td>{item.status}</Td>
+                                        <Td>{((selectorPengguna.paging.currentPage-1)*10 + (index+1))}</Td>
+                                        <Td>{item.nama}</Td>
+                                        <Td>{item.username}</Td>
+                                        <Td>{item.level}</Td>
+                                        <Td>{item.nidn}</Td>
                                         <Td>
-                                            {
-                                                item.status=="" || item.status=="menunggu"? 
-                                                <div className="flex flex-wrap gap-2">
-                                                    <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/izin/edit/${item.id}`)}>
-                                                        edit
-                                                    </Button>
-                                                    <Button variant='solid' className="grow" color="red" onClick={()=>deleteIzin(item.id)}>
-                                                        hapus
-                                                    </Button>
-                                                </div>:null
-                                            }
+                                            <div className="flex flex-wrap gap-2">
+                                                <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/pengguna/edit/${item.id}`)}>
+                                                    edit
+                                                </Button>
+                                                <Button variant='solid' className="grow" color="red" onClick={()=>deletePengguna(item.id)}>
+                                                    hapus
+                                                </Button>
+                                            </div>
                                         </Td>
                                     </Tr>
                                     )
@@ -171,11 +165,11 @@ const IzinPage = () => {
                             </TBody>
                         </Table>
                         <div className="flex items-center gap-8">
-                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorIzin.paging.prevPage==null} onClick={() => dispatch(prev())}>
+                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorPengguna.paging.prevPage==null} onClick={() => dispatch(prev())}>
                                 prev
                             </Button>
-                            Page < b > {selectorIzin.paging.currentPage}</b > of < b > {selectorIzin.paging.totalPage}</b>
-                            <Button color='red' icon='HeroArrowRight' isDisable={selectorIzin.paging.nextPage==null} onClick={() => dispatch(next())}>
+                            Page < b > {selectorPengguna.paging.currentPage}</b > of < b > {selectorPengguna.paging.totalPage}</b>
+                            <Button color='red' icon='HeroArrowRight' isDisable={selectorPengguna.paging.nextPage==null} onClick={() => dispatch(next())}>
                                 next
                             </Button>
                             </div>
@@ -186,4 +180,4 @@ const IzinPage = () => {
     );
 };
 
-export default IzinPage;
+export default PenggunaPage;

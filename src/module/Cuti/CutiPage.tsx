@@ -43,6 +43,7 @@ const CutiPage = () => {
             if (status == 200) {
                 const cutiList = list.data.map((item: any) =>
                     new CutiModel(
+                        item.id,
                         item.tanggal_pengajuan,
                         item.lama_cuti,
                         new JenisCuti(
@@ -56,8 +57,6 @@ const CutiPage = () => {
                         item.tujuan,
                         item.dokumen,
                         item.status,
-                        item.id,
-                        false
                     )
                 );
 

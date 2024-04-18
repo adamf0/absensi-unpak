@@ -49,6 +49,7 @@ const ApprovalIzinPage = () => {
             if (status == 200) {
                 const izinList = list.data.map((item: any) =>
                     new IzinModel(
+                        item.id,
                         item.tanggal_pengajuan,
                         new JenisIzin(
                             item.JenisIzin?.id ?? "",
@@ -57,8 +58,6 @@ const ApprovalIzinPage = () => {
                         item.tujuan,
                         item.dokumen,
                         item.status,
-                        item.id,
-                        false
                     )
                 );
 
