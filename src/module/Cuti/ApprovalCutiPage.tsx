@@ -39,9 +39,9 @@ const ApprovalCutiPage = () => {
 
     const loadTable = async (page: number) => {
         const response: any = await GetListCuti(page);
-        if (response.status !== 200) {
-            throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-        }
+        // if (response.status !== 200) {
+        //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+        // }
 
         if (response.status === 200 || response.status === 500) {
             const { status, message, list } = response;

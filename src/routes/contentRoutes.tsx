@@ -1,8 +1,7 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { RouteProps } from 'react-router-dom';
 import { appPages, authPages, componentsPages, examplePages } from '../config/pages.config';
 import NotFoundPage from '../pages/NotFound.page';
-import LoginPage from '../pages/Login.page';
 
 /**
  * UI
@@ -381,7 +380,7 @@ const contentRoutes: RouteProps[] = [
 	 * ICONS::BEGIN
 	 */
 
-	{ path: authPages.loginPage.to, element: <LoginPage /> },
+	{ path: authPages.loginPage.to, element: <>Halaman Login</> }, //<LoginPage />
 	{ path: authPages.profilePage.to, element: <ProfilePage /> },
 
 	{ path: '*', element: <NotFoundPage /> },

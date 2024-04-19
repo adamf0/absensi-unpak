@@ -6,7 +6,7 @@ import Subheader, { SubheaderLeft } from "../../components/layouts/Subheader/Sub
 import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AlertObserver } from "../IO/AlertObserver";
 import { ConsoleObserver } from "../IO/ConsoleObserver";
 import PagingTable from "../model/PagingTable";
@@ -17,10 +17,10 @@ import { jenisizinselector } from "../redux/jenisIzinSlice";
 import { DeleteJenisIzin } from "../repo/DeleteJenisIzin";
 import { GetListJenisIzin } from "../repo/GetListJenisIzin";
 import { JenisIzinModel } from "../model/JenisIzinModel";
+import { toast } from "react-toastify";
 
 const JenisIzinPage = () => {
     const navigate = useNavigate();
-
     const selectorJenisIzin = useAppSelector(jenisizinselector);
     const dispatch = useAppDispatch();
 
@@ -33,11 +33,12 @@ const JenisIzinPage = () => {
     const loadTable = async (page: number) => {
         const response: any = await GetListJenisIzin(page);
         if (response.status !== 200) {
+            toast(response.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
             throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         }
 
         if (response.status === 200 || response.status === 500) {
-            const { status, message, list } = response;
+            const { status, message, log, list } = response;
 
             if (status == 200) {
                 const jenisizinList = list.data.map((item: any) =>
@@ -61,8 +62,10 @@ const JenisIzinPage = () => {
                 await dispatch(loadList(jenisizinList));
                 await dispatch(pagingTable(paging));
             } else if (status == 500) {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
+                toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                console.trace(log)
             } else {
+                toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 console.trace(message ?? "Terjadi masalah pada saat request ke server")
             }
         }
@@ -73,22 +76,23 @@ const JenisIzinPage = () => {
             const response:any = await DeleteJenisIzin(id);
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
-                const { status,message } = response;
+                const { status,message,log } = response;
 
                 if (status == 200){
-                    alert(message);
+                    toast(message, { type: "success", autoClose: 2000 });
                     loadTable(1)
                 } else if (status == 500) {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                    console.trace(log)
                 } else {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 }
             } else {
-                alert("terjadi masalah pada saat request ke server")
+                toast("terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
             }
         } catch (error:any) {
-            alert(error.message ?? "terjadi masalah pada saat request ke server")
-            throw error;
+            toast(error.message, { type: "error", autoClose: 2000 });
+            console.trace(error.message)
         } finally {
 
         }

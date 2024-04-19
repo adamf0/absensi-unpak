@@ -1,9 +1,8 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CutiModel } from "../model/CutiModel";
 import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
 import { JenisCutiModel } from "../model/JenisCutiModel";
-import { Approval } from "../model/Approval";
 
 interface state {
   list_jenis_cuti: Array<JenisCutiModel>,
@@ -54,9 +53,6 @@ export const cutilice = createSlice({
     next: (state) => {
       state.paging.currentPage += 1;
     },
-  },
-  extraReducers: (builder) => {
-
   },
 });
 export const { loadList, loadListJenisCuti, editCuti, deletedCuti, pagingTable, prev, next } = cutilice.actions;

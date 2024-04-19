@@ -10,17 +10,23 @@ import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../IO/AlertObserver';
 import { ConsoleObserver } from '../IO/ConsoleObserver';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';
-import { CreateJenisIzin } from '../repo/CreateJenisIzin';
+import { JenisIzinModel } from '../model/JenisIzinModel';
+import { editJenisIzin } from '../redux/jenisIzinSlice';
+import { GetJenisIzin } from '../repo/GetJenisIzin';
+import { UpdateJenisIzin } from '../repo/UpdateJenisIzin';
+import { toast } from 'react-toastify';
 
-const NewJenisIzinPage = () => {
+const EditJenisIzinPage = () => {
+	const { id } = useParams();
 	const navigate = useNavigate();
 	const maxRef = useRef<any>(null);
+	const [jenisIzin,setJenisIzin] = useState<JenisIzinModel|null>(null); 
 	const [disableButton, setDisableButton] = useState<boolean>(false);
 	// const toastId = useRef<any>(null);
 	const dispatch = useAppDispatch();
@@ -30,6 +36,33 @@ const NewJenisIzinPage = () => {
 
 	const handler2 = new HandlerObserver();
 	handler2.addObserver(new AlertObserver());
+
+	const loadJenisIzin = async (id:any) => {
+		const response: any = await GetJenisIzin(id);
+		if (response.status !== 200) {
+			toast(response.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
+		}
+
+		if (response.status === 200 || response.status === 500) {
+			const { status, message, data, log } = response;
+
+			if (status == 200) {
+				const jenisIzinParse = new JenisIzinModel(
+					data.id,
+					data.nama,
+				)
+				setJenisIzin(jenisIzinParse)
+				await dispatch(editJenisIzin(jenisIzinParse));
+			} else if (status == 500) {
+				toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				console.trace(log)
+			} else {
+				toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+			}
+		}
+	}
 
 	const formik = useFormik({
 		enableReinitialize: true,
@@ -44,28 +77,29 @@ const NewJenisIzinPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await CreateJenisIzin({
+				const response: any = await UpdateJenisIzin({
+					id: id,
 					nama: value.nama,
 				});
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
-					const { status, message } = response;
+					const { status, message, log } = response;
 
 					if (status == 200) {
-						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
-						alert(message);
+						toast(message, { type: "success", autoClose: 2000 });
 						navigate(`/jenis_izin`)
 					} else if (status == 500) {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+						console.trace(log)
 					} else {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 					}
 				} else {
-					alert("terjadi masalah pada saat request ke server");
+					toast("Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 				}
 			} catch (error: any) {
-				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
-				throw error;
+				toast(error.message, { type: "error", autoClose: 2000 });
+				console.trace(error.message)
 			} finally {
 				setDisableButton(false);
 			}
@@ -73,11 +107,19 @@ const NewJenisIzinPage = () => {
 		},
 	});
 
+	useEffect(() => {
+		loadJenisIzin(id)
+	}, [])
+
+	useEffect(()=>{
+		formik.setFieldValue("nama", jenisIzin?.nama??"")
+	},[jenisIzin])
+
 	return (
-		<PageWrapper name='JenisIzin'>
+		<PageWrapper name='Izin'>
 			<Subheader>
 				<SubheaderLeft>
-					<Breadcrumb currentPage='Tambah Jenis Izin' />
+					<Breadcrumb currentPage='Ubah Jenis Izin' />
 				</SubheaderLeft>
 			</Subheader>
 			<Container>
@@ -121,4 +163,4 @@ const NewJenisIzinPage = () => {
 	);
 };
 
-export default NewJenisIzinPage;
+export default EditJenisIzinPage;

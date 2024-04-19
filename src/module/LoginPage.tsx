@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PageWrapper from '../components/layouts/PageWrapper/PageWrapper';
 import Button from '../components/ui/Button';
 import Input from '../components/form/Input';
@@ -44,7 +44,7 @@ const LoginPage = () => {
 
 			return errors;
 		},
-		onSubmit: async (values: TValues, { setFieldError }) => {
+		onSubmit: async (values: TValues) => {
 			try {
 				const response:any = await DoLogin({
 					"username":values.username,

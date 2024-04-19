@@ -48,9 +48,6 @@ export const jenisizinlice = createSlice({
       state.paging.currentPage += 1;
     },
   },
-  extraReducers: (builder) => {
-
-  },
 });
 export const { loadList, editJenisIzin, deletedJenisIzin, pagingTable, prev, next } = jenisizinlice.actions;
 export const jenisizinselector = (state: RootState) => state.jenisIzinReducer;

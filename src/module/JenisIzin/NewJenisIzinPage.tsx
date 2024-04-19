@@ -10,22 +10,18 @@ import Card, { CardBody } from '../../components/ui/Card';
 import { TInputTypes } from '../../types/input.type';
 import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
 import { AlertObserver } from '../IO/AlertObserver';
 import { ConsoleObserver } from '../IO/ConsoleObserver';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';
-import { JenisIzinModel } from '../model/JenisIzinModel';
-import { editJenisIzin } from '../redux/jenisIzinSlice';
-import { GetJenisIzin } from '../repo/GetJenisIzin';
-import { UpdateJenisIzin } from '../repo/UpdateJenisIzin';
+import { CreateJenisIzin } from '../repo/CreateJenisIzin';
+import { toast } from 'react-toastify';
 
-const EditJenisIzinPage = () => {
-	const { id } = useParams();
+const NewJenisIzinPage = () => {
 	const navigate = useNavigate();
 	const maxRef = useRef<any>(null);
-	const [jenisIzin,setJenisIzin] = useState<JenisIzinModel|null>(null); 
 	const [disableButton, setDisableButton] = useState<boolean>(false);
 	// const toastId = useRef<any>(null);
 	const dispatch = useAppDispatch();
@@ -35,30 +31,6 @@ const EditJenisIzinPage = () => {
 
 	const handler2 = new HandlerObserver();
 	handler2.addObserver(new AlertObserver());
-
-	const loadJenisIzin = async (id:any) => {
-		const response: any = await GetJenisIzin(id);
-		if (response.status !== 200) {
-			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-		}
-
-		if (response.status === 200 || response.status === 500) {
-			const { status, message, data } = response;
-
-			if (status == 200) {
-				const jenisIzinParse = new JenisIzinModel(
-					data.id,
-					data.nama,
-				)
-				setJenisIzin(jenisIzinParse)
-				await dispatch(editJenisIzin(jenisIzinParse));
-			} else if (status == 500) {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
-			} else {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
-			}
-		}
-	}
 
 	const formik = useFormik({
 		enableReinitialize: true,
@@ -73,29 +45,28 @@ const EditJenisIzinPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await UpdateJenisIzin({
-					id: id,
+				const response: any = await CreateJenisIzin({
 					nama: value.nama,
 				});
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
-					const { status, message } = response;
+					const { status, message, log } = response;
 
 					if (status == 200) {
-						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
-						alert(message);
+						toast(message, { type: "success", autoClose: 2000 });
 						navigate(`/jenis_izin`)
 					} else if (status == 500) {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+						console.trace(log)
 					} else {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 					}
 				} else {
-					alert("terjadi masalah pada saat request ke server");
+					toast("Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 				}
 			} catch (error: any) {
-				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
-				throw error;
+				toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				console.trace(error.message)
 			} finally {
 				setDisableButton(false);
 			}
@@ -103,19 +74,11 @@ const EditJenisIzinPage = () => {
 		},
 	});
 
-	useEffect(() => {
-		loadJenisIzin(id)
-	}, [])
-
-	useEffect(()=>{
-		formik.setFieldValue("nama", jenisIzin?.nama??"")
-	},[jenisIzin])
-
 	return (
-		<PageWrapper name='Izin'>
+		<PageWrapper name='JenisIzin'>
 			<Subheader>
 				<SubheaderLeft>
-					<Breadcrumb currentPage='Ubah Jenis Izin' />
+					<Breadcrumb currentPage='Tambah Jenis Izin' />
 				</SubheaderLeft>
 			</Subheader>
 			<Container>
@@ -159,4 +122,4 @@ const EditJenisIzinPage = () => {
 	);
 };
 
-export default EditJenisIzinPage;
+export default NewJenisIzinPage;

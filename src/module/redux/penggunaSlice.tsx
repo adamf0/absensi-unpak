@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import PagingTable from "../model/PagingTable";
 import { PenggunaModel } from "../model/PenggunaModel";
@@ -47,9 +47,6 @@ export const penggunaslice = createSlice({
     next: (state) => {
       state.paging.currentPage += 1;
     },
-  },
-  extraReducers: (builder) => {
-
   },
 });
 export const { loadList, editPengguna, deletedPengguna, pagingTable, prev, next } = penggunaslice.actions;

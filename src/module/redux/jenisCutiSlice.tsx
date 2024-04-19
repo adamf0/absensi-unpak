@@ -48,9 +48,6 @@ export const jeniscutilice = createSlice({
       state.paging.currentPage += 1;
     },
   },
-  extraReducers: (builder) => {
-
-  },
 });
 export const { loadList, editJenisCuti, deletedJenisCuti, pagingTable, prev, next } = jeniscutilice.actions;
 export const jeniscutiselector = (state: RootState) => state.jenisCutiReducer;

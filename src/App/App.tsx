@@ -35,9 +35,12 @@ import PenggunaPage from '../module/Pengguna/PenggunaPage';
 import JenisCutiPage from '../module/JenisCuti/JenisCutiPage';
 import NewJenisCutiPage from '../module/JenisCuti/NewJenisCutiPage';
 import EditJenisCutiPage from '../module/JenisCuti/EditJenisCutiPage';
-import EditJenisIzinPage from '../module/JenisCuti copy/EditJenisCutiPage';
-import JenisIzinPage from '../module/JenisCuti copy/JenisCutiPage';
-import NewJenisIzinPage from '../module/JenisCuti copy/NewJenisCutiPage';
+import EditJenisIzinPage from '../module/JenisIzin/EditJenisIzinPage';
+import JenisIzinPage from '../module/JenisIzin/JenisIzinPage';
+import NewJenisIzinPage from '../module/JenisIzin/NewJenisIzinPage';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import HomePage from '../module/Home/HomePage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -48,58 +51,58 @@ const App = () => {
 	const { fontSize } = useFontSize();
 	dayjs.extend(localizedFormat);
 
-	function loadSideNav(){
-		if(levelMode=="sdm"){
+	function loadSideNav() {
+		if (levelMode == "sdm") {
 			return <>
-						<NavItem {...{
-							id: 'cutiApprovalPage',
-							to: '/approval/cuti',
-							text: 'Cuti',
-							icon: 'HeroRectangleGroup',
-						}} />
-						<NavItem {...{
-							id: 'izinApprovalPage',
-							to: '/approval/izin',
-							text: 'Izin',
-							icon: 'HeroRectangleGroup',
-						}} />
-					</>
-		} else if(levelMode=="dosen"){
+				<NavItem {...{
+					id: 'cutiApprovalPage',
+					to: '/approval/cuti',
+					text: 'Cuti',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
+					id: 'izinApprovalPage',
+					to: '/approval/izin',
+					text: 'Izin',
+					icon: 'HeroRectangleGroup',
+				}} />
+			</>
+		} else if (levelMode == "dosen") {
 			return <>
-					<NavItem {...{
-						id: 'cutiPage',
-						to: '/cuti',
-						text: 'Cuti',
-						icon: 'HeroRectangleGroup',
-					}} />
-					<NavItem {...{
-						id: 'izinPage',
-						to: '/izin',
-						text: 'Izin',
-						icon: 'HeroRectangleGroup',
-					}} />
-				</>
-		} else if(levelMode=="admin"){
+				<NavItem {...{
+					id: 'cutiPage',
+					to: '/cuti',
+					text: 'Cuti',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
+					id: 'izinPage',
+					to: '/izin',
+					text: 'Izin',
+					icon: 'HeroRectangleGroup',
+				}} />
+			</>
+		} else if (levelMode == "admin") {
 			return <>
-			<NavItem {...{
-				id: 'pengguna',
-				to: '/pengguna',
-				text: 'Pengguna',
-				icon: 'HeroRectangleGroup',
-			}} />
-			<NavItem {...{
-				id: 'Jenis Cuti',
-				to: '/jenis_cuti',
-				text: 'Jenis Cuti',
-				icon: 'HeroRectangleGroup',
-			}} />
-			<NavItem {...{
-				id: 'Jenis Izin',
-				to: '/jenis_izin',
-				text: 'Jenis Izin',
-				icon: 'HeroRectangleGroup',
-			}} />
-		</>
+				<NavItem {...{
+					id: 'pengguna',
+					to: '/pengguna',
+					text: 'Pengguna',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
+					id: 'Jenis Cuti',
+					to: '/jenis_cuti',
+					text: 'Jenis Cuti',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
+					id: 'Jenis Izin',
+					to: '/jenis_izin',
+					text: 'Jenis Izin',
+					icon: 'HeroRectangleGroup',
+				}} />
+			</>
 		}
 		return <></>
 	}
@@ -118,7 +121,7 @@ const App = () => {
 								<Nav>
 									<NavItem {...{
 										id: 'homePage',
-										to: '/home',
+										to: '/',
 										text: 'Home',
 										icon: 'HeroRectangleGroup',
 									}} />
@@ -224,7 +227,7 @@ const App = () => {
 									</>
 								}>
 								<Routes>
-									<Route path="/" element={<InputPage />} />
+									<Route path="/" element={<HomePage />} />
 									{/* <Route path="/absensi" element={<InputPage />} /> */}
 									<Route path="/cuti" element={<CutiPage />} />
 									<Route path="/cuti/tambah" element={<NewCutiPage />} />
@@ -258,8 +261,10 @@ const App = () => {
 
 					<Routes>
 						<Route path="/login" element={null} />
-						<Route path="*" element={<FooterRouter />}/>
+						<Route path="*" element={<FooterRouter />} />
 					</Routes>
+
+					<ToastContainer />
 				</Wrapper>
 			</div>
 		</>

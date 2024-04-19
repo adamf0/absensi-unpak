@@ -54,9 +54,6 @@ export const izinlice = createSlice({
       state.paging.currentPage += 1;
     },
   },
-  extraReducers: (builder) => {
-    
-  },
 });
 export const { loadList, loadListJenisIzin, editIzin, deletedIzin, pagingTable, prev, next } = izinlice.actions;
 export const izinselector = (state: RootState) => state.izinReducer;

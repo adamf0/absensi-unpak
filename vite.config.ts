@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, splitVendorChunkPlugin } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import EnvironmentPlugin from 'vite-plugin-environment';
 
@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
 		},
 		assetsInclude: ['**/*.md'],
 		base: "/",
-		plugins: [react(), EnvironmentPlugin({})],
+		plugins: [react(), splitVendorChunkPlugin(), EnvironmentPlugin({})],
 		preview: {
 			// port: 81,
 			strictPort: true,
