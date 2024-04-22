@@ -4655,6 +4655,11 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
+node-path@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.npmjs.org/node-path/-/node-path-0.0.3.tgz"
+  integrity sha512-S+n5Gb8mQHr8AAzrLo/VD+6gq+45b8B/U0o0/Cnx+vBctvC9EvzapdV5Jem5rJT95mNrweZnxAuQErlTWSDjiA==
+
 node-releases@^2.0.14:
   version "2.0.14"
   resolved "https://registry.npmjs.org/node-releases/-/node-releases-2.0.14.tgz"
