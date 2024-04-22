@@ -9,7 +9,7 @@ const module = resolve(__dirname, 'src')
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 	return {
-
+		baseUrl: "./",
 		resolve: {
 			alias: {
 			  '@module': resolve(module, 'module'),
