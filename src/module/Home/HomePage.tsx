@@ -1,9 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import Container from "../../components/layouts/Container/Container";
 import PageWrapper from "../../components/layouts/PageWrapper/PageWrapper";
 import Subheader, { SubheaderLeft } from "../../components/layouts/Subheader/Subheader";
 import Card, { CardBody } from "../../components/ui/Card";
-import { useAppDispatch } from "../redux/hooks";
 import Icon from "../../components/icon/Icon";
 import CardBadgeInfo from "../component/CardBadgeInfo";
 import Button, { IButtonProps } from "../../components/ui/Button";
@@ -22,11 +20,10 @@ import useLevelMode from "../../hooks/useLevelMode";
 import { CreateAbsentMasuk } from "../repo/CreateAbsentMasuk";
 import { CreateAbsentKeluar } from "../repo/CreateAbsentKeluar";
 import { HandlerObserver } from "../abstract/HandlerObserver";
-import { ConsoleObserver } from "../IO/ConsoleObserver";
 import Label from "../../components/form/Label";
 import Textarea from "../../components/form/Textarea";
-import { idea } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { GetInfo } from "../repo/GetInfo";
+import { ConsoleObserver } from "../IO/ConsoleObserver";
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
