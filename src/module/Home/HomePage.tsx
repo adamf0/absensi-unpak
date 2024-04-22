@@ -33,6 +33,8 @@ const HomePage = () => {
     const [isBefore8AM, setIsBefore8AM] = useState<boolean>(false);
     const [is8hour, set8hour] = useState<boolean>(false);
     const [isLate, setIsLate] = useState<boolean>(false);
+    const timeAbsenString = "08:00"
+    const timeAbsen = parseInt(timeAbsenString.split(":")[0])
 
     const [keterangan, setKeterangan] = useState<any>("");
     const [catatanTelat, setCatatanTelat] = useState<any>(null);
@@ -63,7 +65,7 @@ const HomePage = () => {
         }
     });
     const { levelMode } = useLevelMode();
-    const dateNow = new Date().toISOString().slice(0, 10);
+    const dateNow = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
 
     const handler1 = new HandlerObserver();
     handler1.addObserver(new ConsoleObserver());
@@ -113,21 +115,20 @@ const HomePage = () => {
         };
     }
 
-
     const checkTime = () => {
         const currentTime = moment().tz('Asia/Jakarta');
-        const checkBefore8AM = currentTime.isBefore(currentTime.clone().startOf('day').add(8, 'hours'));
+        const checkBefore8AM = currentTime.isBefore(currentTime.clone().startOf('day').add(timeAbsen, 'hours'));
         setIsBefore8AM(checkBefore8AM);
     }
     const check8hour = () => {
         const masuk = moment(absenMasuk).tz('Asia/Jakarta')
-        const check = masuk.isAfter(masuk.startOf('day').add(8, 'hours'));
+        const check = masuk.isAfter(masuk.startOf('day').add(timeAbsen, 'hours'));
         set8hour(check);
     }
     const checkLate = () => {
         const currentTime = (absenMasuk == null ? moment() : moment(absenMasuk)).tz('Asia/Jakarta');
-        const absenMasukTime = moment("08:00", 'HH:mm').tz('Asia/Jakarta');
-        const checkLate = currentTime.isAfter(absenMasukTime);
+        const absenMasukTime = moment(timeAbsenString, 'HH:mm').tz('Asia/Jakarta');
+        const checkLate = absenMasukTime.isAfter(currentTime);
         setIsLate(checkLate);
     }
     const loadAbsen = async () => {
@@ -212,7 +213,7 @@ const HomePage = () => {
     }
     const absenHandler = async (type: string) => {
         try {
-            const timeNow = new Date().toISOString().split('T')[1].slice(0, 8)
+            const timeNow = moment().tz('Asia/Jakarta').format("HH:mm")
             const response: any = (type == "masuk" ?
                 await CreateAbsentMasuk({
                     "nidn": levelMode == "dosen" ? localStorage.getItem('userRef') : null,
@@ -237,9 +238,9 @@ const HomePage = () => {
                 if (status == 200) {
                     toast(message, { type: "success", autoClose: 2000 });
                     if (type == "masuk") {
-                        setAbsenMasuk(new Date().toISOString())
+                        setAbsenMasuk(`${dateNow} ${timeNow}`)
                     } else {
-                        setAbsenKeluar(new Date().toISOString())
+                        setAbsenKeluar(`${dateNow} ${timeNow}`)
                     }
                     setKeterangan("")
                 } else if (status == 500) {
@@ -282,7 +283,7 @@ const HomePage = () => {
         return isLate && ["dosen", "karyawan"].includes(levelMode) ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="red" variant='outline'>
-                    anda telat masuk jam 08:00
+                    anda telat masuk jam {timeAbsenString}
                 </Alert>
             </div> : null
     }
@@ -314,7 +315,7 @@ const HomePage = () => {
     const keteranganComponent = () => {
         const output = [];
 
-        if (absenMasuk && absenKeluar == null) {
+        if (absenMasuk!=null && absenKeluar == null) {
             output.push(
                 <Label key="pulang-cepat" htmlFor="keterangan" className="font-bold">
                     Pulang cepat? Kasih tahu alasannya.
@@ -328,7 +329,8 @@ const HomePage = () => {
             );
         }
 
-        if ((is8hour && absenKeluar == null) || (isLate && absenMasuk == null)) {
+        console.log(is8hour,absenKeluar,isLate,absenMasuk)
+        if ((absenMasuk!=null && absenKeluar == null) || (absenMasuk == null && !isBefore8AM)) {
             output.push(
                 <Textarea
                     key="alasan"

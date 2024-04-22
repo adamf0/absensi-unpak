@@ -32,7 +32,7 @@ const CutiPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListCuti(page);
+        const response: any = await GetListCuti(page,localStorage.getItem('userRef'));
         // if (response.status !== 200) {
         //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         // }

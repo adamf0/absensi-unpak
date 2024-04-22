@@ -33,7 +33,7 @@ const IzinPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListIzin(page);
+        const response: any = await GetListIzin(page,localStorage.getItem('userRef'));
         // if (response.status !== 200) {
         //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         // }
