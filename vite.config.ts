@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import path from "path";
+import * as path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
 			'process.env.base_url_api': JSON.stringify(env.base_url_api)
 		},
 		assetsInclude: ['**/*.md'],
-		base: "/",
+		// base: "/",
 		plugins: [react(), EnvironmentPlugin({})],
 		preview: {
 			port: 81,
