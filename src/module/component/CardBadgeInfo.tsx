@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FC, ReactNode } from "react";
-import { TRounded } from "../../types/rounded.type";
+import { TRounded } from "@/types/rounded.type";
 
 interface ICardBadgeInfoProps {
     children?: ReactNode;

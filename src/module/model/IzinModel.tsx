@@ -1,4 +1,4 @@
-import { JenisIzinModel } from "./JenisIzinModel";
+import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 
 export class IzinModel {
     id: string;

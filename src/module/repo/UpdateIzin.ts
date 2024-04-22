@@ -1,4 +1,4 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "@/module/axiosInstance";
 
 export const UpdateIzin = async (formData:any) => {
     try {

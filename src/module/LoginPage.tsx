@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
-import PageWrapper from '../components/layouts/PageWrapper/PageWrapper';
-import Button from '../components/ui/Button';
-import Input from '../components/form/Input';
-import LogoTemplate from '../templates/layouts/Logo/Logo.template';
-import FieldWrap from '../components/form/FieldWrap';
-import Icon from '../components/icon/Icon';
-import Validation from '../components/form/Validation';
-import { DoLogin } from './repo/DoLogin';
-import useLevelMode from '../hooks/useLevelMode';
-import useUserRef from '../hooks/useUserRef';
+import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
+import Button from '@/components/ui/Button';
+import Input from '@/components/form/Input';
+import LogoTemplate from '@/templates/layouts/Logo/Logo.template';
+import FieldWrap from '@/components/form/FieldWrap';
+import Icon from '@/components/icon/Icon';
+import Validation from '@/components/form/Validation';
+import { DoLogin } from '@/module/repo/DoLogin';
+import useLevelMode from '@/hooks/useLevelMode';
+import useUserRef from '@/hooks/useUserRef';
 
 type TValues = {
 	username: string;

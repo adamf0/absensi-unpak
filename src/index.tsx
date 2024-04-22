@@ -1,20 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from '@/reportWebVitals';
 
-import { ThemeContextProvider } from './context/themeContext';
-import { AuthProvider } from './context/authContext';
-import App from './App/App';
+import { ThemeContextProvider } from '@/context/themeContext';
+import { AuthProvider } from '@/context/authContext';
+import App from '@/App/App';
 
-import './i18n';
-import './styles/index.css';
+import '@/i18n';
+import '@/styles/index.css';
 
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css';
-import './styles/vendors.css';
+import '@/styles/vendors.css';
 import { Provider } from 'react-redux';
-import { storeRoot } from './module/redux/store';
+import { storeRoot } from '@/module/redux/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

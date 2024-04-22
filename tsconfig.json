@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
-		"baseUrl": "src",
+		"baseUrl": ".",
 		"paths": {
-			"@module/*": ["module/*"]
+			"@/*": ["src/*"]
 		},
 		"target": "ES2022",
 		"useDefineForClassFields": true,
@@ -21,7 +21,7 @@
 		/* Linting */
 		"strict": true,
 		// "noUnusedLocals": true,
-		"noUnusedParameters": true, //skip=false
+		"noUnusedParameters": false, //skip=false
 		"noFallthroughCasesInSwitch": true
 	},
 	"include": ["src", "./src/declaration.d.ts"],

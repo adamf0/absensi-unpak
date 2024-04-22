@@ -1,4 +1,4 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "@/module/axiosInstance";
 
 export const GetListIzin = async (page: number, nidn: string|null = null, nip: string|null = null) => {
     try {

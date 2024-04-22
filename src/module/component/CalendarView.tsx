@@ -4,13 +4,13 @@ import FullCalendar from '@fullcalendar/react';
 import dayjs from 'dayjs';
 import colors from 'tailwindcss/colors';
 import { DateSelectArg, EventApi, EventClickArg, EventContentArg } from '@fullcalendar/core';
-import Calendar, { TViewMode, useCalendarView } from '../../components/Calendar';
-import Avatar from '../../components/Avatar';
-import Button from '../../components/ui/Button';
-import Card, { CardHeader, CardHeaderChild, CardBody } from '../../components/ui/Card';
-import Dropdown, { DropdownToggle, DropdownMenu, DropdownItem } from '../../components/ui/Dropdown';
-import usersDb, { TUser } from '../../mocks/db/users.db';
-import { TIcons } from '../../types/icons.type';
+import Calendar, { TViewMode, useCalendarView } from '@/components/Calendar';
+import Avatar from '@/components/Avatar';
+import Button from '@/components/ui/Button';
+import Card, { CardHeader, CardHeaderChild, CardBody } from '@/components/ui/Card';
+import Dropdown, { DropdownToggle, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import usersDb, { TUser } from '@/mocks/db/users.db';
+import { TIcons } from '@/types/icons.type';
 
 const CalendarView = () => {
 	const { t } = useTranslation();

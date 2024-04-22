@@ -1,19 +1,14 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import path, { resolve } from "path";
+import path from "path";
 
 // https://vitejs.dev/config/
-const module = resolve(__dirname, 'src')
-
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 	return {
-
 		resolve: {
-			alias: {
-			  '@module': resolve(module, 'module/'),
-			},
+			alias: [{ find: "@", replacement: path.resolve(__dirname, "src") }]
 		},
 		define: {
 			'process.env.deploy': JSON.stringify(env.deploy),

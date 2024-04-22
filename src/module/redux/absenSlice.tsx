@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "./store";
-import { Absen } from "../model/Absen";
+import { RootState } from "@/module/redux/store";
+import { Absen } from "@/module/model/Absen";
 
 interface state{
   absen: Absen | null,

@@ -1,4 +1,4 @@
-import { Observer } from "./Observer";
+import { Observer } from "@/module/abstract/Observer";
 
 export class HandlerObserver {
     private observers: Observer[] = [];

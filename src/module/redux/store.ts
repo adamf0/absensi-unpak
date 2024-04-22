@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import cutiReducer from './cutiSlice';
-import absenReducer from './absenSlice';
-import izinReducer from './izinSlice';
-import penggunaReducer from './penggunaSlice';
-import jenisCutiReducer from './jenisCutiSlice';
-import jenisIzinReducer from './jenisIzinSlice';
+import cutiReducer from '@/module/redux/cutiSlice';
+import absenReducer from '@/module/redux/absenSlice';
+import izinReducer from '@/module/redux/izinSlice';
+import penggunaReducer from '@/module/redux/penggunaSlice';
+import jenisCutiReducer from '@/module/redux/jenisCutiSlice';
+import jenisIzinReducer from '@/module/redux/jenisIzinSlice';
 
 export const storeRoot = configureStore({
   reducer: {

@@ -1,4 +1,4 @@
-import { TableItemStrategy } from "../abstract/TableItemStrategy";
+import { TableItemStrategy } from "@/module/abstract/TableItemStrategy";
 
 export interface TableProps {
     colums:string[],

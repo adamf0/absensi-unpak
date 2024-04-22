@@ -1,4 +1,4 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "@/module/axiosInstance";
 
 export const GetInfo = async (nidn: string|null = null, nip: string|null = null, tanggal_awal: string|null = null, tanggal_akhir: string|null = null) => {
     try {

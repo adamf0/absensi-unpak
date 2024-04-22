@@ -1,13 +1,12 @@
-import Button from '../../components/ui/Button';
-import ButtonGroup from '../../components/ui/ButtonGroup';
-import Dropdown, { DropdownToggle, DropdownMenu, DropdownItem } from '../../components/ui/Dropdown';
-import DARK_MODE from '../../constants/darkMode.constant';
-import useDarkMode from '../../hooks/useDarkMode';
-import useFontSize from '../../hooks/useFontSize';
-import useLevelMode from '../../hooks/useLevelMode';
-import useUserRef from '../../hooks/useUserRef';
-import { getLevel } from '../CheckLevels';
-import { getInfoUser } from '../InfoUser';
+import Button from '@/components/ui/Button';
+import ButtonGroup from '@/components/ui/ButtonGroup';
+import Dropdown, { DropdownToggle, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import DARK_MODE from '@/constants/darkMode.constant';
+import useDarkMode from '@/hooks/useDarkMode';
+import useLevelMode from '@/hooks/useLevelMode';
+import useUserRef from '@/hooks/useUserRef';
+import { getLevel } from '@/module/CheckLevels';
+import { getInfoUser } from '@/module/InfoUser';
 
 const SettingsComponent = () => {
 	// const { fontSize, setFontSize } = useFontSize();

@@ -1,5 +1,5 @@
 // import { MouseEventHandler } from "react";
-import { CutiModel } from "./CutiModel";
+import { CutiModel } from "@/module/model/CutiModel";
 
 interface CardProps {
     data: CutiModel;

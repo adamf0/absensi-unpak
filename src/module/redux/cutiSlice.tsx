@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CutiModel } from "../model/CutiModel";
-import { RootState } from "./store";
-import PagingTable from "../model/PagingTable";
-import { JenisCutiModel } from "../model/JenisCutiModel";
+import { CutiModel } from "@/module/model/CutiModel";
+import { RootState } from "@/module/redux/store";
+import PagingTable from "@/module/model/PagingTable";
+import { JenisCutiModel } from "@/module/model/JenisCutiModel";
 
 interface state {
   list_jenis_cuti: Array<JenisCutiModel>,

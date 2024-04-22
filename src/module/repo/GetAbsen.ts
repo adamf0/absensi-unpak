@@ -1,4 +1,4 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "@/module/axiosInstance";
 
 export const GetAbsen = async (tanggal:string, nidn: string|null = null, nip: string|null = null) => {
     try {

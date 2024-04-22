@@ -1,5 +1,5 @@
-import Button from "../../components/ui/Button";
-import { PaginationProps } from "../model/PaginationProps";
+import Button from "@/components/ui/Button";
+import { PaginationProps } from "@/module/model/PaginationProps";
 
 export const PaginationComponent: React.FC<PaginationProps> = ({ currentPage, start, end, totalData, prevPage, nextPage, handlePrevPage, handleNextPage, }) => {
     return (

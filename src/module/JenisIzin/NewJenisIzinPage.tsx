@@ -1,22 +1,22 @@
 import { useFormik } from 'formik';
-import Input from '../../components/form/Input';
-import Label from '../../components/form/Label';
-import Breadcrumb from '../../components/layouts/Breadcrumb/Breadcrumb';
-import Container from '../../components/layouts/Container/Container';
-import PageWrapper from '../../components/layouts/PageWrapper/PageWrapper';
-import Subheader, { SubheaderLeft } from '../../components/layouts/Subheader/Subheader';
-import Button from '../../components/ui/Button';
-import Card, { CardBody } from '../../components/ui/Card';
-import { TInputTypes } from '../../types/input.type';
+import Input from '@/components/form/Input';
+import Label from '@/components/form/Label';
+import Breadcrumb from '@/components/layouts/Breadcrumb/Breadcrumb';
+import Container from '@/components/layouts/Container/Container';
+import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
+import Subheader, { SubheaderLeft } from '@/components/layouts/Subheader/Subheader';
+import Button from '@/components/ui/Button';
+import Card, { CardBody } from '@/components/ui/Card';
+import { TInputTypes } from '@/types/input.type';
 import * as Yup from 'yup';
-import Validation from '../../components/form/Validation';
+import Validation from '@/components/form/Validation';
 import { useRef, useState } from 'react';
-import { HandlerObserver } from '../abstract/HandlerObserver';
-import { AlertObserver } from '@module/IO/AlertObserver';
-import { ConsoleObserver } from '@module/IO/ConsoleObserver';
+import { HandlerObserver } from '@/module/abstract/HandlerObserver';
+import { AlertObserver } from '@/module/IO/AlertObserver';
+import { ConsoleObserver } from '@/module/IO/ConsoleObserver';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../redux/hooks';
-import { CreateJenisIzin } from '../repo/CreateJenisIzin';
+import { useAppDispatch } from '@/module/redux/hooks';
+import { CreateJenisIzin } from '@/module/repo/CreateJenisIzin';
 import { toast } from 'react-toastify';
 
 const NewJenisIzinPage = () => {

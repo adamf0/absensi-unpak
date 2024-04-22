@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { JenisIzinModel } from "../model/JenisIzinModel";
-import { RootState } from "./store";
-import PagingTable from "../model/PagingTable";
+import { JenisIzinModel } from "@/module/model/JenisIzinModel";
+import { RootState } from "@/module/redux/store";
+import PagingTable from "@/module/model/PagingTable";
 
 interface state {
   list: Array<JenisIzinModel>,

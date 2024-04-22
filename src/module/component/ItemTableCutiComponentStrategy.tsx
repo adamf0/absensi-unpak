@@ -1,8 +1,8 @@
 import moment from 'moment';
-import { deletedCuti, editCuti } from '../redux/cutiSlice';
-import { useAppDispatch } from '../redux/hooks';
-import Button from '../../components/ui/Button';
-import { Td, Tr } from '../../components/ui/Table';
+import { deletedCuti, editCuti } from '@/module/redux/cutiSlice';
+import { useAppDispatch } from '@/module/redux/hooks';
+import Button from '@/components/ui/Button';
+import { Td, Tr } from '@/components/ui/Table';
 // import "moment/locale/id";
 
 class ItemTableCutiComponentStrategy { //implements TableItemStrategy 

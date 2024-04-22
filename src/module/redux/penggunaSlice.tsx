@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "./store";
-import PagingTable from "../model/PagingTable";
-import { PenggunaModel } from "../model/PenggunaModel";
+import { RootState } from "@/module/redux/store";
+import PagingTable from "@/module/model/PagingTable";
+import { PenggunaModel } from "@/module/model/PenggunaModel";
 
 interface state {
   list: Array<PenggunaModel>,
