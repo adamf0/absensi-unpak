@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"baseUrl": "./",
 		"paths": {
-			"@module/*": ["src/module/*"]
+			"@module/*": ["./src/module"]
 		},
 		"target": "ES2022",
 		"useDefineForClassFields": true,
