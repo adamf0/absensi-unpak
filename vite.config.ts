@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
 		},
 		assetsInclude: ['**/*.md'],
 		base: "/",
-		plugins: [react(), splitVendorChunkPlugin(), EnvironmentPlugin({})],
+		plugins: [react(), EnvironmentPlugin({})],
 		preview: {
 			// port: 81,
 			strictPort: true,
