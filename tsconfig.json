@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"baseUrl": ".",
 		"target": "ES2022",
 		"useDefineForClassFields": true,
 		"lib": ["ES2022", "DOM", "DOM.Iterable"],
@@ -7,8 +8,8 @@
 		"skipLibCheck": true,
 
 		/* Bundler mode */
-		"moduleResolution": "node",
-		// "allowImportingTsExtensions": true,
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"noEmit": true,
@@ -17,7 +18,7 @@
 		/* Linting */
 		"strict": true,
 		// "noUnusedLocals": true,
-		// "noUnusedParameters": true, //skip=false
+		"noUnusedParameters": true, //skip=false
 		"noFallthroughCasesInSwitch": true
 	},
 	"include": ["src", "./src/declaration.d.ts"],

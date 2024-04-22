@@ -23,7 +23,7 @@ import { HandlerObserver } from "../abstract/HandlerObserver";
 import Label from "../../components/form/Label";
 import Textarea from "../../components/form/Textarea";
 import { GetInfo } from "../repo/GetInfo";
-import { ConsoleObserver } from "../IO/ConsoleObserver";
+import { ConsoleObserver } from "src/module/IO/ConsoleObserver";
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
