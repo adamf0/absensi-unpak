@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
 import { useEffect, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
-import { AlertObserver } from '../IO/AlertObserver';
+import { AlertObserver } from '@module/IO/IO/AlertObserver';
 import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { CreateIzin } from '../repo/CreateIzin';
 import { useNavigate } from 'react-router-dom';

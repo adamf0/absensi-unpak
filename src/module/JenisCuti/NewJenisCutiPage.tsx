@@ -12,7 +12,7 @@ import * as Yup from 'yup';
 import Validation from '../../components/form/Validation';
 import { ReactNode, useRef, useState } from 'react';
 import { HandlerObserver } from '../abstract/HandlerObserver';
-import { AlertObserver } from '../IO/AlertObserver';
+import { AlertObserver } from '@module/IO/IO/AlertObserver';
 import { ConsoleObserver } from '../IO/ConsoleObserver';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../redux/hooks';

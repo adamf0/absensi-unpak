@@ -7,7 +7,7 @@ import Button from "../../components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "../../components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "../../components/ui/Table";
 import { useEffect, useState } from "react";
-import { AlertObserver } from "../IO/AlertObserver";
+import { AlertObserver } from "@module/IO/IO/AlertObserver";
 import { ConsoleObserver } from "../IO/ConsoleObserver";
 import { IzinModel } from "../model/IzinModel";
 import PagingTable from "../model/PagingTable";
