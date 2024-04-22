@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
 
 		resolve: {
 			alias: {
-			  '@module': resolve(module, 'module'),
+			  '@module': resolve(module, 'module/'),
 			},
 		},
 		define: {
@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
 			port: 81,
 			strictPort: true,
 			host: true,
-			origin: "https://0.0.0.0:81",
+			// origin: "http://0.0.0.0:81",
 		},
 	}
 });
