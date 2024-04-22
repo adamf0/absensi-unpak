@@ -22,7 +22,7 @@ import { JenisCutiModel } from '../model/JenisCutiModel';
 import { cutiselector, loadListJenisCuti } from '../redux/cutiSlice';
 import { GetListJenisCuti } from '../repo/GetListJenisCuti';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '@module/IO/SelectOptionsAdapter';
 
 const NewCutiPage = () => {
 	const navigate = useNavigate();

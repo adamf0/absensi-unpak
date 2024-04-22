@@ -21,7 +21,7 @@ import { JenisCutiModel } from '../model/JenisCutiModel';
 import { cutiselector, editCuti, loadListJenisCuti } from '../redux/cutiSlice';
 import { GetListJenisCuti } from '../repo/GetListJenisCuti';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '@module/IO/SelectOptionsAdapter';
 import { CutiModel } from '../model/CutiModel';
 import { GetCuti } from '../repo/GetCuti';
 import { UpdateCuti } from '../repo/UpdateCuti';

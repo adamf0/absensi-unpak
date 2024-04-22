@@ -21,7 +21,7 @@ import { JenisIzinModel } from '../model/JenisIzinModel';
 import { izinselector, editIzin, loadListJenisIzin } from '../redux/izinSlice';
 import { GetListJenisIzin } from '../repo/GetListJenisIzin';
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '@module/IO/SelectOptionsAdapter';
 import { IzinModel } from '../model/IzinModel';
 import { GetIzin } from '../repo/GetIzin';
 import { UpdateIzin } from '../repo/UpdateIzin';

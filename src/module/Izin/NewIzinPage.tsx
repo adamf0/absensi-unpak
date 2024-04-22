@@ -22,7 +22,7 @@ import { izinselector, loadListJenisIzin } from '../redux/izinSlice';
 import { GetListJenisIzin } from '../repo/GetListJenisIzin';
 import { JenisIzinModel } from '../model/JenisIzinModel';
 import SelectReact from '../../components/form/SelectReact';
-import { SelectOptionsAdapter } from '../IO/SelectOptionsAdapter';
+import { SelectOptionsAdapter } from '@module/IO/SelectOptionsAdapter';
 
 const NewIzinPage = () => {
 	const navigate = useNavigate();
