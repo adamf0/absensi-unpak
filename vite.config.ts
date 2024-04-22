@@ -14,14 +14,14 @@ export default defineConfig(({ mode }) => {
 		base: "/",
 		plugins: [react(), EnvironmentPlugin({})],
 		preview: {
-			// port: 81,
+			port: 81,
 			strictPort: true,
 		},
 		server: {
-			// port: 81,
+			port: 81,
 			strictPort: true,
 			host: true,
-			//  origin: "https://0.0.0.0:81",
+			origin: "https://0.0.0.0:81",
 		},
 	}
 });
