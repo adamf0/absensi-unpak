@@ -7,11 +7,6 @@ import path from 'node:path';
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 	return {
-		resolve:{
-			alias: {
-				'@module': path.resolve(__dirname, './src/module')
-			}
-		},
 		define: {
 			'process.env.deploy': JSON.stringify(env.deploy),
 			'process.env.base_url_api': JSON.stringify(env.base_url_api)
