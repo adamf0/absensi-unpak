@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
 
 		resolve: {
 			alias: {
-			  '@module': path.resolve(__dirname, 'src/module/'),
+			  '@module': path.resolve(__dirname, 'src/module'),
 			},
 		},
 		define: {
