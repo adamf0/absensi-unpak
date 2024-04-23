@@ -5,7 +5,8 @@ import path, { join } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-	const env = loadEnv(process.cwd(), '');
+	const env = loadEnv(process.env.MODE || 'development', process.cwd(), '');
+
 	return {
 		resolve: {
 			alias: [
