@@ -12,7 +12,10 @@ export default defineConfig(({ mode }) => {
 				{
 					find: "@",
 					replacement: path.resolve(__dirname, "src"),
-					'@root': join(__dirname, 'src'),
+				},
+				{
+					find: "@root",
+					replacement: join(__dirname, 'src'),
 				},
 			]
 		},
@@ -34,8 +37,7 @@ export default defineConfig(({ mode }) => {
 			fs: {
 				cachedChecks: false,
 			},
-
-			// origin: "http://0.0.0.0:81",
+			origin: "http://0.0.0.0:81",
 		},
 	}
 });
