@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
 		},
 		define: {
 			'process.env.deploy': JSON.stringify("dev"),
-			'process.env.base_url_api': JSON.stringify("https://api-hr.unpak.ac.id")
+			'process.env.base_url_api': JSON.stringify("https://api-hr.unpak.ac.id") //http://localhost:8000
 		},
 		assetsInclude: ['**/*.md'],
 		base: "/",

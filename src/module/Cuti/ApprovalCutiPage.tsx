@@ -143,13 +143,6 @@ const ApprovalCutiPage = () => {
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
-                    <CardHeader>
-                        <CardHeaderChild>
-                            <Button variant='solid' onClick={()=>navigate('/cuti/tambah')}>
-                                Tambah
-                            </Button>
-                        </CardHeaderChild>
-                    </CardHeader>
                     <CardBody className='overflow-auto'>
                         <Table className='table-fixed max-md:min-w-[70rem]'>
                             <THead>
