@@ -152,14 +152,27 @@ const EditIzinPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await UpdateIzin({
-					id:id,
-					nidn: localStorage.getItem('userRef') ?? "-",
-					tanggal_pengajuan: value.tanggal_pengajuan,
-					tujuan: value.tujuan_izin,
-					jenis_izin: value.jenis_izin,
-					dokumen: value.dokumen
-				});
+				let form = null
+				if(value.dokumen==null){
+					form = {
+						id:id,
+						nidn: localStorage.getItem('userRef') ?? "-",
+						tanggal_pengajuan: value.tanggal_pengajuan,
+						tujuan: value.tujuan_izin,
+						jenis_izin: value.jenis_izin,
+						dokumen: value.dokumen
+					}
+				} else{
+					form = new FormData()
+					form.append("id",String(id))
+					form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
+					form.append("tujuan",value.tujuan_izin)
+					form.append("jenis_izin",value.jenis_izin)
+					form.append("dokumen",value.dokumen)
+				}
+
+				const response: any = await UpdateIzin(form);
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
 					const { status, message } = response;

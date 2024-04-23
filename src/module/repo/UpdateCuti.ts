@@ -4,7 +4,7 @@ export const UpdateCuti = async (formData:any) => {
     try {
         const response = await axiosInstance.post('/cuti/update', formData,{
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": formData instanceof FormData? "multipart/form-data":"application/json",
             }
         });
         return response;

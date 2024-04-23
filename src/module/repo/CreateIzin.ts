@@ -4,7 +4,7 @@ export const CreateIzin = async (formData:any) => {
     try {
         const response = await axiosInstance.postForm('/izin/create', formData, {
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": formData instanceof FormData? "multipart/form-data":"application/json",
             }
         });
         return response;

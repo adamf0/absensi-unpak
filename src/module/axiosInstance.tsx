@@ -10,11 +10,11 @@ instance.interceptors.request.use(config => {
     //     config.headers['Authorization'] = authData;
     // }
 
-    if (config.data instanceof FormData) {
-        config.headers['Content-Type'] = 'multipart/form-data';
-    } else {
-        config.headers['Content-Type'] = 'application/json';
-    }
+    // if (config.data instanceof Object) {
+    //     config.headers['Content-Type'] = 'application/json';
+    // } else {
+        // config.headers['Content-Type'] = 'multipart/form-data';
+    // }
     // config.headers['Accept'] = 'application/json';
     config.headers['Access-Control-Allow-Origin'] = '*';
     if (config.method?.toLowerCase() === 'post') {

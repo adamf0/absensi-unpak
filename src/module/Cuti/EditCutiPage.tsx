@@ -169,15 +169,28 @@ const EditCutiPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				const response: any = await UpdateCuti({
-					id:id,
-					nidn: localStorage.getItem('userRef') ?? "-",
-					tanggal_pengajuan: value.tanggal_pengajuan,
-					lama_cuti: value.lama_cuti,
-					tujuan: value.tujuan_cuti,
-					jenis_cuti: value.jenis_cuti,
-					dokumen: value.dokumen
-				});
+				let form = null
+				if(value.dokumen==null){
+					form = {
+						id:id,
+						nidn: localStorage.getItem('userRef') ?? "-",
+						tanggal_pengajuan: value.tanggal_pengajuan,
+						lama_cuti: value.lama_cuti,
+						tujuan: value.tujuan_cuti,
+						jenis_cuti: value.jenis_cuti,
+						dokumen: value.dokumen
+					}
+				} else{
+					form = new FormData()
+					form.append("id",String(id))
+					form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
+					form.append("lama_cuti",value.lama_cuti)
+					form.append("tujuan",value.tujuan_cuti)
+					form.append("jenis_cuti",value.jenis_cuti)
+					form.append("dokumen",value.dokumen)
+				}
+				const response: any = await UpdateCuti(form);
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
 					const { status, message } = response;

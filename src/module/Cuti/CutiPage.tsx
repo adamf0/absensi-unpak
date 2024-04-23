@@ -160,7 +160,7 @@ const CutiPage = () => {
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
-                                        <Td>-</Td>
+                                        <Td>{item.dokumen}</Td>
                                         <Td>{item.status}</Td>
                                         <Td>
                                             {

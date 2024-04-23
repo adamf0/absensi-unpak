@@ -125,21 +125,24 @@ const NewCutiPage = () => {
 				// toastId.current = toast("Loading...", { autoClose: false });
 				setDisableButton(true);
 
-				let form = new FormData()
-				form.append("nidn",localStorage.getItem('userRef') ?? "-")
-				form.append("tanggal_pengajuan",value.tanggal_pengajuan)
-				form.append("lama_cuti",value.lama_cuti)
-				form.append("tujuan",value.tujuan_cuti)
-				form.append("jenis_cuti",value.jenis_cuti)
-				form.append("dokumen",value.dokumen)
-				// {
-				// 	nidn: localStorage.getItem('userRef') ?? "-",
-				// 	tanggal_pengajuan: value.tanggal_pengajuan,
-				// 	lama_cuti: value.lama_cuti,
-				// 	tujuan: value.tujuan_cuti,
-				// 	jenis_cuti: value.jenis_cuti,
-				// 	dokumen: value.dokumen
-				// }
+				let form = null
+				if(value.dokumen==null){
+					form = {
+						nidn: localStorage.getItem('userRef') ?? "-",
+						tanggal_pengajuan: value.tanggal_pengajuan,
+						lama_cuti: value.lama_cuti,
+						tujuan: value.tujuan_cuti,
+						jenis_cuti: value.jenis_cuti,
+					}
+				} else{
+					form = new FormData()
+					form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
+					form.append("lama_cuti",value.lama_cuti)
+					form.append("tujuan",value.tujuan_cuti)
+					form.append("jenis_cuti",value.jenis_cuti)
+					form.append("dokumen",value.dokumen)
+				}
 
 				const response: any = await CreateCuti(form);
 				handler1.notifyObservers(response);
