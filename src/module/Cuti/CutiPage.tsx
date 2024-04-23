@@ -160,7 +160,7 @@ const CutiPage = () => {
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
-                                        <Td><a href={item?.dokumen??""}>Buka</a></Td>
+                                        <Td><a href={item?.dokumen??""} className="inline-flex items-center justify-center bg-transparent border-2 border-blue-500/50 text-black dark:text-white hover:border-blue-500 active:border-blue-500 px-5 py-1.5 text-base rounded-lg transition-all duration-300 ease-in-out grow">Buka</a></Td>
                                         <Td>{item.status}</Td>
                                         <Td>
                                             {
