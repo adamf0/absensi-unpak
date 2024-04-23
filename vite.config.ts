@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 			alias: [
 				{
 					find: "@",
-					replacement: join(__dirname, "src"),
+					replacement: path.resolve(__dirname, "src"),
 				},
 				// {
 				// 	find: "@root",
