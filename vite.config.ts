@@ -31,10 +31,10 @@ export default defineConfig(({ mode }) => {
 			port: 81,
 			strictPort: true,
 			host: true,
-			// fs: {
-			// 	cachedChecks: false,
-			// },
-		  
+			fs: {
+				cachedChecks: false,
+			},
+
 			// origin: "http://0.0.0.0:81",
 		},
 	}
