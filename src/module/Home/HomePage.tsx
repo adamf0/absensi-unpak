@@ -42,7 +42,7 @@ const HomePage = () => {
     const [absenMasuk, setAbsenMasuk] = useState<any>(null);
     const [absenKeluar, setAbsenKeluar] = useState<any>(null);
     const [disableAbsen, setDisableAbsen] = useState<boolean>(true);
-    const [listEvent, setListEvent] = useState<any>([ //not work pass as parameter to CalendarView
+    const [listEvent, setListEvent] = useState<any>([ //not work pass parameter to CalendarView
 		{
 			"id": 19781,
 			"start": "2024-04-25",
@@ -314,7 +314,7 @@ const HomePage = () => {
         const intervalCheck = setInterval(checkTime, 1000);
         loadAbsen()
         loadInfo()
-        // loadCalendar()
+        loadCalendar()
 
         return () => {
             clearInterval(intervalCheck);
@@ -347,7 +347,7 @@ const HomePage = () => {
         return absenMasuk && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm")}
+                    anda masuk jam {moment(absenMasuk).format("HH:mm")}
                 </Alert>
             </div> : null
     }
@@ -364,7 +364,7 @@ const HomePage = () => {
         return absenKeluar && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda pulang jam {moment(absenKeluar).tz('Asia/Jakarta').format("HH:mm")} {catatan}
+                    anda pulang jam {moment(absenKeluar).format("HH:mm")} {catatan}
                 </Alert>
             </div> : null
     }

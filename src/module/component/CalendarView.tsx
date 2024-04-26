@@ -25,7 +25,7 @@ const CalendarView = (source:any) => {
 		title: currentDate,
 	} = useCalendarView(ref);
 
-	const INITIAL_EVENTS = [ //work
+	const INITIAL_EVENTS = [ //work as initialize
 		{
 			id: 100,
 			title: 'sakit',
@@ -39,7 +39,7 @@ const CalendarView = (source:any) => {
 			end: '2024-04-27'
 		},
 	];
-	console.log(source, INITIAL_EVENTS)
+	// console.log(source, INITIAL_EVENTS)
 
 	const CALENDAR_VIEW: {
 		[key in TViewMode]: { key: TViewMode; text: string; icon: TIcons };
