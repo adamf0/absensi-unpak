@@ -5,8 +5,19 @@ import path, { join } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-	const env = loadEnv(process.env.MODE || 'development', process.cwd(), '');
-
+	const env = loadEnv(mode, process.cwd(),'')
+	const processEnvValues = {
+		'process.env': Object.entries(env).reduce(
+		  (prev, [key, val]) => {
+			return {
+			  ...prev,
+			  [key]: val,
+			}
+		  },
+		  {},
+		)
+	}
+	
 	return {
 		resolve: {
 			alias: [
@@ -20,10 +31,11 @@ export default defineConfig(({ mode }) => {
 				// },
 			]
 		},
-		define: {
-			'process.env.deploy': JSON.stringify("dev"),
-			'process.env.base_url_api': JSON.stringify("https://api-hr.unpak.ac.id") //http://localhost:8000
-		},
+		define: processEnvValues,
+		// {
+		// 	'process.env.deploy': JSON.stringify("dev"),
+		// 	'process.env.base_url_api': JSON.stringify("http://localhost:8000") //https://api-hr.unpak.ac.id
+		// },
 		assetsInclude: ['**/*.md'],
 		base: "/",
 		plugins: [react(), EnvironmentPlugin({})],
