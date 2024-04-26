@@ -24,12 +24,15 @@ import Label from "@/components/form/Label";
 import Textarea from "@/components/form/Textarea";
 import { GetInfo } from "@/module/repo/GetInfo";
 import { ConsoleObserver } from "@/module/IO/ConsoleObserver";
+import { GetListCalendar } from "@/module/repo/GetListCalendar";
+import { EventSourceInput } from "@fullcalendar/core/index.js";
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
     const [isBefore8AM, setIsBefore8AM] = useState<boolean>(false);
     const [is8hour, set8hour] = useState<boolean>(false);
     const [isLate, setIsLate] = useState<boolean>(false);
+    const [ipAddress, setIPAddress] = useState<any>(null);
     const timeAbsenString = "08:00"
     const timeAbsen = parseInt(timeAbsenString.split(":")[0])
 
@@ -39,6 +42,14 @@ const HomePage = () => {
     const [absenMasuk, setAbsenMasuk] = useState<any>(null);
     const [absenKeluar, setAbsenKeluar] = useState<any>(null);
     const [disableAbsen, setDisableAbsen] = useState<boolean>(true);
+    const [listEvent, setListEvent] = useState<any>([ //not work pass as parameter to CalendarView
+		{
+			"id": 19781,
+			"start": "2024-04-25",
+			"end": "2024-04-25",
+			"title": "Tidak Masuk"
+		},
+	]);
     const [info, setInfo] = useState<any>({
         absen: {
             masuk: 0,
@@ -61,7 +72,6 @@ const HomePage = () => {
             terima: 0
         }
     });
-    const { levelMode } = useLevelMode();
     const dateNow = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
 
     const handler1 = new HandlerObserver();
@@ -129,39 +139,44 @@ const HomePage = () => {
         setIsLate(checkLate);
     }
     const loadAbsen = async () => {
-        if (!["dosen", "karyawan"].includes(levelMode)) {
-            console.log("loadAbsen hanya berjalan untuk karyawan dan dosen hukan ")
+        if (!["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"")) {
+            console.log("loadAbsen hanya berjalan untuk pegawai dan dosen hukan ")
         } else {
-            const response: any = await GetAbsen(dateNow, levelMode == "dosen" ? localStorage.getItem('userRef') : null, levelMode == "karyawan" ? localStorage.getItem('userRef') : null);
-            if (response.status !== 200) {
-                toast(response.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-                throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-            }
-
-            if (response.status === 200 || response.status === 500) {
-                const { status, message, data, log } = response;
-
-                if (status == 200) {
-                    setAbsenMasuk(data.absen_masuk)
-                    setAbsenKeluar(data.absen_keluar)
-                    setCatatanTelat(data.catatan_telat)
-                    setCatatanPulang(data.catatan_pulang)
-                    setDisableAbsen(false)
-                } else if (status == 500) {
-                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-                    setDisableAbsen(true)
-                    handler1.notifyObservers(log)
-                } else {
-                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-                    setDisableAbsen(true)
-                    handler1.notifyObservers(message ?? "Terjadi masalah pada saat request ke server")
-                }
+            try {
+                const response: any = await GetAbsen(
+                    dateNow, 
+                    localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null, 
+                    localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null
+                );
+                
+                if (response.status === 200 || response.status === 500) {
+                    const { status, message, data, log } = response;
+    
+                    if (status == 200) {
+                        setAbsenMasuk(data?.absen_masuk)
+                        setAbsenKeluar(data?.absen_keluar)
+                        setCatatanTelat(data?.catatan_telat)
+                        setCatatanPulang(data?.catatan_pulang)
+                        setDisableAbsen(false)
+                    } else if (status == 500) {
+                        toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                        setDisableAbsen(true)
+                        handler1.notifyObservers(log)
+                    } else {
+                        toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                        setDisableAbsen(true)
+                        handler1.notifyObservers(message ?? "Terjadi masalah pada saat request ke server")
+                    }
+                }   
+            } catch (error:any) {
+                toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                throw error;
             }
         }
     }
     const loadInfo = async () => {
-        if (!["dosen", "karyawan"].includes(levelMode)) {
-            console.log("loadInfo hanya berjalan untuk karyawan dan dosen hukan ")
+        if (!["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"")) {
+            console.log("loadInfo hanya berjalan untuk pegawai dan dosen hukan ")
         } else {
             let tanggal_awaldx = null
             let tanggal_akhirdx = null
@@ -181,8 +196,8 @@ const HomePage = () => {
                 tanggal_akhirdx = null
             }
             const response: any = await GetInfo(
-                levelMode == "dosen" ? localStorage.getItem('userRef') : null,
-                levelMode == "karyawan" ? localStorage.getItem('userRef') : null,
+                localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
+                localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
                 tanggal_awaldx,
                 tanggal_akhirdx
             );
@@ -195,6 +210,7 @@ const HomePage = () => {
                 const { status, message, data, log } = response;
 
                 if (status == 200) {
+                    console.log(data)
                     setInfo(data)
                 } else if (status == 500) {
                     toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
@@ -209,60 +225,100 @@ const HomePage = () => {
         }
     }
     const absenHandler = async (type: string) => {
-        try {
-            const timeNow = moment().tz('Asia/Jakarta').format("HH:mm")
-            const response: any = (type == "masuk" ?
-                await CreateAbsentMasuk({
-                    "nidn": levelMode == "dosen" ? localStorage.getItem('userRef') : null,
-                    "nip": levelMode == "karyawan" ? localStorage.getItem('userRef') : null,
-                    "tanggal": dateNow,
-                    "absen_masuk": timeNow,
-                    "keterangan": keterangan,
-                }) :
-                await CreateAbsentKeluar({
-                    "nidn": levelMode == "dosen" ? localStorage.getItem('userRef') : null,
-                    "nip": levelMode == "karyawan" ? localStorage.getItem('userRef') : null,
-                    "tanggal": dateNow,
-                    "absen_keluar": timeNow,
-                    "keterangan": keterangan,
-                })
-            );
-
-            handler1.notifyObservers(response);
-            if (response.status === 200 || response.status === 500) {
-                const { status, message } = response;
-
-                if (status == 200) {
-                    toast(message, { type: "success", autoClose: 2000 });
-                    if (type == "masuk") {
-                        setAbsenMasuk(`${dateNow} ${timeNow}`)
+        getIPAddress()
+        if(!checkIp()){
+            toast(`berada diluar jaringan universitas pakuan`, { type: "error", autoClose: 2000 });
+        } else{
+            try {
+                const timeNow = moment().tz('Asia/Jakarta').format("HH:mm")
+                const response: any = (type == "masuk" ?
+                    await CreateAbsentMasuk({
+                        "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
+                        "nip": localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
+                        "tanggal": dateNow,
+                        "absen_masuk": timeNow,
+                        "keterangan": keterangan,
+                    }) :
+                    await CreateAbsentKeluar({
+                        "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
+                        "nip": localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
+                        "tanggal": dateNow,
+                        "absen_keluar": timeNow,
+                        "keterangan": keterangan,
+                    })
+                );
+    
+                handler1.notifyObservers(response);
+                if (response.status === 200 || response.status === 500) {
+                    const { status, message } = response;
+    
+                    if (status == 200) {
+                        toast(message, { type: "success", autoClose: 2000 });
+                        if (type == "masuk") {
+                            setAbsenMasuk(`${dateNow} ${timeNow}`)
+                        } else {
+                            setAbsenKeluar(`${dateNow} ${timeNow}`)
+                        }
+                        setKeterangan("")
+                        loadInfo()
+                    } else if (status == 500) {
+                        toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                     } else {
-                        setAbsenKeluar(`${dateNow} ${timeNow}`)
+                        toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                     }
-                    setKeterangan("")
-                } else if (status == 500) {
-                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 } else {
-                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                    toast("Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 }
-            } else {
-                toast("Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+            } catch (error: any) {
+                toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                handler1.notifyObservers(error.message)
+            } finally {
+    
             }
-        } catch (error: any) {
-            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-            handler1.notifyObservers(error.message)
-        } finally {
+        }
+    }
+    const getIPAddress = async () => {
+        try {
+          const response = await fetch('https://api.ipify.org?format=json');
+          const data = await response.json();
+          console.log(`ip: ${data.ip}`)
+          setIPAddress(data.ip);
+          
+        } catch (error) {
+          console.error('Error fetching IP address:', error);
+        }
+    };
+    const loadCalendar = async () => {
+        const response: any = await GetListCalendar(
+            localStorage.getItem('levelMode')=="pegawai"? "nip":"nidn",
+            localStorage.getItem('userRef'),
+            "2024-04"
+        );
+        if (response.status === 200 || response.status === 500) {
+            const { status, message, list, log } = response;
 
+            if (status == 200) {
+                setListEvent(list);
+            } else if (status == 500) {
+                toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                handler1.notifyObservers(log)
+            } else {
+                toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                handler1.notifyObservers(message ?? "Terjadi masalah pada saat request ke server")
+            }
         }
     }
 
     useEffect(() => {
         checkTime()
-        const interval = setInterval(checkTime, 1000);
+        const intervalCheck = setInterval(checkTime, 1000);
         loadAbsen()
         loadInfo()
+        // loadCalendar()
 
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(intervalCheck);
+        }
     }, []);
 
     useEffect(() => {
@@ -276,8 +332,11 @@ const HomePage = () => {
         
     }, [activeTab]);
 
+    const checkIp = async () => {
+        return ipAddress.includes("103.169") || ipAddress.includes("2001:df0:3140") 
+    }
     const alertTerlambat = () => {
-        return isLate && ["dosen", "karyawan"].includes(levelMode) ?
+        return isLate && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="red" variant='outline'>
                     anda telat masuk jam {timeAbsenString}
@@ -285,7 +344,7 @@ const HomePage = () => {
             </div> : null
     }
     const alertMasuk = () => {
-        return absenMasuk && ["dosen", "karyawan"].includes(levelMode) ?
+        return absenMasuk && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
                     anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm")}
@@ -302,7 +361,7 @@ const HomePage = () => {
             catatan = `dengan catatan pulang ${catatanTelat}`
         }
 
-        return absenKeluar && ["dosen", "karyawan"].includes(levelMode) ?
+        return absenKeluar && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
                     anda pulang jam {moment(absenKeluar).tz('Asia/Jakarta').format("HH:mm")} {catatan}
@@ -326,7 +385,7 @@ const HomePage = () => {
             );
         }
 
-        console.log(is8hour,absenKeluar,isLate,absenMasuk)
+        // console.log(is8hour,absenKeluar,isLate,absenMasuk)
         if ((absenMasuk!=null && absenKeluar == null) || (absenMasuk == null && !isBefore8AM)) {
             output.push(
                 <Textarea
@@ -378,12 +437,12 @@ const HomePage = () => {
                                                 <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
                                                     <span className='font-semibold'>Absen Masuk</span>
                                                 </div>
-                                                <div className='text-4xl font-semibold'>{info.absen.masuk}</div>
+                                                <div className='text-4xl font-semibold'>{info?.absen?.masuk??0}</div>
                                                 <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={info.absen.lebih_8jam}>&ge;8 Jam Kerja</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info.absen.kurang_8jam}>&lt;7 Jam Kerja</CardBadgeInfo>
-                                                    <CardBadgeInfo status="success" value={info.absen.tepat_waktu}>Tepat Waktu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info.absen.telat}>Telat</CardBadgeInfo>
+                                                    <CardBadgeInfo status="waiting" value={info?.absen?.lebih_8jam??0}>&ge;8 Jam Kerja</CardBadgeInfo>
+                                                    <CardBadgeInfo status="reject" value={info?.absen?.kurang_8jam??0}>&lt;7 Jam Kerja</CardBadgeInfo>
+                                                    <CardBadgeInfo status="success" value={info?.absen?.tepat_waktu??0}>Tepat Waktu</CardBadgeInfo>
+                                                    <CardBadgeInfo status="reject" value={info?.absen?.telat??0}>Telat</CardBadgeInfo>
                                                 </div>
                                             </div>
                                         </CardBody>
@@ -399,7 +458,7 @@ const HomePage = () => {
                                                 <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
                                                     <span className='font-semibold'>Tidak Masuk</span>
                                                 </div>
-                                                <div className='text-4xl font-semibold'>{info.absen.tidak_masuk}</div>
+                                                <div className='text-4xl font-semibold'>{info?.absen?.tidak_masuk??0}</div>
                                             </div>
                                         </CardBody>
                                     </Card>
@@ -414,10 +473,10 @@ const HomePage = () => {
                                                 <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
                                                     <span className='font-semibold'>Izin</span>
                                                 </div>
-                                                <div className='text-4xl font-semibold'>{info.izin.total}</div>
+                                                <div className='text-4xl font-semibold'>{info?.izin?.total??0}</div>
                                                 <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={info.izin.menunggu}>Menunggu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info.izin.tolak}>Tolak</CardBadgeInfo>
+                                                    <CardBadgeInfo status="waiting" value={info?.izin?.menunggu??0}>Menunggu</CardBadgeInfo>
+                                                    <CardBadgeInfo status="reject" value={info?.izin?.tolak??0}>Tolak</CardBadgeInfo>
                                                 </div>
                                             </div>
                                         </CardBody>
@@ -433,10 +492,29 @@ const HomePage = () => {
                                                 <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
                                                     <span className='font-semibold'>Cuti</span>
                                                 </div>
-                                                <div className='text-4xl font-semibold'>{info.cuti.total}</div>
+                                                <div className='text-4xl font-semibold'>{info?.cuti?.total??0}</div>
                                                 <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={info.cuti.menunggu}>Menunggu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info.cuti.tolak}>Tolak</CardBadgeInfo>
+                                                    <CardBadgeInfo status="waiting" value={info?.cuti?.menunggu??0}>Menunggu</CardBadgeInfo>
+                                                    <CardBadgeInfo status="reject" value={info?.cuti?.tolak??0}>Tolak</CardBadgeInfo>
+                                                </div>
+                                            </div>
+                                        </CardBody>
+                                    </Card>
+                                </div>
+                                <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
+                                    <Card className={`h-full`}>
+                                        <CardBody>
+                                            <div className='flex flex-col gap-2'>
+                                                <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
+                                                    <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                                                </div>
+                                                <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
+                                                    <span className='font-semibold'>SPPD</span>
+                                                </div>
+                                                <div className='text-4xl font-semibold'>0</div>
+                                                <div className='flex flex-wrap gap-2'>
+                                                    <CardBadgeInfo status="waiting" value={0}>Menunggu</CardBadgeInfo>
+                                                    <CardBadgeInfo status="reject" value={0}>Tolak</CardBadgeInfo>
                                                 </div>
                                             </div>
                                         </CardBody>
@@ -445,7 +523,7 @@ const HomePage = () => {
                             </div>
                         </div>
                         {
-                            ["dosen", "karyawan"].includes(levelMode) ?
+                            ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") && !disableAbsen ?
                                 <>
                                     <div className='col-span-12 2xl:col-span-4'>
                                         <div className='grid h-full grid-cols-12 gap-4'>
@@ -481,9 +559,11 @@ const HomePage = () => {
                                         </div>
                                     </div>
                                     <div className='col-span-12 2xl:col-span-8'>
-                                        <CalendarView></CalendarView>
+                                        <CalendarView source={listEvent}></CalendarView>
                                     </div>
-                                </> : null
+                                </> : <div className='col-span-12'>
+                                        <CalendarView source={listEvent}></CalendarView>
+                                    </div>
                         }
                     </div>
                 </Container>

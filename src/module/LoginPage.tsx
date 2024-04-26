@@ -59,8 +59,21 @@ const LoginPage = () => {
 						localStorage.setItem('infoUser', JSON.stringify(data));
 						if(data.level.length>0){
 							const level = data.level[0]
-							setLevelMode(level)
-							setUserRef(level!="dosen"? data.id:data?.NIDN)
+							//bug tidak set useref dan level mode setelah logout
+							// setLevelMode(level)
+							localStorage.setItem('levelMode', level);
+
+							// console.log(level=="pegawai",level=="dosen",["sdm","admin","warek"].includes(level),data?.NIDN)
+							if(level=="pegawai"){
+								// setUserRef(data?.nip??"")
+								localStorage.setItem('userRef', data?.nip??"");
+							} else if(level=="dosen"){
+								// setUserRef(data?.NIDN??"")
+								localStorage.setItem('userRef', data?.NIDN??"");
+							} else if(["sdm","admin","warek"].includes(level)){
+								// setUserRef(data?.id??"")
+								localStorage.setItem('userRef', data?.id??"");
+							}
 						}
 						// const info = localStorage.getItem('infoUser')??"{}";
 						// console.log(JSON.parse(info))

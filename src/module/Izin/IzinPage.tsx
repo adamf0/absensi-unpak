@@ -19,10 +19,12 @@ import { HandlerObserver } from "@/module/abstract/HandlerObserver";
 import moment from "moment";
 import { izinselector } from "@/module/redux/izinSlice";
 import { JenisIzinModel } from "@/module/model/JenisIzinModel";
+import { toast } from "react-toastify";
+import useLevelMode from "@/hooks/useLevelMode";
 
 const IzinPage = () => {
     const navigate = useNavigate();
-
+    const { levelMode } = useLevelMode();
     const selectorIzin = useAppSelector(izinselector);
     const dispatch = useAppDispatch();
 
@@ -33,47 +35,55 @@ const IzinPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListIzin(page,localStorage.getItem('userRef'));
-        // if (response.status !== 200) {
-        //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-        // }
+        try {
+            const response: any = await GetListIzin(
+                page,
+                levelMode == "dosen" ? localStorage.getItem('userRef') : null,
+                levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
+            );
 
-        if (response.status === 200 || response.status === 500) {
-            const { status, message, list } = response;
+            if (response.status === 200 || response.status === 500) {
+                const { status, message, list, log } = response;
 
-            if (status == 200) {
-                const izinList = list.data.map((item: any) =>
-                    new IzinModel(
-                        item.id,
-                        item.tanggal_pengajuan,
-                        new JenisIzinModel(
-                            item.JenisIzin?.id ?? "",
-                            item.JenisIzin?.nama ?? ""
-                        ),
-                        item.tujuan,
-                        item.dokumen,
-                        item.status,
-                    )
-                );
+                if (status == 200) {
+                    const izinList = list.data.map((item: any) =>
+                        new IzinModel(
+                            item.id,
+                            item.tanggal_pengajuan,
+                            new JenisIzinModel(
+                                item.JenisIzin?.id ?? "",
+                                item.JenisIzin?.nama ?? ""
+                            ),
+                            item.tujuan,
+                            item.dokumen,
+                            item.status,
+                        )
+                    );
 
-                const paging: PagingTable = {
-                    totalData: list.totalData,
-                    totalPage: list.totalPage,
-                    currentPage: list.currentPage,
-                    start: list.startIndex || 1,
-                    end: list.endIndex,
-                    pageSize: list.pageSize,
-                    prevPage: list.prevPage,
-                    nextPage: list.nextPage,
-                };
+                    const paging: PagingTable = {
+                        totalData: list.totalData,
+                        totalPage: list.totalPage,
+                        currentPage: list.currentPage,
+                        start: list.startIndex || 1,
+                        end: list.endIndex,
+                        pageSize: list.pageSize,
+                        prevPage: list.prevPage,
+                        nextPage: list.nextPage,
+                    };
 
-                await dispatch(loadList(izinList));
-                await dispatch(pagingTable(paging));
-            } else if (status == 500) {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
-            } else {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
-            }
+                    await dispatch(loadList(izinList));
+                    await dispatch(pagingTable(paging));
+                } else if (status == 500) {
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                } else {
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                }
+            }   
+        } catch (error:any) {
+            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+            throw error;
         }
     };
 
@@ -82,21 +92,21 @@ const IzinPage = () => {
             const response:any = await DeleteIzin(id);
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
-                const { status,message } = response;
+                const { status,message,log } = response;
 
                 if (status == 200){
-                    alert(message);
+                    toast(message, { type: "success", autoClose: 2000 });
                     loadTable(1)
                 } else if (status == 500) {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 } else {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 }
-            } else {
-                alert("terjadi masalah pada saat request ke server")
-            }
+            }   
         } catch (error:any) {
-            alert(error.message ?? "terjadi masalah pada saat request ke server")
+            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
             throw error;
         } finally {
 

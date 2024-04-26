@@ -18,10 +18,12 @@ import { DeleteCuti } from "@/module/repo/DeleteCuti";
 import { GetListCuti } from "@/module/repo/GetListCuti";
 import { HandlerObserver } from "@/module/abstract/HandlerObserver";
 import moment from "moment";
+import { toast } from "react-toastify";
+import useLevelMode from "@/hooks/useLevelMode";
 
 const CutiPage = () => {
     const navigate = useNavigate();
-
+    const { levelMode } = useLevelMode();
     const selectorCuti = useAppSelector(cutiselector);
     const dispatch = useAppDispatch();
 
@@ -32,52 +34,59 @@ const CutiPage = () => {
     handler2.addObserver(new AlertObserver());
 
     const loadTable = async (page: number) => {
-        const response: any = await GetListCuti(page,localStorage.getItem('userRef'));
-        // if (response.status !== 200) {
-        //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-        // }
-
-        if (response.status === 200 || response.status === 500) {
-            const { status, message, list } = response;
-
-            if (status == 200) {
-                const cutiList = list.data.map((item: any) =>
-                    new CutiModel(
-                        item.id,
-                        item.tanggal_pengajuan,
-                        item.lama_cuti,
-                        new JenisCutiModel(
-                            item.JenisCuti?.id ?? "",
-                            item.JenisCuti?.nama ?? "",
-                            item.JenisCuti?.min ?? "",
-                            item.JenisCuti?.max ?? "",
-                            item.JenisCuti?.dokumen ?? false,
-                            item.JenisCuti?.kondisi ?? "",
-                        ),
-                        item.tujuan,
-                        item.dokumen,
-                        item.status,
-                    )
-                );
-
-                const paging: PagingTable = {
-                    totalData: list.totalData,
-                    totalPage: list.totalPage,
-                    currentPage: list.currentPage,
-                    start: list.startIndex || 1,
-                    end: list.endIndex,
-                    pageSize: list.pageSize,
-                    prevPage: list.prevPage,
-                    nextPage: list.nextPage,
-                };
-
-                await dispatch(loadList(cutiList));
-                await dispatch(pagingTable(paging));
-            } else if (status == 500) {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
-            } else {
-                console.trace(message ?? "Terjadi masalah pada saat request ke server")
-            }
+        try {
+            const response: any = await GetListCuti(
+                page,
+                levelMode == "dosen" ? localStorage.getItem('userRef') : null,
+                levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
+            );
+            if (response.status === 200 || response.status === 500) {
+                const { status, message, list, log } = response;
+    
+                if (status == 200) {
+                    const cutiList = list.data.map((item: any) =>
+                        new CutiModel(
+                            item.id,
+                            item.tanggal_pengajuan,
+                            item.lama_cuti,
+                            new JenisCutiModel(
+                                item.JenisCuti?.id ?? "",
+                                item.JenisCuti?.nama ?? "",
+                                item.JenisCuti?.min ?? "",
+                                item.JenisCuti?.max ?? "",
+                                item.JenisCuti?.dokumen ?? false,
+                                item.JenisCuti?.kondisi ?? "",
+                            ),
+                            item.tujuan,
+                            item.dokumen,
+                            item.status,
+                        )
+                    );
+    
+                    const paging: PagingTable = {
+                        totalData: list.totalData,
+                        totalPage: list.totalPage,
+                        currentPage: list.currentPage,
+                        start: list.startIndex || 1,
+                        end: list.endIndex,
+                        pageSize: list.pageSize,
+                        prevPage: list.prevPage,
+                        nextPage: list.nextPage,
+                    };
+    
+                    await dispatch(loadList(cutiList));
+                    await dispatch(pagingTable(paging));
+                } else if (status == 500) {
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                } else {
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                }
+            }   
+        } catch (error:any) {
+            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+            throw error;
         }
     };
 
@@ -86,21 +95,21 @@ const CutiPage = () => {
             const response:any = await DeleteCuti(id);
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
-                const { status,message } = response;
+                const { status,message,log } = response;
 
                 if (status == 200){
-                    alert(message);
+                    toast(message, { type: "success", autoClose: 2000 });
                     loadTable(1)
                 } else if (status == 500) {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 } else {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 }
-            } else {
-                alert("terjadi masalah pada saat request ke server")
-            }
+            }   
         } catch (error:any) {
-            alert(error.message ?? "terjadi masalah pada saat request ke server")
+            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
             throw error;
         } finally {
 
@@ -160,7 +169,7 @@ const CutiPage = () => {
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
-                                        <Td><a href={item?.dokumen??""} className="inline-flex items-center justify-center bg-transparent border-2 border-blue-500/50 text-black dark:text-white hover:border-blue-500 active:border-blue-500 px-5 py-1.5 text-base rounded-lg transition-all duration-300 ease-in-out grow">Buka</a></Td>
+                                        <Td><a href={item?.dokumen??""} target="_blank" className="inline-flex items-center justify-center bg-transparent border-2 border-blue-500/50 text-black dark:text-white hover:border-blue-500 active:border-blue-500 px-5 py-1.5 text-base rounded-lg transition-all duration-300 ease-in-out grow">Buka</a></Td>
                                         <Td>{item.status}</Td>
                                         <Td>
                                             {

@@ -43,7 +43,7 @@ import HomePage from '@/module/Home/HomePage';
 
 const App = () => {
 	const navigate = useNavigate();
-	const { levelMode } = useLevelMode();
+	// const { levelMode } = useLevelMode();
 
 	getOS();
 
@@ -51,7 +51,7 @@ const App = () => {
 	dayjs.extend(localizedFormat);
 
 	function loadSideNav() {
-		if (levelMode == "sdm") {
+		if (localStorage.getItem('levelMode') == "sdm") {
 			return <>
 				<NavItem {...{
 					id: 'cutiApprovalPage',
@@ -66,7 +66,7 @@ const App = () => {
 					icon: 'HeroRectangleGroup',
 				}} />
 			</>
-		} else if (levelMode == "dosen") {
+		} else if (["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"")) {
 			return <>
 				<NavItem {...{
 					id: 'cutiPage',
@@ -81,7 +81,7 @@ const App = () => {
 					icon: 'HeroRectangleGroup',
 				}} />
 			</>
-		} else if (levelMode == "admin") {
+		} else if (localStorage.getItem('levelMode') == "admin") {
 			return <>
 				<NavItem {...{
 					id: 'pengguna',

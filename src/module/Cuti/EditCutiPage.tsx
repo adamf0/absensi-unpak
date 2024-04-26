@@ -25,9 +25,12 @@ import { SelectOptionsAdapter } from '@/module/IO/SelectOptionsAdapter';
 import { CutiModel } from '@/module/model/CutiModel';
 import { GetCuti } from '@/module/repo/GetCuti';
 import { UpdateCuti } from '@/module/repo/UpdateCuti';
+import useLevelMode from '@/hooks/useLevelMode';
+import { toast } from 'react-toastify';
 
 const EditCutiPage = () => {
 	const { id } = useParams();
+	const { levelMode } = useLevelMode();
 	const navigate = useNavigate();
 	const FILE_SIZE = 1024 * 1024 * 10; // 10 MB
 	const SUPPORTED_FORMATS = ['application/pdf'];
@@ -48,77 +51,96 @@ const EditCutiPage = () => {
 	handler2.addObserver(new AlertObserver());
 
 	const loadJenisCuti = async () => {
-		const response: any = await GetListJenisCuti();
-		if (response.status !== 200) {
-			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-		}
-
-		if (response.status === 200 || response.status === 500) {
-			const { status, message, list } = response;
-
-			if (status == 200) {
-				const listJenisCuti = list.map((item: any) =>
-					new JenisCutiModel(
-						item.id,
-						item.nama,
-						item.min,
-						item.max,
-						item.dokumen,
-						item.kondisi,
-					)
-				)
-
-				await dispatch(loadListJenisCuti(listJenisCuti));
-			} else if (status == 500) {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
-			} else {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+		try {
+			const response: any = await GetListJenisCuti();
+			if (response.status !== 200) {
+				throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 			}
+
+			if (response.status === 200 || response.status === 500) {
+				const { status, message, list, log } = response;
+
+				if (status == 200) {
+					const listJenisCuti = list.map((item: any) =>
+						new JenisCutiModel(
+							item.id,
+							item.nama,
+							item.min,
+							item.max,
+							item.dokumen,
+							item.kondisi,
+						)
+					)
+
+					await dispatch(loadListJenisCuti(listJenisCuti));
+				} else if (status == 500) {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				} else {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				}
+			}   
+		} catch (error:any) {
+			toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+			throw error;
 		}
 	};
 	const loadCuti = async (id:any) => {
-		const response: any = await GetCuti(id);
-		if (response.status !== 200) {
-			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-		}
-
-		if (response.status === 200 || response.status === 500) {
-			const { status, message, data } = response;
-
-			if (status == 200) {
-				const cutiParse = new CutiModel(
-					data.id,
-					data.tanggal_pengajuan,
-					data.lama_cuti,
-					new JenisCutiModel(
-						data.JenisCuti?.id,
-						data.JenisCuti?.nama,
-						data.JenisCuti?.min,
-						data.JenisCuti?.max,
-						data.JenisCuti?.dokumen,
-						data.JenisCuti?.kondisi
-					),
-					data.tujuan,
-					data.dokumen,
-					data.status,
-				);
-				setCuti(cutiParse)
-				await dispatch(editCuti(cutiParse));
-			} else if (status == 500) {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
-			} else {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+		try {
+			const response: any = await GetCuti(id);
+			if (response.status !== 200) {
+				throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 			}
+
+			if (response.status === 200 || response.status === 500) {
+				const { status, message, data, log } = response;
+
+				if (status == 200) {
+					const cutiParse = new CutiModel(
+						data.id,
+						data.tanggal_pengajuan,
+						data.lama_cuti,
+						new JenisCutiModel(
+							data.JenisCuti?.id,
+							data.JenisCuti?.nama,
+							data.JenisCuti?.min,
+							data.JenisCuti?.max,
+							data.JenisCuti?.dokumen,
+							data.JenisCuti?.kondisi
+						),
+						data.tujuan,
+						data.dokumen,
+						data.status,
+					);
+					setCuti(cutiParse)
+					setMin(parseInt(data.JenisCuti?.min))
+					setMax(parseInt(data.JenisCuti?.max))
+					await dispatch(editCuti(cutiParse));
+				} else if (status == 500) {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				} else {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				}
+			}   
+		} catch (error:any) {
+			toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+			throw error;
 		}
 	}
 
 	function isValidURL(string:any) 
         {
-            var res = string.match(`(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-
-            ]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]
-            \.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|w
-            ww\.[a-zA-Z0-9]+\.[^\s]{2,})`);
-        return (res !== null);
+			if(typeof string === 'string' || string instanceof String){
+				var res = string.match(`(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-
+				]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]
+				\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|w
+				ww\.[a-zA-Z0-9]+\.[^\s]{2,})`);
+				return (res !== null);
+			}
+			return true
     };
 
 	const formik = useFormik({
@@ -144,7 +166,7 @@ const EditCutiPage = () => {
 					return !(value == undefined || value == "");
 				}
 			),
-			dokumen: Yup.mixed().nullable().test(
+			dokumen: Yup.mixed().nullable().optional().test(
 				'required',
 				'this is required',
 				(value: any) => {
@@ -171,19 +193,35 @@ const EditCutiPage = () => {
 
 				let form = null
 				if(value.dokumen==null){
-					form = {
-						id:id,
-						nidn: localStorage.getItem('userRef') ?? "-",
-						tanggal_pengajuan: value.tanggal_pengajuan,
-						lama_cuti: value.lama_cuti,
-						tujuan: value.tujuan_cuti,
-						jenis_cuti: value.jenis_cuti,
-						dokumen: value.dokumen
+					if(levelMode == "pegawai"){
+						form = {
+							id:id,
+							nip: levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
+							tanggal_pengajuan: value.tanggal_pengajuan,
+							lama_cuti: value.lama_cuti,
+							tujuan: value.tujuan_cuti,
+							jenis_cuti: value.jenis_cuti,
+							dokumen: value.dokumen
+						}
+					} else{
+						form = {
+							id:id,
+							nidn: levelMode == "dosen" ? localStorage.getItem('userRef') : null,
+							tanggal_pengajuan: value.tanggal_pengajuan,
+							lama_cuti: value.lama_cuti,
+							tujuan: value.tujuan_cuti,
+							jenis_cuti: value.jenis_cuti,
+							dokumen: value.dokumen
+						}
 					}
 				} else{
 					form = new FormData()
 					form.append("id",String(id))
-					form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					if(levelMode == "pegawai"){
+						form.append("nip",localStorage.getItem('userRef') ?? "-")
+					} else{
+						form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					}
 					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
 					form.append("lama_cuti",value.lama_cuti)
 					form.append("tujuan",value.tujuan_cuti)
@@ -193,22 +231,21 @@ const EditCutiPage = () => {
 				const response: any = await UpdateCuti(form);
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
-					const { status, message } = response;
+					const { status, message, log } = response;
 
 					if (status == 200) {
-						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
-						alert(message);
+						toast(message, { type: "success", autoClose: 2000 });
 						navigate(`/cuti`)
 					} else if (status == 500) {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						handler1.notifyObservers(log)
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 					} else {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						handler1.notifyObservers(log)
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 					}
-				} else {
-					alert("terjadi masalah pada saat request ke server");
-				}
-			} catch (error: any) {
-				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+				}   
+			} catch (error:any) {
+				toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 				throw error;
 			} finally {
 				setDisableButton(false);
@@ -244,7 +281,7 @@ const EditCutiPage = () => {
 		<PageWrapper name='Cuti'>
 			<Subheader>
 				<SubheaderLeft>
-					<Breadcrumb currentPage='Tambah Cuti' />
+					<Breadcrumb currentPage='Ubah Cuti' />
 				</SubheaderLeft>
 			</Subheader>
 			<Container>

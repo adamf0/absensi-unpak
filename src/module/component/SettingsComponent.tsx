@@ -31,7 +31,13 @@ const SettingsComponent = () => {
 									children={level}
 									onClick={() => {
 										setLevelMode(level)
-										setUserRef(getInfoUser(level!="dosen"? "id":"NIDN"))
+										if(level=="pegawai"){
+											setUserRef(getInfoUser("nip"))
+										} else if(level=="dosen"){
+											setUserRef(getInfoUser("NIDN"))
+										} else{
+											setUserRef(getInfoUser("id"))
+										}
 									}}
 									isActive={level===levelMode}
 								/>)

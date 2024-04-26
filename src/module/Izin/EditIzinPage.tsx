@@ -25,9 +25,12 @@ import { SelectOptionsAdapter } from '@/module/IO/SelectOptionsAdapter';
 import { IzinModel } from '@/module/model/IzinModel';
 import { GetIzin } from '@/module/repo/GetIzin';
 import { UpdateIzin } from '@/module/repo/UpdateIzin';
+import useLevelMode from '@/hooks/useLevelMode';
+import { toast } from 'react-toastify';
 
 const EditIzinPage = () => {
 	const { id } = useParams();
+	const { levelMode } = useLevelMode();
 	const navigate = useNavigate();
 	const FILE_SIZE = 1024 * 1024 * 10; // 10 MB
 	const SUPPORTED_FORMATS = ['application/pdf'];
@@ -45,68 +48,85 @@ const EditIzinPage = () => {
 	handler2.addObserver(new AlertObserver());
 
 	const loadJenisIzin = async () => {
-		const response: any = await GetListJenisIzin();
-		if (response.status !== 200) {
-			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-		}
-
-		if (response.status === 200 || response.status === 500) {
-			const { status, message, list } = response;
-
-			if (status == 200) {
-				const listJenisIzin = list.map((item: any) =>
-					new JenisIzinModel(
-						item.id,
-						item.nama
-					)
-				)
-
-				await dispatch(loadListJenisIzin(listJenisIzin));
-			} else if (status == 500) {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
-			} else {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+		try {
+			const response: any = await GetListJenisIzin();
+			if (response.status !== 200) {
+				throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 			}
+
+			if (response.status === 200 || response.status === 500) {
+				const { status, message, list, log } = response;
+
+				if (status == 200) {
+					const listJenisIzin = list.map((item: any) =>
+						new JenisIzinModel(
+							item.id,
+							item.nama
+						)
+					)
+
+					await dispatch(loadListJenisIzin(listJenisIzin));
+				} else if (status == 500) {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				} else {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				}
+			}   
+		} catch (error:any) {
+			toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+			throw error;
 		}
 	};
 	const loadIzin = async (id:any) => {
-		const response: any = await GetIzin(id);
-		if (response.status !== 200) {
-			throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
-		}
-
-		if (response.status === 200 || response.status === 500) {
-			const { status, message, data } = response;
-
-			if (status == 200) {
-				const izinParse = new IzinModel(
-					data.id,
-					data.tanggal_pengajuan,
-					new JenisIzinModel(
-						data.JenisIzin?.id,
-						data.JenisIzin?.nama,
-					),
-					data.tujuan,
-					data.dokumen,
-					data.status,
-				);
-				setIzin(izinParse)
-				await dispatch(editIzin(izinParse));
-			} else if (status == 500) {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
-			} else {
-				console.trace(message ?? "Terjadi masalah pada saat request ke server")
+		try {
+			const response: any = await GetIzin(id);
+			if (response.status !== 200) {
+				throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 			}
+
+			if (response.status === 200 || response.status === 500) {
+				const { status, message, data, log } = response;
+
+				if (status == 200) {
+					const izinParse = new IzinModel(
+						data.id,
+						data.tanggal_pengajuan,
+						new JenisIzinModel(
+							data.JenisIzin?.id,
+							data.JenisIzin?.nama,
+						),
+						data.tujuan,
+						data.dokumen,
+						data.status,
+					);
+					setIzin(izinParse)
+					await dispatch(editIzin(izinParse));
+				} else if (status == 500) {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				} else {
+					handler1.notifyObservers(log)
+					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+				}
+			}   
+		} catch (error:any) {
+			toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+			throw error;
 		}
 	}
 
 	function isValidURL(string:any) 
         {
-            var res = string.match(`(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-
-            ]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]
-            \.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|w
-            ww\.[a-zA-Z0-9]+\.[^\s]{2,})`);
-        return (res !== null);
+            if(typeof string === 'string' || string instanceof String){
+				var res = string.match(`(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-
+				]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]
+				\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|w
+				ww\.[a-zA-Z0-9]+\.[^\s]{2,})`);
+				return (res !== null);
+			}
+			return true
     };
 
 	const formik = useFormik({
@@ -127,7 +147,7 @@ const EditIzinPage = () => {
 					return !(value == undefined || value == "");
 				}
 			),
-			dokumen: Yup.mixed().nullable().test(
+			dokumen: Yup.mixed().nullable().optional().test(
 				'required',
 				'this is required',
 				(value: any) => {
@@ -154,18 +174,33 @@ const EditIzinPage = () => {
 
 				let form = null
 				if(value.dokumen==null){
-					form = {
-						id:id,
-						nidn: localStorage.getItem('userRef') ?? "-",
-						tanggal_pengajuan: value.tanggal_pengajuan,
-						tujuan: value.tujuan_izin,
-						jenis_izin: value.jenis_izin,
-						dokumen: value.dokumen
+					if(levelMode == "pegawai"){
+						form = {
+							id:id,
+							nip: localStorage.getItem('userRef') ?? "-",
+							tanggal_pengajuan: value.tanggal_pengajuan,
+							tujuan: value.tujuan_izin,
+							jenis_izin: value.jenis_izin,
+							dokumen: value.dokumen
+						}
+					} else{
+						form = {
+							id:id,
+							nidn: localStorage.getItem('userRef') ?? "-",
+							tanggal_pengajuan: value.tanggal_pengajuan,
+							tujuan: value.tujuan_izin,
+							jenis_izin: value.jenis_izin,
+							dokumen: value.dokumen
+						}
 					}
 				} else{
 					form = new FormData()
 					form.append("id",String(id))
-					form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					if(levelMode == "pegawai"){
+						form.append("nip",localStorage.getItem('userRef') ?? "-")
+					} else{
+						form.append("nidn",localStorage.getItem('userRef') ?? "-")
+					}
 					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
 					form.append("tujuan",value.tujuan_izin)
 					form.append("jenis_izin",value.jenis_izin)
@@ -175,22 +210,21 @@ const EditIzinPage = () => {
 				const response: any = await UpdateIzin(form);
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
-					const { status, message } = response;
+					const { status, message, log } = response;
 
 					if (status == 200) {
-						// toast.update(toastId.current, { render:message, type: "success", autoClose: 5000 }); //not show
-						alert(message);
+						toast(message, { type: "success", autoClose: 2000 });
 						navigate(`/izin`)
 					} else if (status == 500) {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						handler1.notifyObservers(log)
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 					} else {
-						alert(message ?? "terjadi masalah pada saat request ke server");
+						handler1.notifyObservers(log)
+						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 					}
-				} else {
-					alert("terjadi masalah pada saat request ke server");
-				}
-			} catch (error: any) {
-				// toast.update(toastId.current, { render:error.message ?? "terjadi masalah pada saat request ke server", type: "error", autoClose: 5000 });
+				}   
+			} catch (error:any) {
+				toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
 				throw error;
 			} finally {
 				setDisableButton(false);
