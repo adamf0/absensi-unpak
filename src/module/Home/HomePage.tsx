@@ -223,7 +223,7 @@ const HomePage = () => {
                 toast(`berada diluar jaringan universitas pakuan`, { type: "error", autoClose: 2000 });
             } else{
                 try {
-                    const timeNow = moment().tz('Asia/Jakarta').format("HH:mm")
+                    const timeNow = moment().tz('Asia/Jakarta').format("HH:mm:ss")
                     const response: any = (type == "masuk" ?
                         await CreateAbsentMasuk({
                             "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
@@ -330,7 +330,7 @@ const HomePage = () => {
         return absenMasuk && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm")}
+                    anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm:ss")}
                 </Alert>
             </div> : null
     }
@@ -347,7 +347,7 @@ const HomePage = () => {
         return absenKeluar && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda pulang jam {moment(absenKeluar).tz('Asia/Jakarta').format("HH:mm")} {catatan}
+                    anda pulang jam {moment(absenKeluar).tz('Asia/Jakarta').format("HH:mm:ss")} {catatan}
                 </Alert>
             </div> : null
     }
