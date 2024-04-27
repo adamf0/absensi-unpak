@@ -125,7 +125,7 @@ const HomePage = () => {
     const checkLate = () => {
         const currentTime = (absenMasuk == null ? moment() : moment(absenMasuk)).tz('Asia/Jakarta');
         const absenMasukTime = moment(timeAbsenString, 'HH:mm').tz('Asia/Jakarta');
-        const checkLate = absenMasukTime.isAfter(currentTime);
+        const checkLate = currentTime.isAfter(absenMasukTime);
         setIsLate(checkLate);
     }
     const loadAbsen = async () => {
