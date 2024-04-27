@@ -25,14 +25,12 @@ import Textarea from "@/components/form/Textarea";
 import { GetInfo } from "@/module/repo/GetInfo";
 import { ConsoleObserver } from "@/module/IO/ConsoleObserver";
 import { GetListCalendar } from "@/module/repo/GetListCalendar";
-import { EventSourceInput } from "@fullcalendar/core/index.js";
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
     const [isBefore8AM, setIsBefore8AM] = useState<boolean>(false);
     const [is8hour, set8hour] = useState<boolean>(false);
     const [isLate, setIsLate] = useState<boolean>(false);
-    const [ipAddress, setIPAddress] = useState<any>(null);
     const timeAbsenString = "08:00"
     const timeAbsen = parseInt(timeAbsenString.split(":")[0])
 
@@ -225,69 +223,66 @@ const HomePage = () => {
         }
     }
     const absenHandler = async (type: string) => {
-        getIPAddress()
-        if(!checkIp()){
-            toast(`berada diluar jaringan universitas pakuan`, { type: "error", autoClose: 2000 });
-        } else{
-            try {
-                const timeNow = moment().tz('Asia/Jakarta').format("HH:mm")
-                const response: any = (type == "masuk" ?
-                    await CreateAbsentMasuk({
-                        "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
-                        "nip": localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
-                        "tanggal": dateNow,
-                        "absen_masuk": timeNow,
-                        "keterangan": keterangan,
-                    }) :
-                    await CreateAbsentKeluar({
-                        "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
-                        "nip": localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
-                        "tanggal": dateNow,
-                        "absen_keluar": timeNow,
-                        "keterangan": keterangan,
-                    })
-                );
-    
-                handler1.notifyObservers(response);
-                if (response.status === 200 || response.status === 500) {
-                    const { status, message } = response;
-    
-                    if (status == 200) {
-                        toast(message, { type: "success", autoClose: 2000 });
-                        if (type == "masuk") {
-                            setAbsenMasuk(`${dateNow} ${timeNow}`)
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            const ipAddress = data.ip
+
+            if(!(ipAddress.match(/103\.169/)!==null || ipAddress.match(/2001:df0:3140/)!=null)){
+                toast(`berada diluar jaringan universitas pakuan`, { type: "error", autoClose: 2000 });
+            } else{
+                try {
+                    const timeNow = moment().tz('Asia/Jakarta').format("HH:mm")
+                    const response: any = (type == "masuk" ?
+                        await CreateAbsentMasuk({
+                            "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
+                            "nip": localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
+                            "tanggal": dateNow,
+                            "absen_masuk": timeNow,
+                            "keterangan": keterangan,
+                        }) :
+                        await CreateAbsentKeluar({
+                            "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
+                            "nip": localStorage.getItem('levelMode') == "pegawai" ? localStorage.getItem('userRef') : null,
+                            "tanggal": dateNow,
+                            "absen_keluar": timeNow,
+                            "keterangan": keterangan,
+                        })
+                    );
+        
+                    handler1.notifyObservers(response);
+                    if (response.status === 200 || response.status === 500) {
+                        const { status, message } = response;
+        
+                        if (status == 200) {
+                            toast(message, { type: "success", autoClose: 2000 });
+                            if (type == "masuk") {
+                                setAbsenMasuk(`${dateNow} ${timeNow}`)
+                            } else {
+                                setAbsenKeluar(`${dateNow} ${timeNow}`)
+                            }
+                            setKeterangan("")
+                            loadInfo()
+                        } else if (status == 500) {
+                            toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                         } else {
-                            setAbsenKeluar(`${dateNow} ${timeNow}`)
+                            toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                         }
-                        setKeterangan("")
-                        loadInfo()
-                    } else if (status == 500) {
-                        toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                     } else {
-                        toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                        toast("Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                     }
-                } else {
-                    toast("Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                } catch (error: any) {
+                    toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                    handler1.notifyObservers(error.message)
+                } finally {
+        
                 }
-            } catch (error: any) {
-                toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-                handler1.notifyObservers(error.message)
-            } finally {
-    
-            }
+            }   
+        } catch (error:any) {
+            toast(error.message ?? "error mendapatkan IP Address", { type: "error", autoClose: 2000 });
+            handler1.notifyObservers(error.message)
         }
     }
-    const getIPAddress = async () => {
-        try {
-          const response = await fetch('https://api.ipify.org?format=json');
-          const data = await response.json();
-          console.log(`ip: ${data.ip}`)
-          setIPAddress(data.ip);
-          
-        } catch (error) {
-          console.error('Error fetching IP address:', error);
-        }
-    };
     const loadCalendar = async () => {
         const response: any = await GetListCalendar(
             localStorage.getItem('levelMode')=="pegawai"? "nip":"nidn",
@@ -332,9 +327,6 @@ const HomePage = () => {
         
     }, [activeTab]);
 
-    const checkIp = async () => {
-        return ipAddress.includes("103.169") || ipAddress.includes("2001:df0:3140") 
-    }
     const alertTerlambat = () => {
         return isLate && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
@@ -347,7 +339,7 @@ const HomePage = () => {
         return absenMasuk && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda masuk jam {moment(absenMasuk).format("HH:mm")}
+                    anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm")}
                 </Alert>
             </div> : null
     }
@@ -364,7 +356,7 @@ const HomePage = () => {
         return absenKeluar && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda pulang jam {moment(absenKeluar).format("HH:mm")} {catatan}
+                    anda pulang jam {moment(absenKeluar).tz('Asia/Jakarta').format("HH:mm")} {catatan}
                 </Alert>
             </div> : null
     }
