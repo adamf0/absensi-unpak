@@ -30,7 +30,7 @@ const HomePage = () => {
     const [isBefore8AM, setIsBefore8AM] = useState<boolean>(false);
     const [is8hour, set8hour] = useState<boolean>(false);
     const [isLate, setIsLate] = useState<boolean>(false);
-    const timeAbsenString = "08:00"
+    const timeAbsenString = "08:00:00"
     const timeAbsen = parseInt(timeAbsenString.split(":")[0])
 
     const [keterangan, setKeterangan] = useState<any>("");
@@ -124,7 +124,7 @@ const HomePage = () => {
     }
     const checkLate = () => {
         const currentTime = (absenMasuk == null ? moment() : moment(absenMasuk)).tz('Asia/Jakarta');
-        const absenMasukTime = moment(timeAbsenString, 'HH:mm').tz('Asia/Jakarta');
+        const absenMasukTime = moment(timeAbsenString, 'HH:mm:ss').tz('Asia/Jakarta');
         const checkLate = currentTime.isAfter(absenMasukTime);
         setIsLate(checkLate);
     }
