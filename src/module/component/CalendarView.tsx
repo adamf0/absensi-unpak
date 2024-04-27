@@ -23,22 +23,6 @@ const CalendarView: React.FC<{source:any}> = ({ source }) => {
 		title: currentDate,
 	} = useCalendarView(ref);
 
-	const INITIAL_EVENTS = [
-		{
-			id: 100,
-			title: 'sakit',
-			start: '2024-04-25', 
-			end: '2024-04-25'
-		},
-		{
-			id: 100,
-			title: 'sakit',
-			start: '2024-04-27', 
-			end: '2024-04-27'
-		},
-	];
-	console.log(source, INITIAL_EVENTS)
-
 	const CALENDAR_VIEW: {
 		[key in TViewMode]: { key: TViewMode; text: string; icon: TIcons };
 	} = {
