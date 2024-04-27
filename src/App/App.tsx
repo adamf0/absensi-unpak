@@ -27,7 +27,6 @@ import ApprovalCutiPage from '@/module/Cuti/ApprovalCutiPage';
 import ApprovalIzinPage from '@/module/Izin/ApprovalIzinPage';
 import SettingsComponent from '@/module/component/SettingsComponent';
 import LoginPage from '@/module/LoginPage';
-import useLevelMode from '@/hooks/useLevelMode';
 import EditPenggunaPage from '@/module/Pengguna/EditPenggunaPage';
 import NewPenggunaPage from '@/module/Pengguna/NewPenggunaPage';
 import PenggunaPage from '@/module/Pengguna/PenggunaPage';

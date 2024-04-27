@@ -24,6 +24,7 @@ import Textarea from "@/components/form/Textarea";
 import { GetInfo } from "@/module/repo/GetInfo";
 import { ConsoleObserver } from "@/module/IO/ConsoleObserver";
 import { GetListCalendar } from "@/module/repo/GetListCalendar";
+import { getInfoUser } from "../InfoUser";
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
@@ -387,7 +388,8 @@ const HomePage = () => {
     return (
         <>
             <PageWrapper name='Home'>
-                <Subheader>
+                <Subheader className="flex flex-col">
+                    <h3>{getInfoUser("nama")??"N/a"}</h3>
                     <SubheaderLeft>
                         <div className='flex flex-wrap justify-center items-center rounded-full border-2 border-zinc-500/20 p-1 drop-shadow-xl dark:border-zinc-800'>
                             {Object.values(Periode).map((i) => (

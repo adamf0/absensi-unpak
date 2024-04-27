@@ -20,6 +20,11 @@ const SettingsComponent = () => {
 				<Button icon='HeroCog8Tooth' aria-label='Settings' />
 			</DropdownToggle>
 			<DropdownMenu placement='bottom-end'>
+				<DropdownItem className='flex flex-col !items-start'>
+					<div>{getInfoUser("nama")??"N/a"}</div>
+				</DropdownItem>
+			</DropdownMenu>
+			<DropdownMenu placement='bottom-end'>
 				{
 					getLevel().length>0?
 					<DropdownItem className='flex flex-col !items-start'>
