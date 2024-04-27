@@ -16,7 +16,6 @@ import { DeliveryMan5WithDog } from "@/assets/images";
 import Alert from "@/components/ui/Alert";
 import { GetAbsen } from "@/module/repo/GetAbsen";
 import { toast } from "react-toastify";
-import useLevelMode from "@/hooks/useLevelMode";
 import { CreateAbsentMasuk } from "@/module/repo/CreateAbsentMasuk";
 import { CreateAbsentKeluar } from "@/module/repo/CreateAbsentKeluar";
 import { HandlerObserver } from "@/module/abstract/HandlerObserver";
@@ -40,14 +39,7 @@ const HomePage = () => {
     const [absenMasuk, setAbsenMasuk] = useState<any>(null);
     const [absenKeluar, setAbsenKeluar] = useState<any>(null);
     const [disableAbsen, setDisableAbsen] = useState<boolean>(true);
-    const [listEvent, setListEvent] = useState<any>([ //not work pass parameter to CalendarView
-		{
-			"id": 19781,
-			"start": "2024-04-25",
-			"end": "2024-04-25",
-			"title": "Tidak Masuk"
-		},
-	]);
+    const [listEvent, setListEvent] = useState<any>([]);
     const [info, setInfo] = useState<any>({
         absen: {
             masuk: 0,
@@ -208,7 +200,6 @@ const HomePage = () => {
                 const { status, message, data, log } = response;
 
                 if (status == 200) {
-                    console.log(data)
                     setInfo(data)
                 } else if (status == 500) {
                     toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
@@ -398,7 +389,7 @@ const HomePage = () => {
             <PageWrapper name='Home'>
                 <Subheader>
                     <SubheaderLeft>
-                        <div className='flex rounded-full border-2 border-zinc-500/20 p-1 drop-shadow-xl dark:border-zinc-800'>
+                        <div className='flex flex-wrap justify-center items-center rounded-full border-2 border-zinc-500/20 p-1 drop-shadow-xl dark:border-zinc-800'>
                             {Object.values(Periode).map((i) => (
                                 <Button
                                     key={i.text}
@@ -553,9 +544,10 @@ const HomePage = () => {
                                     <div className='col-span-12 2xl:col-span-8'>
                                         <CalendarView source={listEvent}></CalendarView>
                                     </div>
-                                </> : <div className='col-span-12'>
-                                        <CalendarView source={listEvent}></CalendarView>
-                                    </div>
+                                </> : 
+                                <div className='col-span-12'>
+                                    <CalendarView source={listEvent}></CalendarView>
+                                </div>
                         }
                     </div>
                 </Container>

@@ -1,18 +1,16 @@
 import React, { createRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FullCalendar from '@fullcalendar/react';
-import dayjs from 'dayjs';
-import colors from 'tailwindcss/colors';
-import { DateSelectArg, EventApi, EventClickArg, EventContentArg, EventSourceInput } from '@fullcalendar/core';
+import { EventApi, EventContentArg, EventSourceInput } from '@fullcalendar/core';
 import Calendar, { TViewMode, useCalendarView } from '@/components/Calendar';
 import Avatar from '@/components/Avatar';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardHeaderChild, CardBody } from '@/components/ui/Card';
 import Dropdown, { DropdownToggle, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
-import usersDb, { TUser } from '@/mocks/db/users.db';
+import { TUser } from '@/mocks/db/users.db';
 import { TIcons } from '@/types/icons.type';
 
-const CalendarView = (source:any) => {
+const CalendarView: React.FC<{source:any}> = ({ source }) => {
 	const { t } = useTranslation();
 
 	const ref = createRef<FullCalendar>();
@@ -25,7 +23,7 @@ const CalendarView = (source:any) => {
 		title: currentDate,
 	} = useCalendarView(ref);
 
-	const INITIAL_EVENTS = [ //work as initialize
+	const INITIAL_EVENTS = [
 		{
 			id: 100,
 			title: 'sakit',
@@ -39,7 +37,7 @@ const CalendarView = (source:any) => {
 			end: '2024-04-27'
 		},
 	];
-	// console.log(source, INITIAL_EVENTS)
+	console.log(source, INITIAL_EVENTS)
 
 	const CALENDAR_VIEW: {
 		[key in TViewMode]: { key: TViewMode; text: string; icon: TIcons };
@@ -48,31 +46,6 @@ const CalendarView = (source:any) => {
 		timeGridWeek: { key: 'timeGridWeek', text: 'Week', icon: 'HeroTableCells' },
 		dayGridMonth: { key: 'dayGridMonth', text: 'Month', icon: 'HeroCalendarDays' },
 		listWeek: { key: 'listWeek', text: 'List', icon: 'HeroClipboardDocumentCheck' },
-	};
-
-	const handleDateSelect = (selectInfo: DateSelectArg) => {
-		// eslint-disable-next-line no-alert
-		// const title = prompt('Please enter a new title for your event');
-		// const calendarApi = selectInfo.view.calendar;
-
-		// calendarApi.unselect(); // clear date selection
-
-		// if (title) {
-		// 	calendarApi.addEvent({
-		// 		id: title,
-		// 		title,
-		// 		start: selectInfo.startStr,
-		// 		end: selectInfo.endStr,
-		// 		allDay: selectInfo.allDay,
-		// 	});
-		// }
-	};
-
-	const handleEventClick = (clickInfo: EventClickArg) => {
-		// eslint-disable-next-line no-restricted-globals,no-alert
-		// if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-		// 	clickInfo.event.remove();
-		// }
 	};
 
 	const renderEventContent = (eventContent: EventContentArg) => {
@@ -130,17 +103,43 @@ const CalendarView = (source:any) => {
 					ref={ref}
 					height={700}
 					viewMode={viewMode}
-					initialEvents={INITIAL_EVENTS as EventSourceInput}
+					initialEvents={source as EventSourceInput}
 					editable
 					selectable
 					selectMirror
 					dayMaxEvents={3}
-					select={handleDateSelect}
+					select={()=>{}}
 					eventContent={renderEventContent}
-					eventClick={handleEventClick}
-					eventsSet={handleEvents}
+					eventClick={()=>{}}
+					eventsSet={()=>{}}
 					eventClassNames='truncate'
 				/>
+				<div className='flex flex-wrap gap-2'>
+					<div className='flex gap-1 justify-center items-center'>
+						<div className="w-3 h-3 bg-purple-600 rounded-full"></div> 
+						SPPD
+					</div>
+					<div className='flex gap-1 justify-center items-center'>
+						<div className="w-3 h-3 bg-[#1d4ed8] rounded-full"></div> 
+						Cuti
+					</div>
+					<div className='flex gap-1 justify-center items-center'>
+						<div className="w-3 h-3 bg-[#c2410c] rounded-full"></div> 
+						Izin
+					</div>
+					<div className='flex gap-1 justify-center items-center'>
+						<div className="w-3 h-3 bg-[#b91c1c] rounded-full"></div> 
+						Tidak Masuk
+					</div>
+					<div className='flex gap-1 justify-center items-center'>
+						<div className="w-3 h-3 bg-[#15803d] rounded-full"></div> 
+						Masuk
+					</div>
+					<div className='flex gap-1 justify-center items-center'>
+						<div className="w-3 h-3 bg-black rounded-full"></div> 
+						Telat Masuk
+					</div>
+				</div>
 			</CardBody>
 		</Card>
 	);
