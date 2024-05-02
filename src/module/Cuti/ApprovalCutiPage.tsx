@@ -161,24 +161,24 @@ const ApprovalCutiPage = () => {
                                 {
                                     selectorCuti.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{item.id}</Td>
+                                        <Td>{((selectorCuti.paging.currentPage-1)*10 + (index+1))}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
-                                        <Td>-</Td>
-                                        <Td>{item.status!="tolak"}</Td>
-                                        <Td className="flex flex-wrap gap-2">
+                                        <Td><a href={item?.dokumen??""} target="_blank" className="inline-flex items-center justify-center bg-transparent border-2 border-blue-500/50 text-black dark:text-white hover:border-blue-500 active:border-blue-500 px-5 py-1.5 text-base rounded-lg transition-all duration-300 ease-in-out grow">Buka</a></Td>
+                                        <Td>{item.status}</Td>
+                                        <Td>
                                             {
                                                 item.status==""||item.status=="menunggu"? 
-                                                <>
+                                                <div className="flex flex-wrap gap-2">
                                                     <Button variant='solid' className="grow" color="blue" onClick={()=>setApproval(new Approval(true,item.id,"terima"))}>
                                                         Terima
                                                     </Button>
                                                     <Button variant='solid' className="grow" color="red" onClick={()=>setApproval(new Approval(false,item.id,"tolak"))}>
                                                         Tolak
                                                     </Button>
-                                                </>:""
+                                                </div>:""
                                             }
                                         </Td>
                                     </Tr>
