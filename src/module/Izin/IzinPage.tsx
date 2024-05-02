@@ -167,14 +167,14 @@ const IzinPage = () => {
                                         <Td>
                                             {
                                                 item.status=="" || item.status=="menunggu"? 
-                                                <div className="flex flex-wrap gap-2">
+                                                <>
                                                     <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/izin/edit/${item.id}`)}>
                                                         edit
                                                     </Button>
                                                     <Button variant='solid' className="grow" color="red" onClick={()=>deleteIzin(item.id)}>
                                                         hapus
                                                     </Button>
-                                                </div>:null
+                                                </>:null
                                             }
                                         </Td>
                                     </Tr>
