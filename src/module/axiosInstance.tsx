@@ -15,7 +15,7 @@ instance.interceptors.request.use(config => {
     // } else {
         // config.headers['Content-Type'] = 'multipart/form-data';
     // }
-    // config.headers['Accept'] = 'application/json';
+    config.headers['Content-Type'] = config.data instanceof FormData? "multipart/form-data":"application/json";
     config.headers['Access-Control-Allow-Origin'] = '*';
     if (config.method?.toLowerCase() === 'post') {
         config.params = {
