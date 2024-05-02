@@ -279,7 +279,7 @@ const HomePage = () => {
         const response: any = await GetListCalendar(
             localStorage.getItem('levelMode')=="pegawai"? "nip":"nidn",
             localStorage.getItem('userRef'),
-            "2024-04"
+            moment().tz('Asia/Jakarta').format('YYYY-MM')
         );
         if (response.status === 200 || response.status === 500) {
             const { status, message, list, log } = response;
