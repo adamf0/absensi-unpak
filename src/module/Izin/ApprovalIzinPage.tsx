@@ -160,14 +160,14 @@ const ApprovalIzinPage = () => {
                                         <Td>
                                             {
                                                 item.status==""||item.status=="menunggu"?
-                                                <>
+                                                <div className="flex flex-wrap gap-2">
                                                     <Button variant='solid' className="grow"  color="blue" onClick={()=>setApproval(new Approval(true,item.id,"terima"))}>
                                                         Terima
                                                     </Button>
                                                     <Button variant='solid' className="grow" color="red" onClick={()=>setApproval(new Approval(false,item.id,"tolak"))}>
                                                         Tolak
                                                     </Button>
-                                                </>:null
+                                                </div>:null
                                             }
                                         </Td>
                                     </Tr>
