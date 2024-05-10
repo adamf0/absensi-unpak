@@ -24,7 +24,7 @@ import Textarea from "@/components/form/Textarea";
 import { GetInfo } from "@/module/repo/GetInfo";
 import { ConsoleObserver } from "@/module/IO/ConsoleObserver";
 import { GetListCalendar } from "@/module/repo/GetListCalendar";
-import { getInfoUser } from "../InfoUser";
+import { getInfoUser } from "@/module/InfoUser";
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);

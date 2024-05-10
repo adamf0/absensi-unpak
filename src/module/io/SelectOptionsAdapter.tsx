@@ -1,6 +1,6 @@
-import { TSelectOption } from "../../components/form/SelectReact";
-import { JenisCutiModel } from "../model/JenisCutiModel";
-import { JenisIzinModel } from "../model/JenisIzinModel";
+import { TSelectOption } from "@/module/../components/form/SelectReact";
+import { JenisCutiModel } from "@/module/model/JenisCutiModel";
+import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 
 export class SelectOptionsAdapter {
     static adaptFromJenisCuti(list: JenisCutiModel[]): TSelectOption[] {

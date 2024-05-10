@@ -19,10 +19,10 @@ import { useAppDispatch } from '@/module/redux/hooks';
 import { CreateMasterCalendar } from '@/module/repo/CreateMasterCalendar';
 import { toast } from 'react-toastify';
 import Textarea from '@/components/form/Textarea';
-import { MasterCalendarModel } from '../model/MasterCalendarModel';
-import { editMasterCalendar } from '../redux/masterCalendarSlice';
-import { GetMasterCalendar } from '../repo/GetMasterCalendar';
-import { UpdateMasterCalendar } from '../repo/UpdateMasterCalendar';
+import { MasterCalendarModel } from '@/module/model/MasterCalendarModel';
+import { editMasterCalendar } from '@/module/redux/masterCalendarSlice';
+import { GetMasterCalendar } from '@/module/repo/GetMasterCalendar';
+import { UpdateMasterCalendar } from '@/module/repo/UpdateMasterCalendar';
 
 const EditMasterCalendarPage = () => {
 	const { id } = useParams();
