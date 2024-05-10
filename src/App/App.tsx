@@ -39,6 +39,9 @@ import NewJenisIzinPage from '@/module/JenisIzin/NewJenisIzinPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomePage from '@/module/Home/HomePage';
+import MasterCalendarPage from '@/module/MasterCalendar/MasterCalendarPage';
+import NewMasterCalendarPage from '@/module/MasterCalendar/NewMasterCalendarPage';
+import EditMasterCalendarPage from '@/module/MasterCalendar/EditMasterCalendarPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -62,6 +65,12 @@ const App = () => {
 					id: 'izinApprovalPage',
 					to: '/approval/izin',
 					text: 'Izin',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
+					id: 'masterCalendarPage',
+					to: '/master_calendar',
+					text: 'Master Calendar',
 					icon: 'HeroRectangleGroup',
 				}} />
 			</>
@@ -248,6 +257,10 @@ const App = () => {
 									<Route path="/jenis_izin" element={<JenisIzinPage />} />
 									<Route path="/jenis_izin/tambah" element={<NewJenisIzinPage />} />
 									<Route path="/jenis_izin/edit/:id" element={<EditJenisIzinPage />} />
+
+									<Route path="/master_calendar" element={<MasterCalendarPage />} />
+									<Route path="/master_calendar/tambah" element={<NewMasterCalendarPage />} />
+									<Route path="/master_calendar/edit/:id" element={<EditMasterCalendarPage />} />
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}
