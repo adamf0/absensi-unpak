@@ -5,15 +5,17 @@ import izinReducer from '@/module/redux/izinSlice';
 import penggunaReducer from '@/module/redux/penggunaSlice';
 import jenisCutiReducer from '@/module/redux/jenisCutiSlice';
 import jenisIzinReducer from '@/module/redux/jenisIzinSlice';
+import claimAbsenReducer from '@/module/redux/claimAbsenSlice';
 
 export const storeRoot = configureStore({
   reducer: {
     cutiReducer,
     absenReducer,
     izinReducer,
+    claimAbsenReducer,
     penggunaReducer,
     jenisCutiReducer,
-    jenisIzinReducer
+    jenisIzinReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: false

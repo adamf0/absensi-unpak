@@ -17,18 +17,19 @@ import { HandlerObserver } from '@/module/abstract/HandlerObserver';
 import { AlertObserver } from '@/module/IO/AlertObserver';
 import { ConsoleObserver } from '@/module/IO/ConsoleObserver';
 import { useNavigate, useParams } from 'react-router-dom';
-import { JenisCutiModel } from '@/module/model/JenisCutiModel';
-import { cutiselector, editCuti, loadListJenisCuti } from '@/module/redux/cutiSlice';
-import { GetListJenisCuti } from '@/module/repo/GetListJenisCuti';
+import { claimAbsenselector, editClaimAbsen, loadListAbsen } from '@/module/redux/claimAbsenSlice';
 import { useAppSelector, useAppDispatch } from '@/module/redux/hooks';
 import { SelectOptionsAdapter } from '@/module/IO/SelectOptionsAdapter';
-import { CutiModel } from '@/module/model/CutiModel';
-import { GetCuti } from '@/module/repo/GetCuti';
-import { UpdateCuti } from '@/module/repo/UpdateCuti';
 import useLevelMode from '@/hooks/useLevelMode';
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import { AbsenModel } from '@/module/model/AbsenModel';
+import { GetListAbsen } from '@/module/repo/GetListAbsen';
+import { GetClaimAbsen } from '@/module/repo/GetClaimAbsen';
+import { ClaimAbsenModel } from '@/module/model/ClaimAbsenModel';
+import moment from 'moment';
+import { UpdateClaimAbsen } from '@/module/repo/UpdateClaimAbsen';
 
-const EditCutiPage = () => {
+const EditClaimAbsenPage = () => {
 	const { id } = useParams();
 	const { levelMode } = useLevelMode();
 	const navigate = useNavigate();
@@ -37,12 +38,9 @@ const EditCutiPage = () => {
 	const [disableButton, setDisableButton] = useState<boolean>(false);
 	// const toastId = useRef<any>(null);
 	const fileRef = useRef(null);
-	const selectorCuti = useAppSelector(cutiselector);
+	const selectorClaimAbsen = useAppSelector(claimAbsenselector);
+	const [claimAbsen, setClaimAbsen] = useState<ClaimAbsenModel|null>(null);
 	const dispatch = useAppDispatch();
-	const [min, setMin] = useState<any>(1);
-	const [max, setMax] = useState<any>(1);
-	const [dokumen, setDokumen] = useState<any>(false);
-	const [cuti, setCuti] = useState<CutiModel|null>(null);
 
 	const handler1 = new HandlerObserver();
 	handler1.addObserver(new ConsoleObserver());
@@ -50,9 +48,12 @@ const EditCutiPage = () => {
 	const handler2 = new HandlerObserver();
 	handler2.addObserver(new AlertObserver());
 
-	const loadJenisCuti = async () => {
+	const loadAbsen = async () => {
 		try {
-			const response: any = await GetListJenisCuti();
+			const response: any = await GetListAbsen(
+				levelMode == "dosen" ? localStorage.getItem('userRef') : null,
+                levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
+			);
 			if (response.status !== 200) {
 				throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 			}
@@ -61,34 +62,36 @@ const EditCutiPage = () => {
 				const { status, message, list, log } = response;
 
 				if (status == 200) {
-					const listJenisCuti = list.map((item: any) =>
-						new JenisCutiModel(
+					const listAbsen = list.map((item: any) =>
+						new AbsenModel(
 							item.id,
-							item.nama,
-							item.min,
-							item.max,
-							item.dokumen,
-							item.kondisi,
+							item.nidn,
+							item.nip,
+							item.tanggal,
+							item.absen_masuk,
+							item.absen_keluar,
+							item.otomatis_keluar? 1:0,
 						)
 					)
+					const listAbsenAutoFilter = listAbsen.filter((item:AbsenModel)=>item.otomatis_keluar==1)
 
-					await dispatch(loadListJenisCuti(listJenisCuti));
+					await dispatch(loadListAbsen(listAbsenAutoFilter));
 				} else if (status == 500) {
-					handler1.notifyObservers(log)
-					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-				} else {
-					handler1.notifyObservers(log)
-					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-				}
-			}   
-		} catch (error:any) {
-			toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
-			throw error;
-		}
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                } else {
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                }
+            }   
+        } catch (error:any) {
+            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+            throw error;
+        }
 	};
-	const loadCuti = async (id:any) => {
+	const loadClaimAbsen = async (id:any) => {
 		try {
-			const response: any = await GetCuti(id);
+			const response: any = await GetClaimAbsen(id);
 			if (response.status !== 200) {
 				throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
 			}
@@ -97,28 +100,25 @@ const EditCutiPage = () => {
 				const { status, message, data, log } = response;
 
 				if (status == 200) {
-					const cutiParse = new CutiModel(
+					const claimAbsenParse = new ClaimAbsenModel(
 						data.id,
-						data?.nidn,
-						data?.nip,
-						data.tanggal_pengajuan,
-						data.lama_cuti,
-						new JenisCutiModel(
-							data.JenisCuti?.id,
-							data.JenisCuti?.nama,
-							data.JenisCuti?.min,
-							data.JenisCuti?.max,
-							data.JenisCuti?.dokumen,
-							data.JenisCuti?.kondisi
+						new AbsenModel(
+							data.Absen?.id ?? "",
+							data.Absen?.nidn,
+							data.Absen?.nip,
+							moment(data.Absen?.tanggal ?? "").locale('id-ID').format("dddd, DD MMMM YYYY"),
+							moment(data.Absen?.absen_masuk ?? "").locale('id-ID').format("HH:mm:ss"),
+							moment(data.Absen?.absen_keluar ?? "").locale('id-ID').format("HH:mm:ss"),
+							data.Absen?.otomatis_keluar ?? false,
 						),
-						data.tujuan,
+						data.catatan,
 						data.dokumen,
+						data.perbaikan_absen_masuk,
+                        data.perbaikan_absen_keluar,
 						data.status,
 					);
-					setCuti(cutiParse)
-					setMin(parseInt(data.JenisCuti?.min))
-					setMax(parseInt(data.JenisCuti?.max))
-					await dispatch(editCuti(cutiParse));
+					setClaimAbsen(claimAbsenParse)
+					await dispatch(editClaimAbsen(claimAbsenParse));
 				} else if (status == 500) {
 					handler1.notifyObservers(log)
 					toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
@@ -148,31 +148,29 @@ const EditCutiPage = () => {
 	const formik = useFormik({
 		enableReinitialize: true,
 		initialValues: {
-			tanggal_pengajuan: "",
-			jenis_cuti: "",
-			lama_cuti: "",
-			tujuan_cuti: "",
+			absenId: "",
+			catatan: "",
+			absen_masuk: "",
+			absen_keluar: "",
 			dokumen: null,
 		},
 		validationSchema: Yup.object({
-			tanggal_pengajuan: Yup.date().required("this is required"),
-			lama_cuti: Yup.number()
-				.typeError("must be a number")
-				.min(1, "this must be at least 1 day")
-				.required("this is required"),
-			tujuan_cuti: Yup.string().required("this is required"),
-			jenis_cuti: Yup.mixed().test(
+			absenId: Yup.mixed().test(
 				'is-selected',
-				'Jenis cuti harus dipilih',
+				'absen harus dipilih',
 				(value: any) => {
 					return !(value == undefined || value == "");
 				}
 			),
+			catatan: Yup.mixed().nullable().optional(),
+			absen_masuk: Yup.mixed().nullable().optional(),
+			absen_keluar: Yup.mixed().nullable().optional(),
 			dokumen: Yup.mixed().nullable().optional().test(
 				'required',
 				'this is required',
 				(value: any) => {
-					return (dokumen? !(value == undefined || value == ""):true)
+					console.log(value);
+					return !(value == undefined || value == "")
 				}
 			).test(
 				'10mb',
@@ -184,7 +182,7 @@ const EditCutiPage = () => {
 				'type',
 				`this is support ${SUPPORTED_FORMATS.join(",")} only`,
 				(value: any) => {
-					return (value==null) || isValidURL(value) || (SUPPORTED_FORMATS.includes(value.type) || dokumen)
+					return value==null || isValidURL(value) || SUPPORTED_FORMATS.includes(value.type)
 				}
 			),
 		}),
@@ -195,49 +193,32 @@ const EditCutiPage = () => {
 
 				let form = null
 				if(value.dokumen==null){
-					if(levelMode == "pegawai"){
-						form = {
-							id:id,
-							nip: levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
-							tanggal_pengajuan: value.tanggal_pengajuan,
-							lama_cuti: value.lama_cuti,
-							tujuan: value.tujuan_cuti,
-							jenis_cuti: value.jenis_cuti,
-							dokumen: value.dokumen
-						}
-					} else{
-						form = {
-							id:id,
-							nidn: levelMode == "dosen" ? localStorage.getItem('userRef') : null,
-							tanggal_pengajuan: value.tanggal_pengajuan,
-							lama_cuti: value.lama_cuti,
-							tujuan: value.tujuan_cuti,
-							jenis_cuti: value.jenis_cuti,
-							dokumen: value.dokumen
-						}
+					form = {
+						id: id,
+						absenId: value.absenId,
+						catatan: value.catatan,
+						absen_masuk: value.absen_masuk,
+						absen_keluar: value.absen_keluar,
+						dokumen: value.dokumen
 					}
 				} else{
 					form = new FormData()
 					form.append("id",String(id))
-					if(levelMode == "pegawai"){
-						form.append("nip",localStorage.getItem('userRef') ?? "-")
-					} else{
-						form.append("nidn",localStorage.getItem('userRef') ?? "-")
-					}
-					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
-					form.append("lama_cuti",value.lama_cuti)
-					form.append("tujuan",value.tujuan_cuti)
-					form.append("jenis_cuti",value.jenis_cuti)
+					form.append("absenId",value.absenId)
+					form.append("catatan",value.catatan)
+					form.append("absen_masuk",value.absen_masuk)
+					form.append("absen_keluar",value.absen_keluar)
 					form.append("dokumen",value.dokumen)
 				}
-				const response: any = await UpdateCuti(form);
+
+				const response: any = await UpdateClaimAbsen(form);
 				handler1.notifyObservers(response);
 				if (response.status === 200 || response.status === 500) {
 					const { status, message, log } = response;
 
 					if (status == 200) {
 						toast(message, { type: "success", autoClose: 2000 });
-						navigate(`/cuti`)
+						navigate(`/claim_absen`)
 					} else if (status == 500) {
 						handler1.notifyObservers(log)
 						toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
@@ -257,19 +238,17 @@ const EditCutiPage = () => {
 	});
 
 	useEffect(() => {
-		loadJenisCuti()
-		loadCuti(id)
-
-		console.log(SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((option:any) => option.value === formik.values.jenis_cuti?.id ))
+		loadAbsen()
+		loadClaimAbsen(id)
 	}, [])
 
 	useEffect(()=>{
-		formik.setFieldValue("tanggal_pengajuan", cuti?.tanggal??"")
-		formik.setFieldValue("jenis_cuti", cuti?.jenis?.id)
-		formik.setFieldValue("lama_cuti", cuti?.lama??"")
-		formik.setFieldValue("tujuan_cuti", cuti?.tujuan??"")
-		formik.setFieldValue("dokumen", cuti?.dokumen??"")
-	},[cuti])
+		formik.setFieldValue("absenId", claimAbsen?.absen?.id??"")
+		formik.setFieldValue("catatan", claimAbsen?.catatan??"")
+		formik.setFieldValue("absen_masuk", claimAbsen?.absen_masuk??"")
+		formik.setFieldValue("absen_keluar", claimAbsen?.absen_keluar??"")
+		formik.setFieldValue("dokumen", claimAbsen?.dokumen??"")
+	},[claimAbsen])
 
 	const handleFileChange = (event: any) => {
 		if (event.currentTarget.files) {
@@ -280,10 +259,10 @@ const EditCutiPage = () => {
 	};
 
 	return (
-		<PageWrapper name='Cuti'>
+		<PageWrapper name='Claim Absen'>
 			<Subheader>
 				<SubheaderLeft>
-					<Breadcrumb currentPage='Ubah Cuti' />
+					<Breadcrumb currentPage='Ubah Claim Absen' />
 				</SubheaderLeft>
 			</Subheader>
 			<Container>
@@ -294,85 +273,81 @@ const EditCutiPage = () => {
 						<Card>
 							<CardBody>
 								<div className='grid gap-4'>
-									<div key={"tanggal_pengajuan"} className='col-span-12 lg:col-span-4'>
+								<div key={"absenId"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.tanggal_pengajuan as boolean}
-											invalidFeedback={formik.errors.tanggal_pengajuan as any}
+											isTouched={formik.touched.absenId as boolean}
+											invalidFeedback={formik.errors.absenId as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"tanggal_pengajuan"}>Tanggal Pengajuan</Label>
-												<Input
-													id={"tanggal_pengajuan"}
-													name={"tanggal_pengajuan"}
-													onChange={formik.handleChange}
-													value={formik.values["tanggal_pengajuan"]}
-													type={"date" as TInputTypes}
-												/>
-											</>
-										</Validation>
-									</div>
-									<div key={"jenis_cuti"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.jenis_cuti as boolean}
-											invalidFeedback={formik.errors.jenis_cuti as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"jenis_cuti"}>Jenis Cuti</Label>
+												<Label htmlFor={"absenId"}>Absen</Label>
 												<SelectReact
-													options={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti)}
-													id='jenis_cuti'
-													name='jenis_cuti'
-													value={SelectOptionsAdapter.adaptFromJenisCuti(selectorCuti.list_jenis_cuti).filter((option:any) => option.value === formik.values.jenis_cuti )}
+													options={SelectOptionsAdapter.adaptFromAbsen(selectorClaimAbsen.list_absen)}
+													id='absenId'
+													name='absenId'
+													value={SelectOptionsAdapter.adaptFromAbsen(selectorClaimAbsen.list_absen).filter((option:any) => option.value === formik.values.absenId )}
 													onChange={(selected: any) => {
-														const jenisCuti: JenisCutiModel = selectorCuti.list_jenis_cuti.filter(jenisCuti => jenisCuti.id == selected.value)[0];
-														setMin(parseInt(jenisCuti.min))
-														setMax(parseInt(jenisCuti.max))
-														setDokumen(jenisCuti.dokumen)
-														formik.setFieldValue("dokumen", !jenisCuti.dokumen? null:selectorCuti.editCuti?.dokumen)
-														formik.setFieldValue('jenis_cuti', selected.value)
+														console.log(selected.value)
+														formik.setFieldValue('absenId', selected.value)
 													}}
 												/>
 											</>
 										</Validation>
 									</div>
-									<div key={"lama_cuti"} className='col-span-12 lg:col-span-4'>
+									<div key={"absen_masuk"} className='col-span-12 lg:col-span-2'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.lama_cuti as boolean}
-											invalidFeedback={formik.errors.lama_cuti as any}
+											isTouched={formik.touched.absen_masuk as boolean}
+											invalidFeedback={formik.errors.absen_masuk as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"lama_cuti"}>Lama Cuti</Label>
+												<Label htmlFor={"absen_masuk"}>Absen Masuk</Label>
 												<Input
-													id={"lama_cuti"}
-													name={"lama_cuti"}
+													id={"absen_masuk"}
+													name={"absen_masuk"}
 													onChange={formik.handleChange}
-													min={min}
-													max={max}
 													// @ts-ignore
 													// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-													value={formik.values["lama_cuti"]}
-													type={"number" as TInputTypes}
+													value={formik.values["absen_masuk"]}
+													type={"time" as TInputTypes}
 												/>
 											</>
 										</Validation>
 									</div>
-									<div key={"tujuan_cuti"} className='col-span-12 lg:col-span-4'>
+									<div key={"absen_keluar"} className='col-span-12 lg:col-span-2'>
 										<Validation
 											isValid={formik.isValid}
-											isTouched={formik.touched.tujuan_cuti as boolean}
-											invalidFeedback={formik.errors.tujuan_cuti as any}
+											isTouched={formik.touched.absen_keluar as boolean}
+											invalidFeedback={formik.errors.absen_keluar as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"tujuan_cuti"}>Tujuan</Label>
-												<Textarea
-													id='tujuan_cuti'
-													name='tujuan_cuti'
+												<Label htmlFor={"absen_keluar"}>Absen Keluar</Label>
+												<Input
+													id={"absen_keluar"}
+													name={"absen_keluar"}
 													onChange={formik.handleChange}
-													value={formik.values.tujuan_cuti}
-													placeholder='masukkan tujuan cuti...'
+													// @ts-ignore
+													// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+													value={formik.values["absen_keluar"]}
+													type={"time" as TInputTypes}
+												/>
+											</>
+										</Validation>
+									</div>
+									<div key={"catatan"} className='col-span-12 lg:col-span-4'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.catatan as boolean}
+											invalidFeedback={formik.errors.catatan as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"catatan"}>Catatan</Label>
+												<Textarea
+													id='catatan'
+													name='catatan'
+													onChange={formik.handleChange}
+													value={formik.values.catatan}
+													placeholder='masukkan catatan...'
 													rows={8} />
 											</>
 										</Validation>
@@ -437,4 +412,4 @@ const EditCutiPage = () => {
 	);
 };
 
-export default EditCutiPage;
+export default EditClaimAbsenPage;

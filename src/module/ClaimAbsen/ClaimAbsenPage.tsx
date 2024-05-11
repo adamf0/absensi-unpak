@@ -9,23 +9,22 @@ import Table, { THead, Tr, Th, TBody, Td } from "@/components/ui/Table";
 import { useEffect, useState } from "react";
 import { AlertObserver } from "@/module/IO/AlertObserver";
 import { ConsoleObserver } from "@/module/IO/ConsoleObserver";
-import { IzinModel } from "@/module/model/IzinModel";
+import { ClaimAbsenModel } from "@/module/model/ClaimAbsenModel";
+import { AbsenModel } from "@/module/model/AbsenModel";
 import PagingTable from "@/module/model/PagingTable";
-import { loadList, next, pagingTable, prev } from "@/module/redux/izinSlice";
+import { claimAbsenselector, loadList, next, pagingTable, prev } from "@/module/redux/claimAbsenSlice";
 import { useAppSelector, useAppDispatch } from "@/module/redux/hooks";
-import { DeleteIzin } from "@/module/repo/DeleteIzin";
-import { GetListIzin } from "@/module/repo/GetListIzin";
+import { DeleteClaimAbsen } from "@/module/repo/DeleteClaimAbsen";
+import { GetListClaimAbsen } from "@/module/repo/GetListClaimAbsen";
 import { HandlerObserver } from "@/module/abstract/HandlerObserver";
 import moment from "moment";
-import { izinselector } from "@/module/redux/izinSlice";
-import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 import { toast } from "react-toastify";
 import useLevelMode from "@/hooks/useLevelMode";
 
-const IzinPage = () => {
+const ClaimAbsenPage = () => {
     const navigate = useNavigate();
     const { levelMode } = useLevelMode();
-    const selectorIzin = useAppSelector(izinselector);
+    const selectorClaimAbsen = useAppSelector(claimAbsenselector);
     const [search, setSearch] = useState<any>(null);
     const dispatch = useAppDispatch();
 
@@ -37,33 +36,36 @@ const IzinPage = () => {
 
     const loadTable = async (page: number, search:any = null) => {
         try {
-            const response: any = await GetListIzin(
+            const response: any = await GetListClaimAbsen(
                 page,
                 levelMode == "dosen" ? localStorage.getItem('userRef') : null,
                 levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
                 search,
             );
-
             if (response.status === 200 || response.status === 500) {
                 const { status, message, list, log } = response;
-
+    
                 if (status == 200) {
-                    const izinList = list.data.map((item: any) =>
-                        new IzinModel(
+                    const claimAbsenList = list.data.map((item: any) =>
+                        new ClaimAbsenModel(
                             item.id,
-                            item?.nidn,
-                            item?.nip,
-                            item.tanggal_pengajuan,
-                            new JenisIzinModel(
-                                item.JenisIzin?.id ?? "",
-                                item.JenisIzin?.nama ?? ""
+                            new AbsenModel(
+                                item.Absen?.id ?? "",
+                                item.Absen?.nidn,
+                                item.Absen?.nip,
+                                moment(item.Absen?.tanggal ?? "").locale('id-ID').format("dddd, DD MMMM YYYY"),
+                                moment(item.Absen?.absen_masuk ?? "").locale('id-ID').format("HH:mm:ss"),
+                                moment(item.Absen?.absen_keluar ?? "").locale('id-ID').format("HH:mm:ss"),
+                                item.Absen?.otomatis_keluar ?? false,
                             ),
-                            item.tujuan,
+                            item.catatan,
+                            item.perbaikan_absen_masuk,
+                            item.perbaikan_absen_keluar,
                             item.dokumen,
                             item.status,
                         )
                     );
-
+    
                     const paging: PagingTable = {
                         totalData: list.totalData,
                         totalPage: list.totalPage,
@@ -74,8 +76,8 @@ const IzinPage = () => {
                         prevPage: list.prevPage,
                         nextPage: list.nextPage,
                     };
-
-                    await dispatch(loadList(izinList));
+    
+                    await dispatch(loadList(claimAbsenList));
                     await dispatch(pagingTable(paging));
                 } else if (status == 500) {
                     handler1.notifyObservers(log)
@@ -91,9 +93,9 @@ const IzinPage = () => {
         }
     };
 
-    async function deleteIzin(id:any){
+    async function deleteClaimAbsen(id:any){
         try {
-            const response:any = await DeleteIzin(id);
+            const response:any = await DeleteClaimAbsen(id);
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
                 const { status,message,log } = response;
@@ -118,36 +120,36 @@ const IzinPage = () => {
     }
 
     useEffect(() => {
-        loadTable(selectorIzin.paging.currentPage, search)
+        loadTable(selectorClaimAbsen.paging.currentPage, search)
 
         return () => { };
     }, [search]);
 
     useEffect(() => {
-        loadTable(selectorIzin.paging.currentPage)
+        loadTable(selectorClaimAbsen.paging.currentPage)
 
         return () => { };
-    }, [selectorIzin.paging.currentPage]);
+    }, [selectorClaimAbsen.paging.currentPage]);
 
     useEffect(() => {
-        if (selectorIzin.deletedIzin?.id != null) {
-            deleteIzin(selectorIzin.deletedIzin?.id)
+        if (selectorClaimAbsen.deletedClaimAbsen?.id != null) {
+            deleteClaimAbsen(selectorClaimAbsen.deletedClaimAbsen?.id)
         }
 
         return () => { };
-    }, [selectorIzin.deletedIzin]);
+    }, [selectorClaimAbsen.deletedClaimAbsen]);
 
     return (
         <>
-            <PageWrapper name='Izin'>
+            <PageWrapper name='Claim Absen'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Izin' />
+                        <Breadcrumb currentPage='Claim Absen' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
                     <div className="flex flex-wrap justify-between gap-4 px-4 pb-4 [&:first-child]:pt-4">
-                        <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
+                        <Button variant='solid' onClick={()=>navigate('/claim_absen/tambah')}>
                             Tambah
                         </Button>
                         <input type="text" onChange={(e:any)=>setSearch(e.target.value)} 
@@ -173,8 +175,10 @@ const IzinPage = () => {
                             <THead>
                                 <Tr>
                                     <Th>#</Th>
-                                    <Th>Tanggal</Th>
-                                    <Th>Tujuan</Th>
+                                    <Th>Tanggal Absen</Th>
+                                    <Th>Jam Absen</Th>
+                                    <Th>Perbaikan Absen</Th>
+                                    <Th>Catatan</Th>
                                     <Th>Dokumen</Th>
                                     <Th>Status</Th>
                                     <Th>Aksi</Th>
@@ -182,21 +186,23 @@ const IzinPage = () => {
                             </THead>
                             <TBody>
                                 {
-                                    selectorIzin.list.map((item,index)=>
+                                    selectorClaimAbsen.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{((selectorIzin.paging.currentPage-1)*10 + (index+1))}</Td>
-                                        <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
-                                        <Td>{item.tujuan}</Td>
+                                        <Td>{((selectorClaimAbsen.paging.currentPage-1)*10 + (index+1))}</Td>
+                                        <Td>{moment(item.absen?.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
+                                        <Td>{item.absen.absen_masuk} - {item.absen.absen_keluar}</Td>
+                                        <Td>{item.absen.absen_masuk} - {item.absen.absen_keluar}</Td>
+                                        <Td>{item.catatan}</Td>
                                         <Td><a href={item?.dokumen??""} target="_blank" className="inline-flex items-center justify-center bg-transparent border-2 border-blue-500/50 text-black dark:text-white hover:border-blue-500 active:border-blue-500 px-5 py-1.5 text-base rounded-lg transition-all duration-300 ease-in-out grow">Buka</a></Td>
                                         <Td>{item.status}</Td>
                                         <Td>
                                             {
                                                 item.status=="" || item.status=="menunggu"? 
                                                 <div className="flex flex-wrap gap-2">
-                                                    <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/izin/edit/${item.id}`)}>
+                                                    <Button variant='outline' className="grow"  color="amber" onClick={()=>navigate(`/claim_absen/edit/${item.id}`)}>
                                                         edit
                                                     </Button>
-                                                    <Button variant='solid' className="grow" color="red" onClick={()=>deleteIzin(item.id)}>
+                                                    <Button variant='solid' className="grow" color="red" onClick={()=>deleteClaimAbsen(item.id)}>
                                                         hapus
                                                     </Button>
                                                 </div>:null
@@ -208,11 +214,11 @@ const IzinPage = () => {
                             </TBody>
                         </Table>
                         <div className="flex items-center gap-8">
-                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorIzin.paging.prevPage==null} onClick={() => dispatch(prev())}>
+                            <Button color='red' icon='HeroArrowLeft' isDisable={selectorClaimAbsen.paging.prevPage==null} onClick={() => dispatch(prev())}>
                                 prev
                             </Button>
-                            Page < b > {selectorIzin.paging.currentPage}</b > of < b > {selectorIzin.paging.totalPage}</b>
-                            <Button color='red' icon='HeroArrowRight' isDisable={selectorIzin.paging.nextPage==null} onClick={() => dispatch(next())}>
+                            Page < b > {selectorClaimAbsen.paging.currentPage}</b > of < b > {selectorClaimAbsen.paging.totalPage}</b>
+                            <Button color='red' icon='HeroArrowRight' isDisable={selectorClaimAbsen.paging.nextPage==null} onClick={() => dispatch(next())}>
                                 next
                             </Button>
                             </div>
@@ -223,4 +229,4 @@ const IzinPage = () => {
     );
 };
 
-export default IzinPage;
+export default ClaimAbsenPage;

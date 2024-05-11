@@ -92,6 +92,8 @@ const EditIzinPage = () => {
 				if (status == 200) {
 					const izinParse = new IzinModel(
 						data.id,
+						data?.nidn,
+                        data?.nip,
 						data.tanggal_pengajuan,
 						new JenisIzinModel(
 							data.JenisIzin?.id,

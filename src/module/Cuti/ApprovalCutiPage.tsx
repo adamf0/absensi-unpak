@@ -26,6 +26,7 @@ import Textarea from "@/components/form/Textarea";
 const ApprovalCutiPage = () => {
     const [modalTolak, setModalTolak] = useState<boolean>(false);
     const [approval, setApproval] = useState<Approval|null>(null);
+    const [search, setSearch] = useState<any>(null);
     const navigate = useNavigate();
 
     const selectorCuti = useAppSelector(cutiselector);
@@ -37,8 +38,8 @@ const ApprovalCutiPage = () => {
     const handler2 = new HandlerObserver();
     handler2.addObserver(new AlertObserver());
 
-    const loadTable = async (page: number) => {
-        const response: any = await GetListCuti(page);
+    const loadTable = async (page: number, search:any = null) => {
+        const response: any = await GetListCuti(page, null, null, search);
         // if (response.status !== 200) {
         //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         // }
@@ -50,6 +51,8 @@ const ApprovalCutiPage = () => {
                 const cutiList = list.data.map((item: any) =>
                     new CutiModel(
                         item.id,
+                        item?.nidn,
+						item?.nip,
                         item.tanggal_pengajuan,
                         item.lama_cuti,
                         new JenisCutiModel(
@@ -120,6 +123,12 @@ const ApprovalCutiPage = () => {
     }
 
     useEffect(() => {
+        loadTable(selectorCuti.paging.currentPage, search)
+
+        return () => { };
+    }, [search]);
+
+    useEffect(() => {
         loadTable(selectorCuti.paging.currentPage)
 
         return () => { };
@@ -143,11 +152,35 @@ const ApprovalCutiPage = () => {
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
+                    <div className="flex flex-wrap justify-between gap-4 px-4 pb-4 [&:first-child]:pt-4">
+                        <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
+                            Tambah
+                        </Button>
+                        <input type="text" onChange={(e:any)=>setSearch(e.target.value)} 
+                            className="max-w-[216px] max-w-[-webkit-fill-available] appearance-none outline-0 text-black 
+                            dark:text-white 
+                            disabled:!opacity-25 
+                            transition-all duration-299 ease-in-out 
+                            border-2 border-black 
+                            dark:border-zinc-800 bg-zinc-100 
+                            dark:bg-zinc-799 
+                            hover:border-blue-500 
+                            dark:hover:border-blue-500 
+                            disabled:!border-zinc-500 
+                            focus:border-zinc-300 
+                            dark:focus:border-zinc-800 
+                            focus:bg-transparent 
+                            dark:focus:bg-transparent 
+                            px-1.5 py-1.5 text-base rounded-lg"
+                            placeholder="Cari..."/>
+                    </div>
                     <CardBody className='overflow-auto'>
                         <Table className='table-fixed max-md:min-w-[70rem]'>
                             <THead>
                                 <Tr>
                                     <Th>#</Th>
+                                    <Th>NIDN</Th>
+                                    <Th>NIP</Th>
                                     <Th>Tanggal</Th>
                                     <Th>Lama</Th>
                                     <Th>Jenis Cuti</Th>
@@ -162,6 +195,8 @@ const ApprovalCutiPage = () => {
                                     selectorCuti.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
                                         <Td>{((selectorCuti.paging.currentPage-1)*10 + (index+1))}</Td>
+                                        <Td>{item.nidn}</Td>
+                                        <Td>{item.nip}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>

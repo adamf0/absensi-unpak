@@ -26,6 +26,7 @@ import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 const ApprovalIzinPage = () => {
     const [modalTolak, setModalTolak] = useState<boolean>(false);
     const [approval, setApproval] = useState<Approval|null>(null);
+    const [search, setSearch] = useState<any>(null);
     const navigate = useNavigate();
 
     const selectorIzin = useAppSelector(izinselector);
@@ -37,8 +38,9 @@ const ApprovalIzinPage = () => {
     const handler2 = new HandlerObserver();
     handler2.addObserver(new AlertObserver());
 
-    const loadTable = async (page: number) => {
-        const response: any = await GetListIzin(page);
+    const loadTable = async (page: number, search:any = null) => {
+        console.log(search)
+        const response: any = await GetListIzin(page, null, null, search);
         // if (response.status !== 200) {
         //     throw new Error(response.message ?? "Terjadi masalah pada saat request ke server");
         // }
@@ -50,6 +52,8 @@ const ApprovalIzinPage = () => {
                 const izinList = list.data.map((item: any) =>
                     new IzinModel(
                         item.id,
+                        item?.nidn,
+                        item?.nip,
                         item.tanggal_pengajuan,
                         new JenisIzinModel(
                             item.JenisIzin?.id ?? "",
@@ -115,6 +119,11 @@ const ApprovalIzinPage = () => {
     }
 
     useEffect(() => {
+        loadTable(selectorIzin.paging.currentPage, search)
+
+        return () => { };
+    }, [search]);
+    useEffect(() => {
         loadTable(selectorIzin.paging.currentPage)
 
         return () => { };
@@ -138,12 +147,37 @@ const ApprovalIzinPage = () => {
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
+                    <div className="flex flex-wrap justify-between gap-4 px-4 pb-4 [&:first-child]:pt-4">
+                        <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
+                            Tambah
+                        </Button>
+                        <input type="text" onChange={(e:any)=>setSearch(e.target.value)} 
+                            className="max-w-[216px] max-w-[-webkit-fill-available] appearance-none outline-0 text-black 
+                            dark:text-white 
+                            disabled:!opacity-25 
+                            transition-all duration-299 ease-in-out 
+                            border-2 border-black 
+                            dark:border-zinc-800 bg-zinc-100 
+                            dark:bg-zinc-799 
+                            hover:border-blue-500 
+                            dark:hover:border-blue-500 
+                            disabled:!border-zinc-500 
+                            focus:border-zinc-300 
+                            dark:focus:border-zinc-800 
+                            focus:bg-transparent 
+                            dark:focus:bg-transparent 
+                            px-1.5 py-1.5 text-base rounded-lg"
+                            placeholder="Cari..."/>
+                    </div>
                     <CardBody className='overflow-auto'>
                         <Table className='table-fixed max-md:min-w-[70rem]'>
                             <THead>
                                 <Tr>
                                     <Th>#</Th>
+                                    <Th>NIDN</Th>
+                                    <Th>NIP</Th>
                                     <Th>Tanggal</Th>
+                                    <Th>Dokumen</Th>
                                     <Th>Tujuan</Th>
                                     <Th>Status</Th>
                                     <Th>Aksi</Th>
@@ -153,8 +187,11 @@ const ApprovalIzinPage = () => {
                                 {
                                     selectorIzin.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
-                                        <Td>{item.id}</Td>
+                                        <Td>{((selectorIzin.paging.currentPage-1)*10 + (index+1))}</Td>
+                                        <Td>{item.nidn}</Td>
+                                        <Td>{item.nip}</Td>
                                         <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
+                                        <Td><a href={item?.dokumen??""} target="_blank" className="inline-flex items-center justify-center bg-transparent border-2 border-blue-500/50 text-black dark:text-white hover:border-blue-500 active:border-blue-500 px-5 py-1.5 text-base rounded-lg transition-all duration-300 ease-in-out grow">Buka</a></Td>
                                         <Td>{item.tujuan}</Td>
                                         <Td>{item.status}</Td>
                                         <Td>

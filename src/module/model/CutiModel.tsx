@@ -2,6 +2,8 @@ import { JenisCutiModel } from "@/module/model/JenisCutiModel";
 
 export class CutiModel {
     id: string;
+    nidn: string|null;
+    nip: string|null;
     tanggal: string;
     lama: number;
     jenis: JenisCutiModel;
@@ -11,6 +13,8 @@ export class CutiModel {
     
     constructor(
         id: string,
+        nidn: string|null,
+        nip: string|null,
         tanggal: string,
         lama: number,
         jenis: JenisCutiModel,
@@ -18,6 +22,8 @@ export class CutiModel {
         dokumen: string|null,
         status: string,
     ) {
+        this.nidn = nidn;
+        this.nip = nip;
         this.tanggal = tanggal;
         this.lama = lama;
         this.jenis = jenis;

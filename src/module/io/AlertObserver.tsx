@@ -1,4 +1,4 @@
-import { Observer } from "../abstract/Observer";
+import { Observer } from "@/module/abstract/Observer";
 
 export class AlertObserver implements Observer {
     update(param:any) {

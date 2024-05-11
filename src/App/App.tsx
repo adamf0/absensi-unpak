@@ -39,6 +39,10 @@ import NewJenisIzinPage from '@/module/JenisIzin/NewJenisIzinPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomePage from '@/module/Home/HomePage';
+import ClaimAbsenPage from '@/module/ClaimAbsen/ClaimAbsenPage';
+import NewClaimAbsenPage from '@/module/ClaimAbsen/NewClaimAbsenPage';
+import EditClaimAbsenPage from '@/module/ClaimAbsen/EditClaimAbsenPage';
+import ApprovalClaimAbsenPage from '@/module/ClaimAbsen/ApprovalClaimAbsenPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -64,6 +68,12 @@ const App = () => {
 					text: 'Izin',
 					icon: 'HeroRectangleGroup',
 				}} />
+				<NavItem {...{
+					id: 'claimAbsenApprovalPage',
+					to: '/approval/claim_absen',
+					text: 'Claim Absen',
+					icon: 'HeroRectangleGroup',
+				}} />
 			</>
 		} else if (["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"")) {
 			return <>
@@ -77,6 +87,12 @@ const App = () => {
 					id: 'izinPage',
 					to: '/izin',
 					text: 'Izin',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
+					id: 'claimAbsenPage',
+					to: '/claim_absen',
+					text: 'Claim Absen',
 					icon: 'HeroRectangleGroup',
 				}} />
 			</>
@@ -248,6 +264,11 @@ const App = () => {
 									<Route path="/jenis_izin" element={<JenisIzinPage />} />
 									<Route path="/jenis_izin/tambah" element={<NewJenisIzinPage />} />
 									<Route path="/jenis_izin/edit/:id" element={<EditJenisIzinPage />} />
+
+									<Route path="/claim_absen" element={<ClaimAbsenPage />} />
+									<Route path="/claim_absen/tambah" element={<NewClaimAbsenPage />} />
+									<Route path="/claim_absen/edit/:id" element={<EditClaimAbsenPage />} />
+									<Route path="/approval/claim_absen" element={<ApprovalClaimAbsenPage />} />
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}

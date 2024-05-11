@@ -11,6 +11,7 @@ import { TUser } from '@/mocks/db/users.db';
 import { TIcons } from '@/types/icons.type';
 
 const CalendarView: React.FC<{source:any}> = ({ source }) => {
+	console.log(source)
 	const { t } = useTranslation();
 
 	const ref = createRef<FullCalendar>();
@@ -38,7 +39,6 @@ const CalendarView: React.FC<{source:any}> = ({ source }) => {
 
 		return (
 			<>
-				{user && <Avatar src={user.image?.thumb} className='me-2 w-6' />}
 				<i className='pe-2'>{eventContent.event.title}</i>
 				{eventContent.timeText && <b>{eventContent.timeText}</b>}
 			</>

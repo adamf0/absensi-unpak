@@ -29,8 +29,9 @@ import { getInfoUser } from "../InfoUser";
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
     const [isBefore8AM, setIsBefore8AM] = useState<boolean>(false);
-    const [is8hour, set8hour] = useState<boolean>(false);
+    const [_, set8hour] = useState<boolean>(false);
     const [isLate, setIsLate] = useState<boolean>(false);
+    const [messageBlockAbsent, setMessageBlockAbsent] = useState<any>(null);
     const timeAbsenString = "08:00:00"
     const timeAbsen = parseInt(timeAbsenString.split(":")[0])
 
@@ -160,7 +161,11 @@ const HomePage = () => {
                     }
                 }   
             } catch (error:any) {
-                toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                if(error.message.includes("hari ini anda sudah")){
+                    setMessageBlockAbsent(error.message)
+                } else{
+                    toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
+                }
                 throw error;
             }
         }
@@ -319,7 +324,15 @@ const HomePage = () => {
         
     }, [activeTab]);
 
-    const alertTerlambat = () => {
+    const alertTerlambatTidakBisaAbsen = () => {
+        if(messageBlockAbsent!=null && messageBlockAbsent!=""){
+            return ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
+                <div className='col-span-12'>
+                    <Alert className='border-transparent' color="red" variant='outline'>
+                        {messageBlockAbsent}
+                    </Alert>
+                </div> : null
+        }
         return isLate && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="red" variant='outline'>
@@ -390,123 +403,129 @@ const HomePage = () => {
             <PageWrapper name='Home'>
                 <Subheader className="flex flex-col">
                     <h3>{getInfoUser("nama")??"N/a"}</h3>
-                    <SubheaderLeft>
-                        <div className='flex flex-wrap justify-center items-center rounded-full border-2 border-zinc-500/20 p-1 drop-shadow-xl dark:border-zinc-800'>
-                            {Object.values(Periode).map((i) => (
-                                <Button
-                                    key={i.text}
-                                    {...(activeTab.text === i.text ? { ...activeProps } : { ...defaultProps })}
-                                    onClick={() => {
-                                        setActiveTab(i);
-                                    }}>
-                                    {i.text}
-                                </Button>
-                            ))}
-                        </div>
-                    </SubheaderLeft>
+                    {
+                        ["dosen", "pegawai", "sdm"].includes(localStorage.getItem('levelMode')??"")? 
+                        <SubheaderLeft>
+                            <div className='flex flex-wrap justify-center items-center rounded-full border-2 border-zinc-500/20 p-1 drop-shadow-xl dark:border-zinc-800'>
+                                {Object.values(Periode).map((i) => (
+                                    <Button
+                                        key={i.text}
+                                        {...(activeTab.text === i.text ? { ...activeProps } : { ...defaultProps })}
+                                        onClick={() => {
+                                            setActiveTab(i);
+                                        }}>
+                                        {i.text}
+                                    </Button>
+                                ))}
+                            </div>
+                        </SubheaderLeft> : null
+                    }
                 </Subheader>
                 <Container>
                     <div className='grid grid-cols-12 gap-4'>
-                        {alertTerlambat()}
+                        {alertTerlambatTidakBisaAbsen()}
                         {alertMasuk()}
                         {alertPulang()}
-                        <div className='col-span-12'>
-                            <div className='grid grid-cols-12 gap-4'>
-                                <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
-                                    <Card className={`h-full`}>
-                                        <CardBody>
-                                            <div className='flex flex-col gap-2'>
-                                                <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
-                                                    <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                        {
+                            ["dosen", "pegawai", "sdm"].includes(localStorage.getItem('levelMode')??"")? 
+                            <div className='col-span-12'>
+                                <div className='grid grid-cols-12 gap-4'>
+                                    <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
+                                        <Card className={`h-full`}>
+                                            <CardBody>
+                                                <div className='flex flex-col gap-2'>
+                                                    <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
+                                                        <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                                                    </div>
+                                                    <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
+                                                        <span className='font-semibold'>Absen Masuk</span>
+                                                    </div>
+                                                    <div className='text-4xl font-semibold'>{info?.absen?.masuk??0}</div>
+                                                    <div className='flex flex-wrap gap-2'>
+                                                        <CardBadgeInfo status="waiting" value={info?.absen?.lebih_8jam??0}>&ge;8 Jam Kerja</CardBadgeInfo>
+                                                        <CardBadgeInfo status="reject" value={info?.absen?.kurang_8jam??0}>&lt;7 Jam Kerja</CardBadgeInfo>
+                                                        <CardBadgeInfo status="success" value={info?.absen?.tepat_waktu??0}>Tepat Waktu</CardBadgeInfo>
+                                                        <CardBadgeInfo status="reject" value={info?.absen?.telat??0}>Telat</CardBadgeInfo>
+                                                    </div>
                                                 </div>
-                                                <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
-                                                    <span className='font-semibold'>Absen Masuk</span>
+                                            </CardBody>
+                                        </Card>
+                                    </div>
+                                    <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
+                                        <Card className={`h-full`}>
+                                            <CardBody>
+                                                <div className='flex flex-col gap-2'>
+                                                    <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
+                                                        <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                                                    </div>
+                                                    <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
+                                                        <span className='font-semibold'>Tidak Masuk</span>
+                                                    </div>
+                                                    <div className='text-4xl font-semibold'>{info?.absen?.tidak_masuk??0}</div>
                                                 </div>
-                                                <div className='text-4xl font-semibold'>{info?.absen?.masuk??0}</div>
-                                                <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={info?.absen?.lebih_8jam??0}>&ge;8 Jam Kerja</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info?.absen?.kurang_8jam??0}>&lt;7 Jam Kerja</CardBadgeInfo>
-                                                    <CardBadgeInfo status="success" value={info?.absen?.tepat_waktu??0}>Tepat Waktu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info?.absen?.telat??0}>Telat</CardBadgeInfo>
+                                            </CardBody>
+                                        </Card>
+                                    </div>
+                                    <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
+                                        <Card className={`h-full`}>
+                                            <CardBody>
+                                                <div className='flex flex-col gap-2'>
+                                                    <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
+                                                        <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                                                    </div>
+                                                    <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
+                                                        <span className='font-semibold'>Izin</span>
+                                                    </div>
+                                                    <div className='text-4xl font-semibold'>{info?.izin?.total??0}</div>
+                                                    <div className='flex flex-wrap gap-2'>
+                                                        <CardBadgeInfo status="waiting" value={info?.izin?.menunggu??0}>Menunggu</CardBadgeInfo>
+                                                        <CardBadgeInfo status="reject" value={info?.izin?.tolak??0}>Tolak</CardBadgeInfo>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
+                                            </CardBody>
+                                        </Card>
+                                    </div>
+                                    <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
+                                        <Card className={`h-full`}>
+                                            <CardBody>
+                                                <div className='flex flex-col gap-2'>
+                                                    <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
+                                                        <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                                                    </div>
+                                                    <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
+                                                        <span className='font-semibold'>Cuti</span>
+                                                    </div>
+                                                    <div className='text-4xl font-semibold'>{info?.cuti?.total??0}</div>
+                                                    <div className='flex flex-wrap gap-2'>
+                                                        <CardBadgeInfo status="waiting" value={info?.cuti?.menunggu??0}>Menunggu</CardBadgeInfo>
+                                                        <CardBadgeInfo status="reject" value={info?.cuti?.tolak??0}>Tolak</CardBadgeInfo>
+                                                    </div>
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    </div>
+                                    <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
+                                        <Card className={`h-full`}>
+                                            <CardBody>
+                                                <div className='flex flex-col gap-2'>
+                                                    <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
+                                                        <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
+                                                    </div>
+                                                    <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
+                                                        <span className='font-semibold'>SPPD</span>
+                                                    </div>
+                                                    <div className='text-4xl font-semibold'>0</div>
+                                                    <div className='flex flex-wrap gap-2'>
+                                                        <CardBadgeInfo status="waiting" value={0}>Menunggu</CardBadgeInfo>
+                                                        <CardBadgeInfo status="reject" value={0}>Tolak</CardBadgeInfo>
+                                                    </div>
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    </div>
                                 </div>
-                                <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
-                                    <Card className={`h-full`}>
-                                        <CardBody>
-                                            <div className='flex flex-col gap-2'>
-                                                <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
-                                                    <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
-                                                </div>
-                                                <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
-                                                    <span className='font-semibold'>Tidak Masuk</span>
-                                                </div>
-                                                <div className='text-4xl font-semibold'>{info?.absen?.tidak_masuk??0}</div>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                </div>
-                                <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
-                                    <Card className={`h-full`}>
-                                        <CardBody>
-                                            <div className='flex flex-col gap-2'>
-                                                <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
-                                                    <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
-                                                </div>
-                                                <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
-                                                    <span className='font-semibold'>Izin</span>
-                                                </div>
-                                                <div className='text-4xl font-semibold'>{info?.izin?.total??0}</div>
-                                                <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={info?.izin?.menunggu??0}>Menunggu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info?.izin?.tolak??0}>Tolak</CardBadgeInfo>
-                                                </div>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                </div>
-                                <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
-                                    <Card className={`h-full`}>
-                                        <CardBody>
-                                            <div className='flex flex-col gap-2'>
-                                                <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
-                                                    <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
-                                                </div>
-                                                <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
-                                                    <span className='font-semibold'>Cuti</span>
-                                                </div>
-                                                <div className='text-4xl font-semibold'>{info?.cuti?.total??0}</div>
-                                                <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={info?.cuti?.menunggu??0}>Menunggu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={info?.cuti?.tolak??0}>Tolak</CardBadgeInfo>
-                                                </div>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                </div>
-                                <div className='col-span-12 sm:col-span-6 lg:col-span-3'>
-                                    <Card className={`h-full`}>
-                                        <CardBody>
-                                            <div className='flex flex-col gap-2'>
-                                                <div className='flex h-16 w-16 items-center justify-center rounded-full bg-blue-500'>
-                                                    <Icon icon='HeroCalendar' size='text-3xl' className='text-white' />
-                                                </div>
-                                                <div className='space-x-1 text-zinc-500 rtl:space-x-reverse'>
-                                                    <span className='font-semibold'>SPPD</span>
-                                                </div>
-                                                <div className='text-4xl font-semibold'>0</div>
-                                                <div className='flex flex-wrap gap-2'>
-                                                    <CardBadgeInfo status="waiting" value={0}>Menunggu</CardBadgeInfo>
-                                                    <CardBadgeInfo status="reject" value={0}>Tolak</CardBadgeInfo>
-                                                </div>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                </div>
-                            </div>
-                        </div>
+                            </div> : null
+                        }
                         {
                             ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") && !disableAbsen ?
                                 <>

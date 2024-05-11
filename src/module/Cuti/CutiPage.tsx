@@ -6,7 +6,7 @@ import Subheader, { SubheaderLeft } from "@/components/layouts/Subheader/Subhead
 import Button from "@/components/ui/Button";
 import { CardBody, CardHeader, CardHeaderChild } from "@/components/ui/Card";
 import Table, { THead, Tr, Th, TBody, Td } from "@/components/ui/Table";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AlertObserver } from "@/module/IO/AlertObserver";
 import { ConsoleObserver } from "@/module/IO/ConsoleObserver";
 import { CutiModel } from "@/module/model/CutiModel";
@@ -20,11 +20,14 @@ import { HandlerObserver } from "@/module/abstract/HandlerObserver";
 import moment from "moment";
 import { toast } from "react-toastify";
 import useLevelMode from "@/hooks/useLevelMode";
+import { TInputTypes } from "@/types/input.type";
+import Input from "@/components/form/Input";
 
 const CutiPage = () => {
     const navigate = useNavigate();
     const { levelMode } = useLevelMode();
     const selectorCuti = useAppSelector(cutiselector);
+    const [search, setSearch] = useState<any>(null);
     const dispatch = useAppDispatch();
 
     const handler1 = new HandlerObserver();
@@ -33,12 +36,13 @@ const CutiPage = () => {
     const handler2 = new HandlerObserver();
     handler2.addObserver(new AlertObserver());
 
-    const loadTable = async (page: number) => {
+    const loadTable = async (page: number, search: any = null) => {
         try {
             const response: any = await GetListCuti(
                 page,
                 levelMode == "dosen" ? localStorage.getItem('userRef') : null,
                 levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
+                search,
             );
             if (response.status === 200 || response.status === 500) {
                 const { status, message, list, log } = response;
@@ -47,6 +51,8 @@ const CutiPage = () => {
                     const cutiList = list.data.map((item: any) =>
                         new CutiModel(
                             item.id,
+                            item?.nidn,
+						    item?.nip,
                             item.tanggal_pengajuan,
                             item.lama_cuti,
                             new JenisCutiModel(
@@ -117,6 +123,12 @@ const CutiPage = () => {
     }
 
     useEffect(() => {
+        loadTable(selectorCuti.paging.currentPage, search)
+
+        return () => { };
+    }, [search]);
+
+    useEffect(() => {
         loadTable(selectorCuti.paging.currentPage)
 
         return () => { };
@@ -139,13 +151,28 @@ const CutiPage = () => {
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
-                    <CardHeader>
-                        <CardHeaderChild>
-                            <Button variant='solid' onClick={()=>navigate('/cuti/tambah')}>
-                                Tambah
-                            </Button>
-                        </CardHeaderChild>
-                    </CardHeader>
+                    <div className="flex flex-wrap justify-between gap-4 px-4 pb-4 [&:first-child]:pt-4">
+                        <Button variant='solid' onClick={()=>navigate('/cuti/tambah')}>
+                            Tambah
+                        </Button>
+                        <input type="text" onChange={(e:any)=>setSearch(e.target.value)} 
+                            className="max-w-[216px] max-w-[-webkit-fill-available] appearance-none outline-0 text-black 
+                            dark:text-white 
+                            disabled:!opacity-25 
+                            transition-all duration-299 ease-in-out 
+                            border-2 border-black 
+                            dark:border-zinc-800 bg-zinc-100 
+                            dark:bg-zinc-799 
+                            hover:border-blue-500 
+                            dark:hover:border-blue-500 
+                            disabled:!border-zinc-500 
+                            focus:border-zinc-300 
+                            dark:focus:border-zinc-800 
+                            focus:bg-transparent 
+                            dark:focus:bg-transparent 
+                            px-1.5 py-1.5 text-base rounded-lg"
+                            placeholder="Cari..."/>
+                    </div>
                     <CardBody className='overflow-auto'>
                         <Table className='table-fixed max-md:min-w-[70rem]'>
                             <THead>

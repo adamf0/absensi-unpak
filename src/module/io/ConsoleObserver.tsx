@@ -1,4 +1,4 @@
-import { Observer } from "../abstract/Observer";
+import { Observer } from "@/module/abstract/Observer";
 
 export class ConsoleObserver implements Observer {
     update(param:any) {

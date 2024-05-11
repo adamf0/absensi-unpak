@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/module/redux/store";
-import { Absen } from "@/module/model/Absen";
+import { AbsenModel } from "@/module/model/AbsenModel";
 
 interface state{
-  absen: Absen | null,
+  absen: AbsenModel | null,
 }
 const initialState:state = {
   absen: null,
@@ -13,10 +13,10 @@ export const absenlice = createSlice({
   name: "absen",
   initialState,
   reducers: {
-    getAbsent: (state, action: PayloadAction<Absen|null>) => {
+    getAbsent: (state, action: PayloadAction<AbsenModel|null>) => {
       state.absen = action.payload;
     },
-    setAbsent: (state, action: PayloadAction<Absen|null>) => {
+    setAbsent: (state, action: PayloadAction<AbsenModel|null>) => {
       state.absen = action.payload;
     },
     setOutAbsent: (state, action: PayloadAction<string>) => {
