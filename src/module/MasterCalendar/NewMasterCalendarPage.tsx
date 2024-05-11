@@ -102,7 +102,7 @@ const NewMasterCalendarPage = () => {
 											invalidFeedback={formik.errors.tanggal_mulai as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"tanggal_mulai"}>Tanggal</Label>
+												<Label htmlFor={"tanggal_mulai"}>Tanggal Awal</Label>
 												<Input
 													id={"tanggal_mulai"}
 													name={"tanggal_mulai"}
@@ -120,7 +120,7 @@ const NewMasterCalendarPage = () => {
 											invalidFeedback={formik.errors.tanggal_akhir as any}
 											validFeedback='Good'>
 											<>
-												<Label htmlFor={"tanggal_akhir"}>Tanggal</Label>
+												<Label htmlFor={"tanggal_akhir"}>Tanggal Akhir</Label>
 												<Input
 													id={"tanggal_akhir"}
 													name={"tanggal_akhir"}
