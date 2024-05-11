@@ -6,6 +6,7 @@ import penggunaReducer from '@/module/redux/penggunaSlice';
 import jenisCutiReducer from '@/module/redux/jenisCutiSlice';
 import jenisIzinReducer from '@/module/redux/jenisIzinSlice';
 import claimAbsenReducer from '@/module/redux/claimAbsenSlice';
+import masterCalendarReducer from '@/module/redux/masterCalendarSlice';
 
 export const storeRoot = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const storeRoot = configureStore({
     penggunaReducer,
     jenisCutiReducer,
     jenisIzinReducer,
+    masterCalendarReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: false

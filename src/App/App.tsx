@@ -43,6 +43,9 @@ import ClaimAbsenPage from '@/module/ClaimAbsen/ClaimAbsenPage';
 import NewClaimAbsenPage from '@/module/ClaimAbsen/NewClaimAbsenPage';
 import EditClaimAbsenPage from '@/module/ClaimAbsen/EditClaimAbsenPage';
 import ApprovalClaimAbsenPage from '@/module/ClaimAbsen/ApprovalClaimAbsenPage';
+import MasterCalendarPage from '@/module/MasterCalendar/MasterCalendarPage';
+import NewMasterCalendarPage from '@/module/MasterCalendar/NewMasterCalendarPage';
+import EditMasterCalendarPage from '@/module/MasterCalendar/EditMasterCalendarPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -72,6 +75,9 @@ const App = () => {
 					id: 'claimAbsenApprovalPage',
 					to: '/approval/claim_absen',
 					text: 'Claim Absen',
+					id: 'masterCalendarPage',
+					to: '/master_calendar',
+					text: 'Master Calendar',
 					icon: 'HeroRectangleGroup',
 				}} />
 			</>
@@ -269,6 +275,9 @@ const App = () => {
 									<Route path="/claim_absen/tambah" element={<NewClaimAbsenPage />} />
 									<Route path="/claim_absen/edit/:id" element={<EditClaimAbsenPage />} />
 									<Route path="/approval/claim_absen" element={<ApprovalClaimAbsenPage />} />
+									<Route path="/master_calendar" element={<MasterCalendarPage />} />
+									<Route path="/master_calendar/tambah" element={<NewMasterCalendarPage />} />
+									<Route path="/master_calendar/edit/:id" element={<EditMasterCalendarPage />} />
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}

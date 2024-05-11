@@ -3,6 +3,9 @@ import { JenisCutiModel } from "@/module/model/JenisCutiModel";
 import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 import { AbsenModel } from "../model/AbsenModel";
 import moment from "moment";
+import { TSelectOption } from "@/module/../components/form/SelectReact";
+import { JenisCutiModel } from "@/module/model/JenisCutiModel";
+import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 
 export class SelectOptionsAdapter {
     static adaptFromJenisCuti(list: JenisCutiModel[]): TSelectOption[] {
