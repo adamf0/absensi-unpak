@@ -30,7 +30,7 @@ const NewClaimAbsenPage = () => {
 	const { levelMode } = useLevelMode();
 	const navigate = useNavigate();
 	const FILE_SIZE = 1024 * 1024 * 10; // 10 MB
-	const SUPPORTED_FORMATS = ['application/pdf'];
+	const SUPPORTED_FORMATS = ['application/pdf','image/jpeg','image/jpg','image/png'];
 	const [disableButton, setDisableButton] = useState<boolean>(false);
 	// const toastId = useRef<any>(null);
 	const fileRef = useRef(null);

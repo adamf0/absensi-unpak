@@ -152,28 +152,6 @@ const ApprovalCutiPage = () => {
                     </SubheaderLeft>
                 </Subheader>
                 <Container>
-                    <div className="flex flex-wrap justify-between gap-4 px-4 pb-4 [&:first-child]:pt-4">
-                        <Button variant='solid' onClick={()=>navigate('/izin/tambah')}>
-                            Tambah
-                        </Button>
-                        <input type="text" onChange={(e:any)=>setSearch(e.target.value)} 
-                            className="max-w-[216px] max-w-[-webkit-fill-available] appearance-none outline-0 text-black 
-                            dark:text-white 
-                            disabled:!opacity-25 
-                            transition-all duration-299 ease-in-out 
-                            border-2 border-black 
-                            dark:border-zinc-800 bg-zinc-100 
-                            dark:bg-zinc-799 
-                            hover:border-blue-500 
-                            dark:hover:border-blue-500 
-                            disabled:!border-zinc-500 
-                            focus:border-zinc-300 
-                            dark:focus:border-zinc-800 
-                            focus:bg-transparent 
-                            dark:focus:bg-transparent 
-                            px-1.5 py-1.5 text-base rounded-lg"
-                            placeholder="Cari..."/>
-                    </div>
                     <CardBody className='overflow-auto'>
                         <Table className='table-fixed max-md:min-w-[70rem]'>
                             <THead>

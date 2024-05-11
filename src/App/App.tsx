@@ -71,7 +71,7 @@ const App = () => {
 					text: 'Izin',
 					icon: 'HeroRectangleGroup',
 				}} />
-				<NavItem {...{
+				{/* <NavItem {...{
 					id: 'claimAbsenApprovalPage',
 					to: '/approval/claim_absen',
 					text: 'Claim Absen',
@@ -79,7 +79,7 @@ const App = () => {
 					to: '/master_calendar',
 					text: 'Master Calendar',
 					icon: 'HeroRectangleGroup',
-				}} />
+				}} /> */}
 			</>
 		} else if (["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"")) {
 			return <>
@@ -275,9 +275,10 @@ const App = () => {
 									<Route path="/claim_absen/tambah" element={<NewClaimAbsenPage />} />
 									<Route path="/claim_absen/edit/:id" element={<EditClaimAbsenPage />} />
 									<Route path="/approval/claim_absen" element={<ApprovalClaimAbsenPage />} />
-									<Route path="/master_calendar" element={<MasterCalendarPage />} />
+									
+									{/* <Route path="/master_calendar" element={<MasterCalendarPage />} />
 									<Route path="/master_calendar/tambah" element={<NewMasterCalendarPage />} />
-									<Route path="/master_calendar/edit/:id" element={<EditMasterCalendarPage />} />
+									<Route path="/master_calendar/edit/:id" element={<EditMasterCalendarPage />} /> */}
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}
