@@ -22,6 +22,7 @@ import { ApprovalCuti } from "@/module/repo/ApprovalCuti";
 import { Approval } from "@/module/model/Approval";
 import Modal, { ModalHeader, ModalBody, ModalFooter, ModalFooterChild } from "@/components/ui/Modal";
 import Textarea from "@/components/form/Textarea";
+import { toast } from "react-toastify";
 
 const ApprovalCutiPage = () => {
     const [modalTolak, setModalTolak] = useState<boolean>(false);
@@ -53,7 +54,8 @@ const ApprovalCutiPage = () => {
                         item.id,
                         item?.nidn,
 						item?.nip,
-                        item.tanggal_pengajuan,
+                        item.tanggal_mulai,
+                        item.tanggal_akhir,
                         item.lama_cuti,
                         new JenisCutiModel(
                             item.JenisCuti?.id ?? "",
@@ -99,7 +101,7 @@ const ApprovalCutiPage = () => {
             });
             handler1.notifyObservers(response);
             if (response.status === 200 || response.status === 500) {
-                const { status,message } = response;
+                const { status,message,log } = response;
 
                 if (status == 200){
                     alert(message);
@@ -107,15 +109,15 @@ const ApprovalCutiPage = () => {
                     setModalTolak(false)
                     setApproval(null)
                 } else if (status == 500) {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 } else {
-                    alert(message ?? "terjadi masalah pada saat request ke server")
+                    handler1.notifyObservers(log)
+                    toast(message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
                 }
-            } else {
-                alert("terjadi masalah pada saat request ke server")
             }
         } catch (error:any) {
-            alert(error.message ?? "terjadi masalah pada saat request ke server")
+            toast(error.message ?? "Terjadi masalah pada saat request ke server", { type: "error", autoClose: 2000 });
             throw error;
         } finally {
 
@@ -175,7 +177,7 @@ const ApprovalCutiPage = () => {
                                         <Td>{((selectorCuti.paging.currentPage-1)*10 + (index+1))}</Td>
                                         <Td>{item.nidn}</Td>
                                         <Td>{item.nip}</Td>
-                                        <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
+                                        <Td>{ moment(item.tanggal_mulai).locale('id-ID').format("dddd, DD MMMM YYYY") } - { moment(item.tanggal_akhir).locale('id-ID').format("dddd, DD MMMM YYYY") }</Td>
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>

@@ -89,14 +89,16 @@ const NewCutiPage = () => {
 	const formik = useFormik({
 		enableReinitialize: true,
 		initialValues: {
-			tanggal_pengajuan: "",
+			tanggal_mulai: "",
+			tanggal_akhir: "",
 			jenis_cuti: "",
 			lama_cuti: "",
 			tujuan_cuti: "",
 			dokumen: null,
 		},
 		validationSchema: Yup.object({
-			tanggal_pengajuan: Yup.date().required("this is required"),
+			tanggal_mulai: Yup.date().required("this is required"),
+			tanggal_akhir: Yup.date().required("this is required"),
 			lama_cuti: Yup.number()
 				.typeError("must be a number")
 				.min(1, "this must be at least 1 day")
@@ -140,7 +142,8 @@ const NewCutiPage = () => {
 					if(levelMode == "pegawai"){
 						form = {
 							nip: levelMode == "pegawai" ? localStorage.getItem('userRef') : null,
-							tanggal_pengajuan: value.tanggal_pengajuan,
+							tanggal_mulai: value.tanggal_mulai,
+							tanggal_akhir: value.tanggal_mulai,
 							lama_cuti: value.lama_cuti,
 							tujuan: value.tujuan_cuti,
 							jenis_cuti: value.jenis_cuti,
@@ -149,7 +152,8 @@ const NewCutiPage = () => {
 					} else{
 						form = {
 							nidn: levelMode == "dosen" ? localStorage.getItem('userRef') : null,
-							tanggal_pengajuan: value.tanggal_pengajuan,
+							tanggal_mulai: value.tanggal_mulai,
+							tanggal_akhir: value.tanggal_akhir,
 							lama_cuti: value.lama_cuti,
 							tujuan: value.tujuan_cuti,
 							jenis_cuti: value.jenis_cuti,
@@ -163,7 +167,8 @@ const NewCutiPage = () => {
 					} else{
 						form.append("nidn",localStorage.getItem('userRef') ?? "-")
 					}
-					form.append("tanggal_pengajuan",value.tanggal_pengajuan)
+					form.append("tanggal_mulai",value.tanggal_mulai)
+					form.append("tanggal_akhir",value.tanggal_akhir)
 					form.append("lama_cuti",value.lama_cuti)
 					form.append("tujuan",value.tujuan_cuti)
 					form.append("jenis_cuti",value.jenis_cuti)
@@ -219,24 +224,6 @@ const NewCutiPage = () => {
 						<Card>
 							<CardBody>
 								<div className='grid gap-4'>
-									<div key={"tanggal_pengajuan"} className='col-span-12 lg:col-span-4'>
-										<Validation
-											isValid={formik.isValid}
-											isTouched={formik.touched.tanggal_pengajuan as boolean}
-											invalidFeedback={formik.errors.tanggal_pengajuan as any}
-											validFeedback='Good'>
-											<>
-												<Label htmlFor={"tanggal_pengajuan"}>Tanggal Pengajuan</Label>
-												<Input
-													id={"tanggal_pengajuan"}
-													name={"tanggal_pengajuan"}
-													onChange={formik.handleChange}
-													value={formik.values["tanggal_pengajuan"]}
-													type={"date" as TInputTypes}
-												/>
-											</>
-										</Validation>
-									</div>
 									<div key={"jenis_cuti"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
@@ -260,6 +247,42 @@ const NewCutiPage = () => {
 														}
 														formik.setFieldValue('jenis_cuti', selected.value)
 													}}
+												/>
+											</>
+										</Validation>
+									</div>
+									<div key={"tanggal_mulai"} className='col-span-12 lg:col-span-2'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.tanggal_mulai as boolean}
+											invalidFeedback={formik.errors.tanggal_mulai as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"tanggal_mulai"}>Tanggal Mulai Cuti</Label>
+												<Input
+													id={"tanggal_mulai"}
+													name={"tanggal_mulai"}
+													onChange={formik.handleChange}
+													value={formik.values["tanggal_mulai"]}
+													type={"date" as TInputTypes}
+												/>
+											</>
+										</Validation>
+									</div>
+									<div key={"tanggal_akhir"} className='col-span-12 lg:col-span-2'>
+										<Validation
+											isValid={formik.isValid}
+											isTouched={formik.touched.tanggal_akhir as boolean}
+											invalidFeedback={formik.errors.tanggal_akhir as any}
+											validFeedback='Good'>
+											<>
+												<Label htmlFor={"tanggal_akhir"}>Tanggal Akhir Cuti</Label>
+												<Input
+													id={"tanggal_akhir"}
+													name={"tanggal_akhir"}
+													onChange={formik.handleChange}
+													value={formik.values["tanggal_akhir"]}
+													type={"date" as TInputTypes}
 												/>
 											</>
 										</Validation>

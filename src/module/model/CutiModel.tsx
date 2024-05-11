@@ -4,7 +4,8 @@ export class CutiModel {
     id: string;
     nidn: string|null;
     nip: string|null;
-    tanggal: string;
+    tanggal_mulai: string;
+    tanggal_akhir: string;
     lama: number;
     jenis: JenisCutiModel;
     tujuan: string;
@@ -15,7 +16,8 @@ export class CutiModel {
         id: string,
         nidn: string|null,
         nip: string|null,
-        tanggal: string,
+        tanggal_mulai: string,
+        tanggal_akhir: string,
         lama: number,
         jenis: JenisCutiModel,
         tujuan: string,
@@ -24,7 +26,8 @@ export class CutiModel {
     ) {
         this.nidn = nidn;
         this.nip = nip;
-        this.tanggal = tanggal;
+        this.tanggal_mulai = tanggal_mulai;
+        this.tanggal_akhir = tanggal_akhir;
         this.lama = lama;
         this.jenis = jenis;
         this.tujuan = tujuan;

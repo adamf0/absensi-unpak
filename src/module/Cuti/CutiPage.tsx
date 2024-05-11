@@ -53,7 +53,8 @@ const CutiPage = () => {
                             item.id,
                             item?.nidn,
 						    item?.nip,
-                            item.tanggal_pengajuan,
+                            item.tanggal_mulai,
+                            item.tanggal_akhir,
                             item.lama_cuti,
                             new JenisCutiModel(
                                 item.JenisCuti?.id ?? "",
@@ -192,7 +193,7 @@ const CutiPage = () => {
                                     selectorCuti.list.map((item,index)=>
                                     <Tr className="text-center" key={index}>
                                         <Td>{((selectorCuti.paging.currentPage-1)*10 + (index+1))}</Td>
-                                        <Td>{moment(item.tanggal).locale('id-ID').format("dddd, DD MMMM YYYY")}</Td>
+                                        <Td>{ moment(item.tanggal_mulai).locale('id-ID').format("dddd, DD MMMM YYYY") } - { moment(item.tanggal_akhir).locale('id-ID').format("dddd, DD MMMM YYYY") }</Td>
                                         <Td>{item.lama} hari</Td>
                                         <Td>{item.jenis?.nama??"-"}</Td>
                                         <Td>{item.tujuan}</Td>
