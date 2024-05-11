@@ -29,7 +29,7 @@ import { getInfoUser } from "@/module/InfoUser";
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState<TPeriod>(Periode.HARI);
     const [isBefore8AM, setIsBefore8AM] = useState<boolean>(false);
-    const [_, set8hour] = useState<boolean>(false);
+    const [eighthour, set8hour] = useState<boolean>(false);
     const [isLate, setIsLate] = useState<boolean>(false);
     const [messageBlockAbsent, setMessageBlockAbsent] = useState<any>(null);
     const timeAbsenString = "08:00:00"
@@ -114,19 +114,29 @@ const HomePage = () => {
         };
     }
 
+    const getCurrentTime = () => {
+        return moment('2024-05-11 16:11:00').tz('Asia/Jakarta')
+    }
     const checkTime = () => {
-        const currentTime = moment().tz('Asia/Jakarta');
-        const checkBefore8AM = currentTime.isBefore(currentTime.clone().startOf('day').add(timeAbsen, 'hours'));
+        const currentTime = getCurrentTime();
+        const checkBefore8AM = currentTime.isBefore(currentTime.clone().startOf('day').add(timeAbsen, 'hours').add('1', 'minutes'));
         setIsBefore8AM(checkBefore8AM);
     }
     const check8hour = () => {
         const masuk = moment(absenMasuk).tz('Asia/Jakarta')
-        const check = masuk.isAfter(masuk.startOf('day').add(timeAbsen, 'hours'));
+        // console.info(getCurrentTime().format('YYYY-MM-DD HH:mm:ss'), masuk.format('YYYY-MM-DD HH:mm:ss'), masuk.clone().add(timeAbsen, 'hours').format('YYYY-MM-DD HH:mm:ss'))
+
+        const check =getCurrentTime().isAfter(moment(absenMasuk).tz('Asia/Jakarta').add(timeAbsen, 'hours'));
         set8hour(check);
     }
+    const checkCurrentAbove15 = () => {
+        const requireCheckout = !isLate? moment(dateNow+' 14:59:00').tz('Asia/Jakarta'):moment(absenMasuk).tz('Asia/Jakarta').startOf('day').add(timeAbsen, 'hours');
+        const check = getCurrentTime().isSameOrAfter(requireCheckout);
+        return check;
+    }
     const checkLate = () => {
-        const currentTime = (absenMasuk == null ? moment() : moment(absenMasuk)).tz('Asia/Jakarta');
-        const absenMasukTime = moment(timeAbsenString, 'HH:mm:ss').tz('Asia/Jakarta');
+        const currentTime = (absenMasuk == null ? getCurrentTime() : moment(absenMasuk)).tz('Asia/Jakarta');
+        const absenMasukTime = moment(timeAbsenString, 'HH:mm:ss').tz('Asia/Jakarta').add('1', 'minutes');
         const checkLate = currentTime.isAfter(absenMasukTime);
         setIsLate(checkLate);
     }
@@ -229,7 +239,7 @@ const HomePage = () => {
                 toast(`berada diluar jaringan universitas pakuan`, { type: "error", autoClose: 2000 });
             } else{
                 try {
-                    const timeNow = moment().tz('Asia/Jakarta').format("HH:mm:ss")
+                    const timeNow = getCurrentTime().format("HH:mm:ss")
                     const response: any = (type == "masuk" ?
                         await CreateAbsentMasuk({
                             "nidn": localStorage.getItem('levelMode') == "dosen" ? localStorage.getItem('userRef') : null,
@@ -284,7 +294,7 @@ const HomePage = () => {
         const response: any = await GetListCalendar(
             localStorage.getItem('levelMode')=="pegawai"? "nip":"nidn",
             localStorage.getItem('userRef'),
-            moment().tz('Asia/Jakarta').format('YYYY')
+            getCurrentTime().format('YYYY')
         );
         if (response.status === 200 || response.status === 500) {
             const { status, message, list, log } = response;
@@ -341,21 +351,22 @@ const HomePage = () => {
             </div> : null
     }
     const alertMasuk = () => {
+        let catatan = ""
+        if (catatanTelat) {
+            catatan = `dengan catatan telat "${catatanTelat}"`
+        }
+
         return absenMasuk && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
             <div className='col-span-12'>
                 <Alert className='border-transparent' color="blue" variant='outline'>
-                    anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm:ss")}
+                    anda masuk jam {moment(absenMasuk).tz('Asia/Jakarta').format("HH:mm:ss")} {catatan}
                 </Alert>
             </div> : null
     }
     const alertPulang = () => {
         let catatan = ""
-        if (catatanTelat && catatanPulang) {
-            catatan = `dengan catatan telat ${catatanTelat} dan pulang cepat karena ${catatanPulang}`
-        } else if (catatanTelat) {
-            catatan = `dengan catatan telat ${catatanTelat}`
-        } else if (catatanPulang) {
-            catatan = `dengan catatan pulang ${catatanTelat}`
+        if (catatanPulang) {
+            catatan = `dengan catatan pulang "${catatanTelat}"`
         }
 
         return absenKeluar && ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") ?
@@ -368,13 +379,17 @@ const HomePage = () => {
     const keteranganComponent = () => {
         const output = [];
 
-        if (absenMasuk!=null && absenKeluar == null) {
+        if ( 
+            absenMasuk!=null && absenKeluar==null &&( 
+                (isLate && !eighthour) || (!isLate && !checkCurrentAbove15()) 
+            ) 
+        ) {
             output.push(
                 <Label key="pulang-cepat" htmlFor="keterangan" className="font-bold">
                     Pulang cepat? Kasih tahu alasannya.
                 </Label>
             );
-        } else if (absenMasuk == null && !isBefore8AM) {
+        } else if (absenMasuk == null && !isBefore8AM) { //belum absen jam <=08:30
             output.push(
                 <Label key="terlambat" htmlFor="keterangan" className="font-bold">
                     {isBefore8AM ? 'Masih belum terlambat, langsung absen sekarang' : 'Yah terlambat, kasih tahu alasannya'}
@@ -382,15 +397,20 @@ const HomePage = () => {
             );
         }
 
-        // console.log(is8hour,absenKeluar,isLate,absenMasuk)
-        if ((absenMasuk!=null && absenKeluar == null) || (absenMasuk == null && !isBefore8AM)) {
+        console.log(absenMasuk,absenKeluar, isLate, eighthour, checkCurrentAbove15())
+        if ( 
+                (absenMasuk!=null && absenKeluar==null &&( 
+                    (isLate && !eighthour) || (!isLate && !checkCurrentAbove15()) 
+                )) || 
+                ( absenMasuk == null && !isBefore8AM )
+            ) {
             output.push(
                 <Textarea
                     key="alasan"
                     name='alasan_khusus'
                     onChange={(e) => setKeterangan(e.target.value)}
                     value={keterangan}
-                    placeholder={isBefore8AM ? 'Masukkan alasan pulang cepat...' : 'Masukkan alasan telat...'}
+                    placeholder={absenMasuk!=null && isLate ? 'Masukkan alasan pulang cepat...' : 'Masukkan alasan telat...'}
                     rows={8}
                 />
             );
