@@ -115,7 +115,7 @@ const HomePage = () => {
     }
 
     const getCurrentTime = () => {
-        return moment('2024-05-11 16:11:00').tz('Asia/Jakarta')
+        return moment().tz('Asia/Jakarta')
     }
     const checkTime = () => {
         const currentTime = getCurrentTime();
