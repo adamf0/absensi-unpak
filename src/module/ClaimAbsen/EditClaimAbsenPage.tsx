@@ -259,10 +259,10 @@ const EditClaimAbsenPage = () => {
 	};
 
 	return (
-		<PageWrapper name='Claim Absen'>
+		<PageWrapper name='Claim Lupa Absen Keluar'>
 			<Subheader>
 				<SubheaderLeft>
-					<Breadcrumb currentPage='Ubah Claim Absen' />
+					<Breadcrumb currentPage='Ubah Claim Lupa Absen Keluar' />
 				</SubheaderLeft>
 			</Subheader>
 			<Container>
@@ -314,7 +314,7 @@ const EditClaimAbsenPage = () => {
 											</>
 										</Validation>
 									</div>
-									<div key={"absen_keluar"} className='col-span-12 lg:col-span-2'>
+									<div key={"absen_keluar"} className='col-span-12 lg:col-span-4'>
 										<Validation
 											isValid={formik.isValid}
 											isTouched={formik.touched.absen_keluar as boolean}

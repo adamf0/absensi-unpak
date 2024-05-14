@@ -64,7 +64,6 @@ const HomePage = () => {
             terima: 0
         }
     });
-    const dateNow = moment().tz('Asia/Jakarta').format('YYYY-MM-DD');
 
     const handler1 = new HandlerObserver();
     handler1.addObserver(new ConsoleObserver());
@@ -117,26 +116,41 @@ const HomePage = () => {
     const getCurrentTime = () => {
         return moment().tz('Asia/Jakarta')
     }
+    const dateNow = getCurrentTime().format('YYYY-MM-DD');
+    
     const checkTime = () => {
         const currentTime = getCurrentTime();
         const checkBefore8AM = currentTime.isBefore(currentTime.clone().startOf('day').add(timeAbsen, 'hours').add('1', 'minutes'));
         setIsBefore8AM(checkBefore8AM);
     }
-    const check8hour = () => {
+    const check8hour = () => { //kena
+        let lama = timeAbsen
+        if(getCurrentTime().day()==5){
+            lama = timeAbsen-1
+        } else if(getCurrentTime().day()==6){
+            lama = timeAbsen-3
+        }
         const masuk = moment(absenMasuk).tz('Asia/Jakarta')
         // console.info(getCurrentTime().format('YYYY-MM-DD HH:mm:ss'), masuk.format('YYYY-MM-DD HH:mm:ss'), masuk.clone().add(timeAbsen, 'hours').format('YYYY-MM-DD HH:mm:ss'))
 
-        const check =getCurrentTime().isAfter(moment(absenMasuk).tz('Asia/Jakarta').add(timeAbsen, 'hours'));
+        const check =getCurrentTime().isAfter(masuk.add(lama, 'hours'));
         set8hour(check);
     }
-    const checkCurrentAbove15 = () => {
-        const requireCheckout = !isLate? moment(dateNow+' 14:59:00').tz('Asia/Jakarta'):moment(absenMasuk).tz('Asia/Jakarta').startOf('day').add(timeAbsen, 'hours');
+    const checkCurrentAbove15 = () => { //kena
+        let jam_pulang = '14:59:00'
+        if(getCurrentTime().day()==5){
+            jam_pulang = '13:59:00'
+        } else if(getCurrentTime().day()==6){
+            jam_pulang = '11:59:00'
+        }
+        const requireCheckout = !isLate? moment(dateNow+' '+jam_pulang).tz('Asia/Jakarta'):moment(absenMasuk).tz('Asia/Jakarta').startOf('day').add(timeAbsen, 'hours');
         const check = getCurrentTime().isSameOrAfter(requireCheckout);
         return check;
     }
     const checkLate = () => {
         const currentTime = (absenMasuk == null ? getCurrentTime() : moment(absenMasuk)).tz('Asia/Jakarta');
-        const absenMasukTime = moment(timeAbsenString, 'HH:mm:ss').tz('Asia/Jakarta').add('1', 'minutes');
+        const absenMasukTime = moment(dateNow + ' '+ timeAbsenString, 'HH:mm:ss').tz('Asia/Jakarta').add('1', 'minutes');
+        console.log(absenMasukTime)
         const checkLate = currentTime.isAfter(absenMasukTime);
         setIsLate(checkLate);
     }
@@ -443,9 +457,6 @@ const HomePage = () => {
                 </Subheader>
                 <Container>
                     <div className='grid grid-cols-12 gap-4'>
-                        {alertTerlambatTidakBisaAbsen()}
-                        {alertMasuk()}
-                        {alertPulang()}
                         {
                             ["dosen", "pegawai", "sdm"].includes(localStorage.getItem('levelMode')??"")? 
                             <div className='col-span-12'>
@@ -549,7 +560,7 @@ const HomePage = () => {
                         {
                             ["dosen", "pegawai"].includes(localStorage.getItem('levelMode')??"") && !disableAbsen ?
                                 <>
-                                    <div className='col-span-12 2xl:col-span-4'>
+                                    <div className='col-span-12 2xl:col-span-6'>
                                         <div className='grid h-full grid-cols-12 gap-4'>
                                             <div className='col-span-12 h-full'>
                                                 <Card>
@@ -582,7 +593,28 @@ const HomePage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='col-span-12 2xl:col-span-8'>
+                                    <div className='col-span-12 2xl:col-span-6'>
+                                        <div className='grid h-full grid-cols-12 gap-4'>
+                                            <div className='col-span-12 h-full'>
+                                                <Card>
+                                                    <CardBody className="flex flex-col">
+                                                        <div className='col-span-6 flex flex-col'>
+                                                            <h4>Ketentuan Aturan</h4>
+                                                            <ol className="list-decimal mx-12">
+                                                                <li>Jam Masuk & Jam Pulang WAJIB terhubung/Koneksi JARINGAN WIFI/LAN UNIVERSITAS PAKUAN Seperti (UNPAK Access / UNPAK Guest/ Eduroam)</li>
+                                                                <li>Jam Masuk lebih dari jam 08.00 WIB harus isi keterangan keterlambatan</li>
+                                                                <li>Jam Pulang kurang dari 15.00 WIB atau kurang dari 14.00 WIB (Jumat) harus isi Keterangan Pulang cepat</li>
+                                                            </ol>
+                                                        </div>
+                                                    </CardBody>
+                                                </Card>
+                                            </div>
+                                            {alertTerlambatTidakBisaAbsen()}
+                                            {alertMasuk()}
+                                            {alertPulang()}
+                                        </div>
+                                    </div>
+                                    <div className='col-span-12 2xl:col-span-12'>
                                         <CalendarView source={listEvent}></CalendarView>
                                     </div>
                                 </> : 

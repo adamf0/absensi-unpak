@@ -141,10 +141,10 @@ const ClaimAbsenPage = () => {
 
     return (
         <>
-            <PageWrapper name='Claim Absen'>
+            <PageWrapper name='Lupa Absen Keluar'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Claim Absen' />
+                        <Breadcrumb currentPage='Lupa Absen Keluar' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>

@@ -131,10 +131,10 @@ const ApprovalClaimAbsenPage = () => {
 
     return (
         <>
-            <PageWrapper name='Claim Absen'>
+            <PageWrapper name='Claim Lupa Absen Keluar'>
                 <Subheader>
                     <SubheaderLeft>
-                        <Breadcrumb currentPage='Claim Absen' />
+                        <Breadcrumb currentPage='Claim Lupa Absen Keluar' />
                     </SubheaderLeft>
                 </Subheader>
                 <Container>

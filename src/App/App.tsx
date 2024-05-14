@@ -46,6 +46,9 @@ import ApprovalClaimAbsenPage from '@/module/ClaimAbsen/ApprovalClaimAbsenPage';
 import MasterCalendarPage from '@/module/MasterCalendar/MasterCalendarPage';
 import NewMasterCalendarPage from '@/module/MasterCalendar/NewMasterCalendarPage';
 import EditMasterCalendarPage from '@/module/MasterCalendar/EditMasterCalendarPage';
+import SPPDPage from '@/module/SPPD/SPPDPage';
+import NewSPPDPage from '@/module/SPPD/NewSPPDPage';
+import EditSPPDPage from '@/module/SPPD/EditSPPDPage';
 
 const App = () => {
 	const navigate = useNavigate();
@@ -72,9 +75,15 @@ const App = () => {
 					icon: 'HeroRectangleGroup',
 				}} />
 				<NavItem {...{
+					id: 'sppdApprovalPage',
+					to: '/approval/sppd',
+					text: 'SPPD',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
 					id: 'claimAbsenApprovalPage',
 					to: '/approval/claim_absen',
-					text: 'Claim Absen',
+					text: 'Lupa Absen Keluar',
 					icon: 'HeroRectangleGroup',
 				}} />
 				<NavItem {...{
@@ -99,9 +108,15 @@ const App = () => {
 					icon: 'HeroRectangleGroup',
 				}} />
 				<NavItem {...{
+					id: 'sppdPage',
+					to: '/sppd',
+					text: 'SPPD',
+					icon: 'HeroRectangleGroup',
+				}} />
+				<NavItem {...{
 					id: 'claimAbsenPage',
 					to: '/claim_absen',
-					text: 'Claim Absen',
+					text: 'Lupa Absen Keluar',
 					icon: 'HeroRectangleGroup',
 				}} />
 			</>
@@ -282,6 +297,10 @@ const App = () => {
 									<Route path="/master_calendar" element={<MasterCalendarPage />} />
 									<Route path="/master_calendar/tambah" element={<NewMasterCalendarPage />} />
 									<Route path="/master_calendar/edit/:id" element={<EditMasterCalendarPage />} />
+
+									<Route path="/sppd" element={<SPPDPage />} />
+									<Route path="/sppd/tambah" element={<NewSPPDPage />} />
+									<Route path="/sppd/edit/:id" element={<EditSPPDPage />} />
 
 									<Route path="/logout" element={<LogoutPage />} />
 									{/* Tambahkan route berikut sebagai route terakhir */}

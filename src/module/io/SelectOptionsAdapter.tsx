@@ -3,6 +3,7 @@ import { JenisCutiModel } from "@/module/model/JenisCutiModel";
 import { JenisIzinModel } from "@/module/model/JenisIzinModel";
 import { AbsenModel } from "../model/AbsenModel";
 import moment from "moment";
+import { JenisSPPDModel } from "../model/JenisSPPDModel";
 
 export class SelectOptionsAdapter {
     static adaptFromJenisCuti(list: JenisCutiModel[]): TSelectOption[] {
@@ -25,6 +26,19 @@ export class SelectOptionsAdapter {
             acc.push({
                 value: jenisIzin.id,
                 label: jenisIzin.nama,
+                isFixed: true,
+                isDisabled: false
+            });
+            return acc;
+        }, []);
+    }
+    static adaptFromJenisSPPD(list: JenisSPPDModel[]): TSelectOption[] {
+        if (!list || list.length === 0) return [];
+
+        return list.reduce((acc: TSelectOption[], jenisSPPD) => {
+            acc.push({
+                value: jenisSPPD.id,
+                label: jenisSPPD.nama,
                 isFixed: true,
                 isDisabled: false
             });

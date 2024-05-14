@@ -1,8 +1,8 @@
 import axiosInstance from "@/module/axiosInstance";
 
-export const UpdateJenisIzin = async (formData:any) => {
+export const CreateSPPD = async (formData:any) => {
     try {
-        const response = await axiosInstance.post('/jenis_izin/update', formData,{
+        const response = await axiosInstance.postForm('/sppd/create', formData, {
             headers: {
               "Content-Type": "application/json",
             }
