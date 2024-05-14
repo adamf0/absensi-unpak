@@ -209,11 +209,11 @@ const LoginPage = () => {
 							</Button>
 						</div>
 					</form>
-					{/* <div>
+					<div>
 						<span className='text-zinc-500'>
-							This site is protected by reCAPTCHA and the Google Privacy Policy.
+							Uji coba sudah berakhir. <b>coming soon</b>
 						</span>
-					</div> */}
+					</div>
 					{/* <div>
 						<span className='flex gap-2 text-sm'>
 							<span className='text-zinc-400 dark:text-zinc-600'>
