@@ -210,9 +210,9 @@ const LoginPage = () => {
 						</div>
 					</form>
 					<div>
-						<span className='text-zinc-500'>
+						<h4 className='text-red-500'>
 							Uji coba sudah berakhir. <b>coming soon</b>
-						</span>
+						</h4>
 					</div>
 					{/* <div>
 						<span className='flex gap-2 text-sm'>
